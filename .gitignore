@@ -1,0 +1,7 @@
+data/raw/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+results/_scratch/
+*.egg-info/

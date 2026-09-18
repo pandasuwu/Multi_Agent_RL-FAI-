@@ -1,0 +1,9 @@
+# Shared defaults. Experiment configs set `base: base.yaml` and override.
+game:
+  name: A
+  prize: 1.0          # V (Game A)
+  cost_rate: 1.0      # c
+  t_max: 8.0          # equilibrium mean quit time is V/c = 1; P(T > 8) = e^-8
+  n_bins: 64          # grid {0, delta, ..., t_max}, delta = t_max / (n_bins - 1)
+  value_rate: 1.0     # Game B: v ~ Exponential(value_rate)
+  n_types: 50         # Game B: equally likely types at quantile midpoints
