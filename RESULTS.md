@@ -60,6 +60,11 @@ All tables are in `results/tables/`: `per_arm.csv`, `pairwise.csv`, `asym_*.csv`
 `game_b_deciles.csv`. Per-run records with the full config snapshot and seed are in
 `results/<experiment>/runs/`.
 
+To watch the setup run, open the live demo, [Give-Up Game Lab](https://claude.ai/artifact/7RDFGua3hKQyYSKt8W7RKN)
+(offline copy: [`demo/index.html`](demo/index.html)). It trains the same arms on both games in the
+browser, with a smaller setup (10 value levels in Game B, no seeds or statistics). It illustrates
+the method; none of the numbers in this report come from it.
+
 ## 2. Did every piece work? (sanity checks)
 
 * **Oracle:** grid exploitability 0.00149 in Game A and 0.0058 in Game B. These are the
