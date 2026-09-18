@@ -1,0 +1,46 @@
+game:
+  name: A
+  prize: 1.0
+  cost_rate: 1.0
+  t_max: 8.0
+  n_bins: 64
+  value_rate: 1.0
+  n_types: 50
+seeds:
+  start: 0
+  count: 20
+network:
+  activation: tanh
+  unroll_steps: 6
+  init_gain: 1.0
+  dense_hidden_layers: 2
+  dense_width: matched
+  param_tolerance: 0.05
+training:
+  mode: sampled
+  steps: 4000
+  eval_every: 50
+  optimizer: adam
+  adam_betas:
+  - 0.0
+  - 0.999
+  lr_schedule: cosine
+  lr_final_fraction: 0.05
+  population_size: 8
+  matches_per_step: 128
+  baseline_rate: 0.05
+  loss_win_ratio: 1.0
+metrics:
+  threshold: 0.05
+  final_window: 0.1
+  late_fraction: 0.5
+stats:
+  n_boot: 10000
+  confidence: 0.95
+lr:
+  default: 0.05
+  tabular: 0.01
+experiment: game_a_sampled
+arms:
+- name: oracle
+- name: tabular

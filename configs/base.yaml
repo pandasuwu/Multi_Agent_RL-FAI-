@@ -1,4 +1,5 @@
 # Shared defaults. Experiment configs set `base: base.yaml` and override.
+# Every number used by the experiments is here or in an experiment config.
 game:
   name: A
   prize: 1.0          # V (Game A)
@@ -7,3 +8,37 @@ game:
   n_bins: 64          # grid {0, delta, ..., t_max}, delta = t_max / (n_bins - 1)
   value_rate: 1.0     # Game B: v ~ Exponential(value_rate)
   n_types: 50         # Game B: equally likely types at quantile midpoints
+
+seeds: {start: 0, count: 20}
+
+network:
+  activation: tanh
+  unroll_steps: 6         # PPL1 -> MBON -> X -> Y -> AVLP727m is 4 synapses; 6 leaves slack
+  init_gain: 1.0          # recurrent weight std = gain / sqrt(in-degree of the post neuron)
+  dense_hidden_layers: 2
+  dense_width: matched    # solve the width that matches the connectome arm's parameter count
+  param_tolerance: 0.05   # arms 2-5 must match within 5% or the run aborts
+
+training:
+  mode: exact             # exact | sampled
+  steps: 3000
+  eval_every: 25
+  optimizer: adam
+  adam_betas: [0.0, 0.999]   # no momentum: momentum makes gradient play orbit mixed equilibria
+  lr_schedule: cosine
+  lr_final_fraction: 0.05
+  population_size: 8      # sampled mode: independent agents, randomly re-matched every round
+  matches_per_step: 128   # sampled mode: matches per agent per round (one update per round)
+  baseline_rate: 0.05     # EMA rate of the per-agent (per-type) reward baseline
+  loss_win_ratio: 1.0     # alpha_loss / alpha_win (sampled mode only)
+
+metrics:
+  threshold: 0.01         # exploitability defining "converged" (exact mode)
+  final_window: 0.1       # final 10% of training: final metrics and stability
+  late_fraction: 0.5      # winner/loser statistics also reported for the last 50%
+
+stats:
+  n_boot: 10000
+  confidence: 0.95
+
+lr: {default: 0.05}

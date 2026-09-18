@@ -256,3 +256,44 @@ Conventions follow Bichler et al., *Nature Machine Intelligence* 3, 687–695 (2
   the configured threshold. Runs that never reach it are reported as censored.
 * **Late-training stability**: total variance of the policy across the snapshots taken in
   the final 10% of episodes.
+
+---
+
+## 5. Why sampled self-play stalls above zero (and why that is not a bug)
+
+At a fully mixed equilibrium every grid time earns the same payoff `w`. Perturb the
+policy to `π* + δ` and the opponent-payoff vector becomes `w𝟙 + Uδ`, so
+
+```
+exploitability(π* + δ) = max_t (Uδ)_t − (π* + δ)ᵀ U δ ≈ max_t (Uδ)_t − π*ᵀ U δ,
+```
+
+which is **first order** in `δ`. It is not second order as at a pure optimum. Any
+residual noise in the policy therefore shows up linearly. Sampled REINFORCE leaves
+such noise everywhere, and worst of all in the tail. The restoring force on the logit
+of time `t` is `∝ π_t · (curvature)`, while the tail has `π_t ~ 10⁻³`. So tail logits
+relax over `~10⁴` updates while every update's sampling noise keeps kicking them.
+
+We checked that the estimator is unbiased (`tests/test_training.py::
+test_sampled_gradient_is_unbiased`: mean REINFORCE gradient vs exact gradient,
+correlation > 0.99). Across batch sizes 16–2048, SGD and Adam, lr decay, shared vs
+population, the floor stayed at 0.02–0.05. It is a property of the estimator on this
+game. Two consequences for the protocol:
+
+* Sampled mode uses its own convergence threshold of `0.05` (`configs/game_a_sampled.yaml`),
+  and exact mode uses `0.01`.
+* The predicted asymmetric-update floors, 0.07–0.13 (section 3), lie well above the
+  symmetric noise floor, so that experiment is decisive despite it.
+
+Two further protocol choices came from the same pilot runs. They are recorded here
+because they change results:
+
+* **No momentum.** Adam with `β₁ = 0.9` makes exact gradient play overshoot and orbit the
+  mixed equilibrium: exploitability went 0.01 → 0.47 in a tabular pilot. `β₁ = 0` with a
+  cosine learning-rate decay converges. Every arm uses the same optimizer.
+* **Population structure.** With independent learners, deviations in which agents
+  differ from each other (`Σ_m δ_m = 0`) grow at rate `∝ 1/(M−1)`. This is because
+  `−U` is positive definite on the tangent space: the multi-population instability
+  behind Selten's theorem. Agents therefore partly specialise; in the tabular runs the
+  SD of per-agent mean quitting time is about 0.4. We report both the mean individual
+  utility loss (primary) and the population-mixture exploitability.

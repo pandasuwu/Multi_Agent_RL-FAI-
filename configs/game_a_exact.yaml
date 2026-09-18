@@ -1,0 +1,11 @@
+base: base.yaml
+experiment: game_a_exact
+arms:
+  - {name: oracle}
+  - {name: tabular}
+training:
+  mode: exact
+  steps: 3000
+  eval_every: 25
+lr:
+  tabular: 0.1
