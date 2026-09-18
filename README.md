@@ -9,7 +9,7 @@ networks of matched size? The circuit is PPL1 → V2 MBONs (MBON18/19) → Tk-GA
 **Answer:** connectome wiring made no difference to how well the agents converged.
 The details, including small speed effects of inconsistent sign, are in
 [`RESULTS.md`](RESULTS.md).
-**Live demo:** open [`demo/index.html`](demo/index.html) in any browser. Players learn the game in real time, with brains wired like the fly circuit (all 4,952 real connections) or its controls. Rebuild it with `python scripts/build_demo.py`.
+**Live demo:** [Give-Up Game Lab](https://claude.ai/artifact/7RDFGua3hKQyYSKt8W7RKN), or open [`demo/index.html`](demo/index.html) in any browser. Players learn both games in real time, with brains wired like the fly circuit (all 4,952 real connections) or its controls. Rebuild it with `python scripts/build_demo.py`.
 **Theory:** [`docs/theory.md`](docs/theory.md).
 **Circuit extraction:** [`docs/circuit.md`](docs/circuit.md).
 
