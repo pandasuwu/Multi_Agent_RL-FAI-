@@ -9,10 +9,13 @@ from src.agents.policies import TabularPolicy
 from src.config import load_config
 from src.games import GameA, TimeGrid
 from src.training.trainer import ExactObjective, SampledSelfPlay, train_run
+from src.training.tuning import resolve_lr_table
 
 
 def _cfg(path: str) -> dict:
-    return load_config(path)
+    cfg = load_config(path)
+    cfg["lr"] = resolve_lr_table(cfg)
+    return cfg
 
 
 def test_tabular_converges_on_game_a_exact():
