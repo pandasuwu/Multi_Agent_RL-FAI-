@@ -52,7 +52,7 @@ tuning:
       network: [0.001, 0.003, 0.01, 0.03, 0.1]
     sampled:
       tabular: [0.003, 0.01, 0.03]
-      network: [0.0003, 0.001, 0.003, 0.01]
+      network: [0.0003, 0.001, 0.003, 0.01, 0.03]
 
 connectome:
   dataset: male-cns:v1.0

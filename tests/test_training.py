@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 import torch
 
 from src.agents.policies import TabularPolicy
@@ -62,3 +63,30 @@ def test_sampled_gradient_is_unbiased():
     est = acc / 10
     assert float((est - exact).norm() / exact.norm()) < 0.1
     assert np.corrcoef(est.numpy(), exact.numpy())[0, 1] > 0.99
+
+
+def test_winner_loser_regression_recovers_planted_effect():
+    """Feed the tracker agents whose mean quit time moves -0.02 per lost and +0.02 per won match."""
+    from src.training.trainer import WinnerLoserTracker
+
+    rng = np.random.default_rng(0)
+    times = np.linspace(0, 8, 64)
+    rounds, m = 16, 8
+    tracker = WinnerLoserTracker(times, total_steps=400, late_fraction=0.5, rounds=rounds)
+    mu = np.full(m, 3.0)
+    for step in range(1, 401):
+        # policy concentrated at mu (two neighbouring bins, exact mean)
+        probs = np.zeros((m, 1, 64))
+        x = np.clip(mu / times[1], 0, 62)
+        lo = np.floor(x).astype(int)
+        probs[np.arange(m), 0, lo] = 1 - (x - lo)
+        probs[np.arange(m), 0, lo + 1] += x - lo
+        won = rng.random((m, rounds)) < 0.5
+        choice = np.clip(np.round(mu / times[1]).astype(int)[:, None].repeat(rounds, 1), 0, 63)
+        tracker.update(step, {"probs": torch.as_tensor(probs), "won": torch.as_tensor(won), "choice": torch.as_tensor(choice)})
+        lost = rounds - won.sum(axis=1)
+        mu = mu - 0.02 * lost + 0.02 * (rounds - lost)
+        assert np.all((mu > 0.5) & (mu < 7.0))  # no clipping, so the planted effect is exact
+    out = tracker.result()
+    # one loss vs one win differs by -0.02 - (+0.02) = -0.04 in the next-round mean
+    assert out["dmu_per_loss_all"] == pytest.approx(-0.04, rel=0.02)

@@ -134,7 +134,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         "experiment": cfg["experiment"],
         "arm": arm_label(arm),
         "seed": seed,
-        "overrides": job["overrides"],
+        "overrides": {k.split(".")[-1]: v for k, v in job["overrides"].items()},
         "config_hash": config_hash(cfg),
         "config": cfg,
     }
