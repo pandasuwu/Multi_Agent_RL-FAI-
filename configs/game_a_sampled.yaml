@@ -3,6 +3,7 @@ experiment: game_a_sampled
 arms:
   - {name: oracle}
   - {name: tabular}
+  - {name: dense}
 training:
   mode: sampled
   steps: 4000
@@ -11,5 +12,4 @@ metrics:
   # sampled REINFORCE has a noise floor near 0.03 on this game (docs/theory.md, sec. 5);
   # the exact-mode threshold of 0.01 is not reachable, so speed uses 0.05
   threshold: 0.05
-lr:
-  tabular: 0.01
+lr_from: {file: tuned_lr.yaml, experiment: game_a_sampled}

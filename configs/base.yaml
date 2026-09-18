@@ -16,7 +16,7 @@ network:
   unroll_steps: 6         # PPL1 -> MBON -> X -> Y -> AVLP727m is 4 synapses; 6 leaves slack
   init_gain: 1.0          # recurrent weight std = gain / sqrt(in-degree of the post neuron)
   dense_hidden_layers: 2
-  dense_width: matched    # solve the width that matches the connectome arm's parameter count
+  dense_width: 47         # INTERIM (milestone 3); milestone 4 switches to "matched"
   param_tolerance: 0.05   # arms 2-5 must match within 5% or the run aborts
 
 training:
@@ -42,3 +42,13 @@ stats:
   confidence: 0.95
 
 lr: {default: 0.05}
+
+tuning:
+  seeds: {start: 1000, count: 3}   # disjoint from evaluation seeds
+  lr_grid:
+    exact:
+      tabular: [0.03, 0.1, 0.3]
+      network: [0.001, 0.003, 0.01]
+    sampled:
+      tabular: [0.003, 0.01, 0.03]
+      network: [0.0003, 0.001, 0.003]

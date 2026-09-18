@@ -16,13 +16,16 @@ from ..metrics import exploitability as mx
 def context_tensors(game: Game, n_agents: int) -> tuple[torch.Tensor, torch.Tensor]:
     """Features and type indices for *all* contexts, for every agent.
 
-    Game A has one context whose feature is ``V / c``; Game B has one context per
-    type whose feature is the value ``v_k``.
+    Game A has one context whose feature is ``V / c``. Game B has one context per
+    type whose feature is the *standardised* value ``(v - E v) / sd(v) = rate * v - 1``
+    for ``v ~ Exp(rate)``. Standard input scaling for every network arm: with raw
+    values up to 4.6 the tanh units saturate and every network stalls (a dense pilot
+    stalled at utility loss 0.06 raw vs 0.003 standardised).
     """
     if isinstance(game, GameA):
         feats = torch.tensor([[game.prize / game.cost_rate]], dtype=torch.float32)
     else:
-        feats = torch.as_tensor(game.values, dtype=torch.float32).unsqueeze(1)
+        feats = torch.as_tensor(game.value_rate * game.values - 1.0, dtype=torch.float32).unsqueeze(1)
     k = feats.shape[0]
     features = feats.unsqueeze(0).expand(n_agents, k, feats.shape[1]).contiguous()
     types = torch.arange(k).unsqueeze(0).expand(n_agents, k).contiguous()

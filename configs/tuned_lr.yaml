@@ -1,0 +1,13 @@
+# Written by scripts/tune_lr.py; do not edit by hand.
+game_a_exact:
+  dense: 0.003
+  tabular: 0.1
+game_a_sampled:
+  dense: 0.0003
+  tabular: 0.01
+game_b_exact:
+  dense: 0.01
+  tabular: 0.1
+game_b_sampled:
+  dense: 0.003
+  tabular: 0.03

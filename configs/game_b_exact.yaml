@@ -1,0 +1,14 @@
+base: base.yaml
+experiment: game_b_exact
+game:
+  name: B
+  t_max: 12.0      # largest type v = ln(100) = 4.61 bids v^2/2 = 10.6 < 12
+arms:
+  - {name: oracle}
+  - {name: tabular}
+  - {name: dense}
+training:
+  mode: exact
+  steps: 4000
+  eval_every: 50
+lr_from: {file: tuned_lr.yaml, experiment: game_b_exact}

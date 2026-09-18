@@ -8,13 +8,13 @@ game:
   n_types: 50
 seeds:
   start: 0
-  count: 20
+  count: 10
 network:
   activation: tanh
   unroll_steps: 6
   init_gain: 1.0
   dense_hidden_layers: 2
-  dense_width: matched
+  dense_width: 47
   param_tolerance: 0.05
 training:
   mode: sampled
@@ -38,9 +38,36 @@ stats:
   n_boot: 10000
   confidence: 0.95
 lr:
-  default: 0.05
+  dense: 0.0003
   tabular: 0.01
+tuning:
+  seeds:
+    start: 1000
+    count: 3
+  lr_grid:
+    exact:
+      tabular:
+      - 0.03
+      - 0.1
+      - 0.3
+      network:
+      - 0.001
+      - 0.003
+      - 0.01
+    sampled:
+      tabular:
+      - 0.003
+      - 0.01
+      - 0.03
+      network:
+      - 0.0003
+      - 0.001
+      - 0.003
 experiment: game_a_sampled
 arms:
 - name: oracle
 - name: tabular
+- name: dense
+lr_from:
+  file: tuned_lr.yaml
+  experiment: game_a_sampled

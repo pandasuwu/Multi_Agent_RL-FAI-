@@ -1,0 +1,16 @@
+base: base.yaml
+experiment: game_b_sampled
+game:
+  name: B
+  t_max: 12.0
+arms:
+  - {name: oracle}
+  - {name: tabular}
+  - {name: dense}
+training:
+  mode: sampled
+  steps: 4000
+  eval_every: 50
+metrics:
+  threshold: 0.05
+lr_from: {file: tuned_lr.yaml, experiment: game_b_sampled}

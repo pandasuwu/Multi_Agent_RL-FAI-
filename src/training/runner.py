@@ -207,6 +207,10 @@ def collect(out_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
 def run_experiment(
     cfg: dict[str, Any], workers: int, resume: bool = True, out_root: Path | None = None
 ) -> Path:
+    from .tuning import resolve_lr_table
+
+    cfg = copy.deepcopy(cfg)
+    cfg["lr"] = resolve_lr_table(cfg)  # the snapshot records the rates actually used
     out_dir = (out_root or REPO_ROOT / "results") / cfg["experiment"]
     out_dir.mkdir(parents=True, exist_ok=True)
     with open(out_dir / "config.yaml", "w", encoding="utf-8") as fh:

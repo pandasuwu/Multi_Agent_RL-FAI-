@@ -66,7 +66,7 @@ def fig_tabular_convergence() -> None:
         arms = [a for a in ("oracle", "tabular") if a in set(curves["arm"])]
         plot_curves(ax, curves[curves["arm"].isin(arms)], "exploitability", rng, N_BOOT, arms)
         thr = cfg["metrics"]["threshold"]
-        ax.axhline(thr, color=INK_2, lw=1, ls="-.", label=f"threshold {thr:g}")
+        ax.axhline(thr, color=INK_2, lw=1, ls="-.", label="convergence threshold")
         n = summary[summary.arm == "tabular"].shape[0]
         ax.set(title=f"{title} (tabular, {n} seeds)", xlabel="episode (update)", ylabel="exploitability")
         ax.legend(loc="upper right")
@@ -89,7 +89,32 @@ def fig_tabular_convergence() -> None:
     save(fig, str(FIG / "fig1_tabular_convergence_game_a"))
 
 
-FIGURES = [fig_tabular_convergence]
+def fig_convergence_all_arms() -> None:
+    """Exploitability vs episodes, every arm, both games x both modes."""
+    panels = [
+        ("game_a_exact", "Game A, exact gradient"),
+        ("game_a_sampled", "Game A, sampled (population of 8)"),
+        ("game_b_exact", "Game B, exact gradient"),
+        ("game_b_sampled", "Game B, sampled (population of 8)"),
+    ]
+    loaded = [(load(e), t) for e, t in panels]
+    if any(x is None for x, _ in loaded):
+        return
+    rng = np.random.default_rng(1)
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8.2))
+    for ax, ((summary, curves, cfg), title) in zip(axes.flat, loaded):
+        plot_curves(ax, curves, "exploitability", rng, N_BOOT)
+        thr = cfg["metrics"]["threshold"]
+        ax.axhline(thr, color=INK_2, lw=1, ls="-.", label="convergence threshold")
+        n = int(summary.groupby("arm").size().max())
+        ax.set(title=f"{title}, {n} seeds", xlabel="episode (update)", ylabel="utility loss (exploitability)")
+    handles, labels = axes.flat[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=min(5, len(labels)), bbox_to_anchor=(0.5, -0.02))
+    fig.tight_layout(rect=(0, 0.06, 1, 1))
+    save(fig, str(FIG / "fig2_convergence_all_arms"))
+
+
+FIGURES = [fig_tabular_convergence, fig_convergence_all_arms]
 
 
 def main() -> None:
