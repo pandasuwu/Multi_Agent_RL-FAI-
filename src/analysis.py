@@ -192,7 +192,15 @@ def run_all(n_boot: int, seed: int = 20260918) -> dict[str, pd.DataFrame]:
     rng = np.random.default_rng(seed)
     out: dict[str, pd.DataFrame] = {}
     per_arm, pairs = [], []
-    for exp in ("game_a_exact", "game_a_sampled", "game_b_exact", "game_b_sampled"):
+    for exp in (
+        "game_a_exact",
+        "game_a_sampled",
+        "game_b_exact",
+        "game_b_sampled",
+        "robust_game_a_sampled_shared_lr",
+        "robust_game_b_exact_shared_lr",
+        "robust_game_b_sampled_shared_lr",
+    ):
         if not (RESULTS / exp / "summary.csv").exists():
             continue
         df, cfg = load_summary(exp)

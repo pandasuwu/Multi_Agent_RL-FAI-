@@ -15,6 +15,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import matplotlib.pyplot as plt  # noqa: E402
+from matplotlib.ticker import FuncFormatter, NullFormatter  # noqa: E402
 
 from src.config import load_config  # noqa: E402
 from src.games import GameA, TimeGrid, exponential_survival  # noqa: E402
@@ -148,6 +149,8 @@ def _dot_panel(ax: plt.Axes, t: pd.DataFrame, metric: str, arms: list[str], log:
     ax.grid(axis="y", visible=False)
     if log:
         ax.set_xscale("log")
+        ax.xaxis.set_minor_formatter(NullFormatter())
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{x:g}"))
 
 
 def fig_main_comparison() -> None:

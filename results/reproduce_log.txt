@@ -1,0 +1,90 @@
++ scripts/build_connectome.py --download
+{
+  "core_neurons": 27,
+  "connecting_neurons": 54,
+  "exact_circuit_neurons": 81,
+  "expansion_neurons": 177,
+  "nodes": 258,
+  "edges": 4952,
+  "self_loops_dropped": 1,
+  "synapses_in_edges": 220286,
+  "input_nodes": 16,
+  "output_nodes": 5,
+  "signed_excitatory_nodes": 137,
+  "signed_inhibitory_nodes": 95,
+  "unsigned_nodes": 26
+}
+subgraph sha256: 48ef287df3584ff57b702a416274a68d55d28ea4bed10c5513bada67764902ed
++ scripts/tune_lr.py configs/game_a_exact.yaml configs/game_b_exact.yaml configs/game_a_sampled.yaml configs/game_b_sampled.yaml --workers 12
+[game_a_exact__lr=0.001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_exact__lr=0.001] 14 runs to do on 12 workers
+[game_a_exact__lr=0.003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_exact__lr=0.003] 14 runs to do on 12 workers
+[game_a_exact__lr=0.01] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_exact__lr=0.01] 14 runs to do on 12 workers
+[game_a_exact__lr=0.03] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_exact__lr=0.03] 16 runs to do on 12 workers
+[game_a_exact__lr=0.1] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_exact__lr=0.1] 16 runs to do on 12 workers
+[game_a_exact__lr=0.3] 2 runs to do on 12 workers
+[game_a_exact] chosen learning rates: {'tabular': 0.1, 'dense': 0.003, 'connectome': 0.03, 'connectome+sign': 0.03, 'rewired': 0.03, 'rewired+sign': 0.03, 'random_sparse': 0.03, 'random_sparse+sign': 0.03}
+[game_b_exact__lr=0.001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_exact__lr=0.001] 14 runs to do on 12 workers
+[game_b_exact__lr=0.003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_exact__lr=0.003] 14 runs to do on 12 workers
+[game_b_exact__lr=0.01] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_exact__lr=0.01] 14 runs to do on 12 workers
+[game_b_exact__lr=0.03] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_exact__lr=0.03] 16 runs to do on 12 workers
+[game_b_exact__lr=0.1] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_exact__lr=0.1] 16 runs to do on 12 workers
+[game_b_exact__lr=0.3] 2 runs to do on 12 workers
+[game_b_exact] chosen learning rates: {'tabular': 0.1, 'dense': 0.01, 'connectome': 0.01, 'connectome+sign': 0.03, 'rewired': 0.01, 'rewired+sign': 0.03, 'random_sparse': 0.03, 'random_sparse+sign': 0.03}
+[game_a_sampled__lr=0.0003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_sampled__lr=0.0003] 14 runs to do on 12 workers
+[game_a_sampled__lr=0.001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_sampled__lr=0.001] 14 runs to do on 12 workers
+[game_a_sampled__lr=0.003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_sampled__lr=0.003] 16 runs to do on 12 workers
+[game_a_sampled__lr=0.01] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_sampled__lr=0.01] 16 runs to do on 12 workers
+[game_a_sampled__lr=0.03] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_sampled__lr=0.03] 16 runs to do on 12 workers
+[game_a_sampled] chosen learning rates: {'tabular': 0.03, 'dense': 0.0003, 'connectome': 0.003, 'connectome+sign': 0.003, 'rewired': 0.03, 'rewired+sign': 0.003, 'random_sparse': 0.003, 'random_sparse+sign': 0.003}
+[game_b_sampled__lr=0.0003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_sampled__lr=0.0003] 14 runs to do on 12 workers
+[game_b_sampled__lr=0.001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_sampled__lr=0.001] 14 runs to do on 12 workers
+[game_b_sampled__lr=0.003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_sampled__lr=0.003] 16 runs to do on 12 workers
+[game_b_sampled__lr=0.01] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_sampled__lr=0.01] 16 runs to do on 12 workers
+[game_b_sampled__lr=0.03] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_sampled__lr=0.03] 16 runs to do on 12 workers
+[game_b_sampled] chosen learning rates: {'tabular': 0.03, 'dense': 0.003, 'connectome': 0.01, 'connectome+sign': 0.01, 'rewired': 0.003, 'rewired+sign': 0.01, 'random_sparse': 0.01, 'random_sparse+sign': 0.01}
++ scripts/run_experiment.py configs/game_a_exact.yaml configs/game_b_exact.yaml configs/game_a_sampled.yaml configs/game_b_sampled.yaml --workers 12
+[game_a_exact] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_exact] 180 runs to do on 12 workers
+[game_b_exact] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_exact] 180 runs to do on 12 workers
+[game_a_sampled] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_a_sampled] 330 runs to do on 12 workers
+[game_b_sampled] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610}
+[game_b_sampled] 90 runs to do on 12 workers
++ scripts/analyze.py
+per_arm: 36 rows
+pairwise: 288 rows
+asym_per_arm: 32 rows
+asym_effects: 96 rows
+asym_pairwise: 144 rows
+game_b_deciles: 180 rows
++ scripts/make_figures.py
+done fig_tabular_convergence
+done fig_convergence_all_arms
+done fig_main_comparison
+done fig_asymmetric_sweep
+done fig_survival_by_arm
+done fig_game_b_bids
+reproduce finished in 59.7 min
+[robust_game_b_sampled_shared_lr] 60/60 runs, 1041s elapsed
+robust_game_a_sampled + robust_game_b_exact: 6m18s (run separately after the first pass; now part of scripts/reproduce.py)

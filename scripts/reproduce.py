@@ -27,6 +27,12 @@ EXPERIMENTS = [
     "configs/game_a_sampled.yaml",
     "configs/game_b_sampled.yaml",
 ]
+# robustness: every circuit arm at one shared (modal tuned) learning rate; not tuned separately
+ROBUSTNESS = [
+    "configs/robust_game_a_sampled_shared_lr.yaml",
+    "configs/robust_game_b_exact_shared_lr.yaml",
+    "configs/robust_game_b_sampled_shared_lr.yaml",
+]
 
 
 def run(args: list[str]) -> None:
@@ -58,9 +64,9 @@ def main() -> None:
         shutil.rmtree(ROOT / "results/_scratch/tuning", ignore_errors=True)
         run(["scripts/tune_lr.py", *EXPERIMENTS, *w])
     if not args.keep_results:
-        for exp in EXPERIMENTS:
+        for exp in EXPERIMENTS + ROBUSTNESS:
             shutil.rmtree(ROOT / "results" / Path(exp).stem, ignore_errors=True)
-    run(["scripts/run_experiment.py", *EXPERIMENTS, *w])
+    run(["scripts/run_experiment.py", *EXPERIMENTS, *ROBUSTNESS, *w])
     run(["scripts/analyze.py"])
     run(["scripts/make_figures.py"])
     print(f"reproduce finished in {(time.perf_counter() - started) / 60:.1f} min")

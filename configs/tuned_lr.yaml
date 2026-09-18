@@ -9,8 +9,14 @@ game_a_exact:
   rewired+sign: 0.03
   tabular: 0.1
 game_a_sampled:
+  connectome: 0.003
+  connectome+sign: 0.003
   dense: 0.0003
-  tabular: 0.01
+  random_sparse: 0.003
+  random_sparse+sign: 0.003
+  rewired: 0.03
+  rewired+sign: 0.003
+  tabular: 0.03
 game_b_exact:
   connectome: 0.01
   connectome+sign: 0.03
@@ -21,5 +27,11 @@ game_b_exact:
   rewired+sign: 0.03
   tabular: 0.1
 game_b_sampled:
+  connectome: 0.01
+  connectome+sign: 0.01
   dense: 0.003
+  random_sparse: 0.01
+  random_sparse+sign: 0.01
+  rewired: 0.003
+  rewired+sign: 0.01
   tabular: 0.03

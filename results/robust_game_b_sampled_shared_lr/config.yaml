@@ -1,0 +1,136 @@
+game:
+  name: B
+  prize: 1.0
+  cost_rate: 1.0
+  t_max: 12.0
+  n_bins: 64
+  value_rate: 1.0
+  n_types: 50
+seeds:
+  start: 0
+  count: 10
+network:
+  activation: tanh
+  unroll_steps: 6
+  init_gain: 1.0
+  dense_hidden_layers: 2
+  dense_width: matched
+  param_tolerance: 0.05
+  sparse_max_batch: 8
+training:
+  mode: sampled
+  steps: 3000
+  eval_every: 50
+  optimizer: adam
+  adam_betas:
+  - 0.0
+  - 0.999
+  lr_schedule: cosine
+  lr_final_fraction: 0.05
+  population_size: 8
+  matches_per_step: 128
+  baseline_rate: 0.05
+  loss_win_ratio: 1.0
+metrics:
+  threshold: 0.05
+  final_window: 0.1
+  late_fraction: 0.5
+stats:
+  n_boot: 10000
+  confidence: 0.95
+lr:
+  connectome: 0.01
+  connectome+sign: 0.01
+  dense: 0.003
+  random_sparse: 0.01
+  random_sparse+sign: 0.01
+  rewired: 0.01
+  rewired+sign: 0.01
+  tabular: 0.03
+tuning:
+  seeds:
+    start: 1000
+    count: 2
+  lr_grid:
+    exact:
+      tabular:
+      - 0.03
+      - 0.1
+      - 0.3
+      network:
+      - 0.001
+      - 0.003
+      - 0.01
+      - 0.03
+      - 0.1
+    sampled:
+      tabular:
+      - 0.003
+      - 0.01
+      - 0.03
+      network:
+      - 0.0003
+      - 0.001
+      - 0.003
+      - 0.01
+      - 0.03
+connectome:
+  dataset: male-cns:v1.0
+  base_url: https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome
+  raw_dir: data/raw
+  files:
+    annotations:
+      name: body-annotations-male-cns-v1.0-minconf-0.5.feather
+      bytes: 14483314
+    neurotransmitters:
+      name: body-neurotransmitters-male-cns-v1.0.feather
+      bytes: 43282834
+    weights:
+      name: connectome-weights-male-cns-v1.0-minconf-0.5-traced-only.feather
+      bytes: 508025642
+  cache: data/connectome/give_up_circuit.npz
+  provenance: data/connectome/give_up_circuit.provenance.json
+  min_synapses: 5
+  core:
+    ppl1:
+      type_regex: ^PPL1[0-9]+$
+    mbon:
+      types:
+      - MBON18
+      - MBON19
+    tk:
+      types:
+      - AVLP727m
+  path:
+    source: mbon
+    target: tk
+    max_synapses: 3
+  expansion:
+    min_exchanged_synapses: 400
+    target_range:
+    - 100
+    - 500
+  roles:
+    input: ppl1
+    output: tk
+  sign_map:
+    acetylcholine: 1
+    gaba: -1
+    glutamate: -1
+    histamine: -1
+  rewire_swaps_per_edge: 10
+experiment: robust_game_b_sampled_shared_lr
+arms:
+- name: connectome
+- name: connectome
+  sign_constrained: true
+- name: rewired
+- name: rewired
+  sign_constrained: true
+- name: random_sparse
+- name: random_sparse
+  sign_constrained: true
+lr_from:
+  file: tuned_lr.yaml
+  experiment: game_b_sampled
+  share_circuit_lr: true

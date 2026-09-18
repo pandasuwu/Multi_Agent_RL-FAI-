@@ -17,6 +17,7 @@ from __future__ import annotations
 import copy
 from typing import Any
 
+import numpy as np
 import pandas as pd
 import yaml
 
@@ -98,4 +99,15 @@ def resolve_lr_table(cfg: dict[str, Any]) -> dict[str, Any]:
     key = source["experiment"]
     if key not in table:
         raise KeyError(f"{path} has no tuned learning rates for {key!r}; run scripts/tune_lr.py first")
-    return table[key]
+    lrs = dict(table[key])
+    if source.get("share_circuit_lr"):
+        # Robustness protocol: arms 3-5 have one architecture and differ only in the
+        # mask, so give them all one step size, the most common tuned choice (ties to
+        # the smaller rate). Removes tuning noise from the wiring contrasts.
+        circuit = [v for k, v in lrs.items() if k.split("+")[0] in ("connectome", "rewired", "random_sparse")]
+        values, counts = np.unique(circuit, return_counts=True)
+        shared = float(values[np.argmax(counts)])
+        for k in lrs:
+            if k.split("+")[0] in ("connectome", "rewired", "random_sparse"):
+                lrs[k] = shared
+    return lrs

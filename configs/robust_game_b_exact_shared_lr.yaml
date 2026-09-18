@@ -1,0 +1,11 @@
+# Robustness check: all circuit arms share one learning rate (the modal tuned value).
+base: game_b_exact.yaml
+experiment: robust_game_b_exact_shared_lr
+arms:
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+lr_from: {file: tuned_lr.yaml, experiment: game_b_exact, share_circuit_lr: true}
