@@ -1,0 +1,561 @@
+<title>Give-Up Game Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #f3f4ef;
+    --panel: #fbfbf8;
+    --ink: #1c211e;
+    --ink-2: #57605a;
+    --ink-3: #8a938c;
+    --rule: #dde0d8;
+    --grid: #e6e8e1;
+    --accent: #b8660f;       /* dopamine amber: the learning population */
+    --accent-soft: rgba(184, 102, 15, 0.14);
+    --ideal: #1c211e;
+    --predict: #2a6fc4;
+    --win: #1d8a5b;
+    --lose: #b8452f;
+    --idle-node: #c9cdc4;
+    --focus: #2a6fc4;
+    --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --cond: "IBM Plex Sans Condensed", "Arial Narrow", "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #111412; --panel: #181c19; --ink: #e5e9e4; --ink-2: #a9b2ab; --ink-3: #737d76;
+      --rule: #2a302b; --grid: #232824; --accent: #e3963d; --accent-soft: rgba(227, 150, 61, 0.16);
+      --ideal: #e5e9e4; --predict: #5b9be8; --win: #3cb07c; --lose: #e0715a; --idle-node: #39413b; --focus: #5b9be8;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #111412; --panel: #181c19; --ink: #e5e9e4; --ink-2: #a9b2ab; --ink-3: #737d76;
+    --rule: #2a302b; --grid: #232824; --accent: #e3963d; --accent-soft: rgba(227, 150, 61, 0.16);
+    --ideal: #e5e9e4; --predict: #5b9be8; --win: #3cb07c; --lose: #e0715a; --idle-node: #39413b; --focus: #5b9be8;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 22px 40px; display: grid; gap: 18px; }
+  header { display: grid; gap: 6px; }
+  h1 { font-family: var(--cond); font-weight: 600; font-size: clamp(24px, 3.4vw, 32px); letter-spacing: 0.005em; margin: 0; text-wrap: balance; }
+  .lede { color: var(--ink-2); max-width: 70ch; margin: 0; }
+  h2 { font-family: var(--cond); font-weight: 600; font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); margin: 0; }
+  .controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; padding: 14px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; }
+  .ctl { display: grid; gap: 6px; }
+  .ctl > span { font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+  .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
+  .seg button { font: inherit; font-size: 13px; border: 0; background: transparent; color: var(--ink-2); padding: 6px 11px; cursor: pointer; border-right: 1px solid var(--rule); }
+  .seg button:last-child { border-right: 0; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+  .seg button:hover:not([aria-pressed="true"]) { background: var(--accent-soft); color: var(--ink); }
+  .actions { display: flex; gap: 8px; margin-left: auto; }
+  .btn { font: inherit; font-size: 13px; font-weight: 600; border-radius: 8px; padding: 7px 14px; cursor: pointer; border: 1px solid var(--ink); background: var(--ink); color: var(--panel); }
+  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  input[type=range] { accent-color: var(--accent); width: 130px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+  .panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+  .stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+  .stat { display: grid; gap: 2px; }
+  .stat .k { font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+  .stat .v { font-family: var(--mono); font-size: 20px; font-variant-numeric: tabular-nums; }
+  .stat .s { font-size: 12px; color: var(--ink-2); }
+  canvas { width: 100%; display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); }
+  .legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 6px; }
+  .note { font-size: 12.5px; color: var(--ink-2); margin: 0; max-width: 72ch; }
+  .bout { display: grid; gap: 8px; }
+  .lane { display: grid; grid-template-columns: 86px 1fr 76px; align-items: center; gap: 10px; font-size: 13px; }
+  .lane .name { font-weight: 600; }
+  .track { position: relative; height: 18px; background: var(--grid); border-radius: 4px; overflow: hidden; }
+  .bar { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--accent); border-radius: 4px; }
+  .lane .res { font-family: var(--mono); font-size: 12.5px; text-align: right; }
+  .verdict { font-size: 13px; color: var(--ink-2); min-height: 1.5em; }
+  .verdict b { color: var(--ink); }
+  .circuit-head { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; justify-content: space-between; }
+  .steps { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); }
+  .full { grid-column: 1 / -1; }
+  footer { font-size: 12px; color: var(--ink-3); max-width: 90ch; }
+  footer a { color: var(--ink-2); }
+  @media (max-width: 860px) {
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid { grid-template-columns: minmax(0, 1fr); }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .actions { margin-left: 0; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Give-Up Game Lab</h1>
+    <p class="lede">Learning players compete in a waiting contest. Both pay 1 per second, and whoever quits first loses a prize worth 1. The unbeatable strategy is to quit at a random time with a steady chance per second (an exponential law, mean 1). Watch a population of players learn it by trial and error, each with a brain that can be wired like the real fruit-fly give-up circuit.</p>
+  </header>
+
+  <section class="controls" aria-label="Simulation controls">
+    <div class="ctl"><span>Brain</span>
+      <div class="seg" id="brain" role="group" aria-label="Brain type">
+        <button data-v="fly" aria-pressed="true">Fly circuit</button>
+        <button data-v="shuffled" aria-pressed="false">Shuffled fly</button>
+        <button data-v="random" aria-pressed="false">Random sparse</button>
+        <button data-v="dense" aria-pressed="false">Ordinary net</button>
+        <button data-v="table" aria-pressed="false">Look-up table</button>
+      </div>
+    </div>
+    <div class="ctl"><span>Losses count</span>
+      <div class="seg" id="rho" role="group" aria-label="How much more players learn from a loss than a win">
+        <button data-v="1" aria-pressed="true">1&times;</button>
+        <button data-v="2" aria-pressed="false">2&times;</button>
+        <button data-v="4" aria-pressed="false">4&times;</button>
+        <button data-v="8" aria-pressed="false">8&times;</button>
+      </div>
+    </div>
+    <div class="ctl"><span>Players</span>
+      <div class="seg" id="players" role="group" aria-label="Number of players">
+        <button data-v="2" aria-pressed="false">2, fixed pair</button>
+        <button data-v="8" aria-pressed="true">8, shuffled</button>
+        <button data-v="16" aria-pressed="false">16, shuffled</button>
+      </div>
+    </div>
+    <div class="ctl"><span>Speed</span>
+      <input id="speed" type="range" min="1" max="30" value="8" aria-label="Rounds per frame">
+    </div>
+    <div class="actions">
+      <button class="btn" id="play">Pause</button>
+      <button class="btn ghost" id="reset">Reset</button>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section class="panel full" aria-label="Current state">
+      <div class="stats">
+        <div class="stat"><span class="k">Practice rounds</span><span class="v" id="sRound">0</span><span class="s" id="sMatches">0 fights</span></div>
+        <div class="stat"><span class="k">Learning speed</span><span class="v" id="sLr">100%</span><span class="s">cools to 5% by round 3,000</span></div>
+        <div class="stat"><span class="k">Exploitability</span><span class="v" id="sExpl">&ndash;</span><span class="s">0 = unbeatable</span></div>
+        <div class="stat"><span class="k">Mean quit time</span><span class="v" id="sMean">&ndash;</span><span class="s">ideal: 1.00</span></div>
+        <div class="stat"><span class="k">Players differ by</span><span class="v" id="sSpread">&ndash;</span><span class="s">spread of their mean quit times</span></div>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="Exploitability over time">
+      <h2>How beatable are the players?</h2>
+      <canvas id="cExpl" height="250" role="img" aria-label="Exploitability against practice rounds, log scale"></canvas>
+      <div class="legend">
+        <span><i style="border-color:var(--accent)"></i>average player</span>
+        <span><i style="border-color:var(--ink-3);border-top-style:dashed"></i>whole population, as one mixed strategy</span>
+        <span><i style="border-color:var(--predict);border-top-style:dotted"></i>where theory says learning settles</span>
+      </div>
+      <p class="note">Exploitability is how much a perfect opponent could win from you, computed exactly over all 64 possible quitting times. With luck-driven learning it levels off near 0.03 to 0.05 rather than reaching 0. Players also drift apart over time: independent learners tend to specialise, some quitting early and some late, while the group as a whole stays near the ideal. With a fixed pair of 2, one player usually ends up always giving in, a winner/loser split.</p>
+    </section>
+
+    <section class="panel" aria-label="Quit-time survival curve">
+      <h2>Chance a player is still fighting at time t</h2>
+      <canvas id="cSurv" height="250" role="img" aria-label="Survival curve of quitting times, log scale"></canvas>
+      <div class="legend">
+        <span><i style="border-color:var(--ideal);border-top-style:dotted"></i>perfect strategy, e<sup>&minus;t</sup></span>
+        <span><i style="border-color:var(--accent)"></i>population</span>
+        <span><i style="border-color:var(--accent);opacity:.35"></i>individual players</span>
+        <span id="predLegend" hidden><i style="border-color:var(--predict);border-top-style:dashed"></i>predicted with lopsided learning</span>
+      </div>
+      <p class="note">On this log scale the perfect strategy is a straight line. That is the same pattern Ventimiglia et al. found in real fly fights.</p>
+    </section>
+
+    <section class="panel" aria-label="A live fight">
+      <h2>A fight right now</h2>
+      <div class="bout">
+        <div class="lane"><span class="name" id="nA">Player 1</span><div class="track"><div class="bar" id="bA"></div></div><span class="res" id="rA"></span></div>
+        <div class="lane"><span class="name" id="nB">Player 2</span><div class="track"><div class="bar" id="bB"></div></div><span class="res" id="rB"></span></div>
+        <div class="verdict" id="verdict" aria-live="polite"></div>
+      </div>
+      <p class="note">Each player picks its quitting time by rolling dice weighted by its current strategy. The clock costs both of them the same, so the winner only profits if the fight was short.</p>
+    </section>
+
+    <section class="panel" aria-label="Brain activity">
+      <div class="circuit-head"><h2>Inside player 1's brain</h2><span class="steps" id="stepLbl"></span></div>
+      <canvas id="cCirc" height="250" role="img" aria-label="Activity of the 258 circuit neurons, grouped by role"></canvas>
+      <p class="note" id="circNote"></p>
+    </section>
+  </div>
+
+  <footer>
+    Wiring: 258 neurons and 4,952 connections cut from the MaleCNS v1.0 male fruit-fly connectome (Berg et al., Cell 2026, CC-BY 4.0) around the give-up circuit of Ventimiglia et al. 2026. Every player is a separate learner (REINFORCE with a running-average baseline, 64 fights per round against freshly shuffled opponents). Everything runs in your browser; nothing is pre-recorded.
+  </footer>
+</div>
+
+<script>
+"use strict";
+const DATA = /*__DATA__*/null;
+const NB = DATA.nBins, TMAX = DATA.tMax, DT = TMAX / (NB - 1);
+const TIMES = Float64Array.from({ length: NB }, (_, i) => i * DT);
+const MATCHES = 64, BASE_RATE = 0.05, DENSE_H = 48, UNROLL = 6;
+const COOL_ROUNDS = 3000, LR_FLOOR = 0.05; // cosine decay of the learning rate, as in the study
+const LR = { table: 0.03, dense: 0.001, fly: 0.003, shuffled: 0.003, random: 0.003 };
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ---------- random numbers (seeded, so Reset replays the same run)
+let seed = 12345;
+function rand() { seed = (seed + 0x6D2B79F5) | 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }
+function randn() { let u = 0; while (u === 0) u = rand(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rand()); }
+
+// ---------- the game: payoff matrix U[i][j] for quitting at t_i against t_j (prize 1, cost 1)
+const U = Array.from({ length: NB }, (_, i) => Float64Array.from({ length: NB }, (_, j) =>
+  (i > j ? 1 : i === j ? 0.5 : 0) - Math.min(TIMES[i], TIMES[j])));
+function exploitability(pi, opp) {
+  let best = -Infinity, own = 0;
+  for (let i = 0; i < NB; i++) { let f = 0; const r = U[i]; for (let j = 0; j < NB; j++) f += r[j] * opp[j]; if (f > best) best = f; own += pi[i] * f; }
+  return best - own;
+}
+
+// ---------- graphs: the real circuit and its two controls
+const N = DATA.n;
+const REAL = []; for (let k = 0; k < DATA.edges.length; k += 2) REAL.push([DATA.edges[k], DATA.edges[k + 1]]);
+const INPUT = [], OUTPUT = [];
+DATA.group.forEach((g, i) => { if (g === "ppl1") INPUT.push(i); if (g === "tk") OUTPUT.push(i); });
+function rewire(edges) { // degree-preserving double-edge swaps
+  const e = edges.map(x => x.slice()); const has = new Set(e.map(([a, b]) => a * N + b));
+  for (let s = 0; s < 10 * e.length; s++) {
+    const i = Math.floor(rand() * e.length), j = Math.floor(rand() * e.length); if (i === j) continue;
+    const [a, b] = e[i], [c, d] = e[j];
+    if (a === d || c === b || has.has(a * N + d) || has.has(c * N + b)) continue;
+    has.delete(a * N + b); has.delete(c * N + d); has.add(a * N + d); has.add(c * N + b); e[i] = [a, d]; e[j] = [c, b];
+  }
+  return e;
+}
+function randomSparse(m) {
+  const has = new Set(), e = [];
+  while (e.length < m) { const a = Math.floor(rand() * N), b = Math.floor(rand() * N); if (a === b || has.has(a * N + b)) continue; has.add(a * N + b); e.push([a, b]); }
+  return e;
+}
+
+// ---------- Adam with beta1 = 0 (as in the study)
+function makeOpt(sizes) { return { v: sizes.map(n => new Float64Array(n)), t: 0 }; }
+function adam(opt, params, grads, lr) {
+  opt.t++; const c = 1 - Math.pow(0.999, opt.t);
+  for (let k = 0; k < params.length; k++) {
+    const p = params[k], g = grads[k], v = opt.v[k];
+    for (let i = 0; i < p.length; i++) { v[i] = 0.999 * v[i] + 0.001 * g[i] * g[i]; p[i] -= lr * g[i] / (Math.sqrt(v[i] / c) + 1e-8); }
+  }
+}
+
+// ---------- three kinds of brain; each maps the (constant) context to 64 logits
+function Table() {
+  const logits = new Float64Array(NB), g = new Float64Array(NB);
+  return { params: [logits], grads: [g], forward() { return logits; }, backward(gl) { g.set(gl); } };
+}
+function Dense() {
+  const H = DENSE_H;
+  const w1 = Float64Array.from({ length: H }, () => randn()), b1 = new Float64Array(H);
+  const w2 = Float64Array.from({ length: H * H }, () => randn() / Math.sqrt(H)), b2 = new Float64Array(H);
+  const w3 = new Float64Array(H * NB), b3 = new Float64Array(NB);
+  const params = [w1, b1, w2, b2, w3, b3], grads = params.map(p => new Float64Array(p.length));
+  const h1 = new Float64Array(H), h2 = new Float64Array(H), out = new Float64Array(NB);
+  return {
+    params, grads,
+    forward() {
+      for (let i = 0; i < H; i++) h1[i] = Math.tanh(w1[i] + b1[i]);
+      for (let j = 0; j < H; j++) { let a = b2[j]; for (let i = 0; i < H; i++) a += h1[i] * w2[i * H + j]; h2[j] = Math.tanh(a); }
+      for (let t = 0; t < NB; t++) { let a = b3[t]; for (let j = 0; j < H; j++) a += h2[j] * w3[j * NB + t]; out[t] = a; }
+      return out;
+    },
+    backward(gl) {
+      const [gw1, gb1, gw2, gb2, gw3, gb3] = grads; const g2 = new Float64Array(H), g1 = new Float64Array(H);
+      gb3.set(gl);
+      for (let j = 0; j < H; j++) { let s = 0; for (let t = 0; t < NB; t++) { gw3[j * NB + t] = h2[j] * gl[t]; s += w3[j * NB + t] * gl[t]; } g2[j] = s * (1 - h2[j] * h2[j]); gb2[j] = g2[j]; }
+      for (let i = 0; i < H; i++) { let s = 0; for (let j = 0; j < H; j++) { gw2[i * H + j] = h1[i] * g2[j]; s += w2[i * H + j] * g2[j]; } g1[i] = s * (1 - h1[i] * h1[i]); gb1[i] = g1[i]; gw1[i] = g1[i]; }
+    },
+  };
+}
+function Circuit(edges) {
+  // h <- tanh(A h + drive), A[post, pre] = w_e only on the given edges; read out from AVLP727m
+  const E = edges.length, pre = Int32Array.from(edges, e => e[0]), post = Int32Array.from(edges, e => e[1]);
+  const indeg = new Float64Array(N); for (const p of post) indeg[p]++;
+  const w = Float64Array.from({ length: E }, (_, k) => randn() / Math.sqrt(Math.max(indeg[post[k]], 1)));
+  const win = Float64Array.from(INPUT, () => randn()), bias = new Float64Array(N);
+  const R = new Float64Array(OUTPUT.length * NB), rb = new Float64Array(NB);
+  const params = [w, win, bias, R, rb], grads = params.map(p => new Float64Array(p.length));
+  const hs = Array.from({ length: UNROLL + 1 }, () => new Float64Array(N)), drive = new Float64Array(N), out = new Float64Array(NB);
+  return {
+    params, grads, hs, edges,
+    forward() {
+      drive.set(bias); INPUT.forEach((n, j) => { drive[n] += win[j]; });
+      hs[0].fill(0);
+      for (let k = 0; k < UNROLL; k++) {
+        const a = Float64Array.from(drive), h = hs[k];
+        for (let e = 0; e < E; e++) a[post[e]] += w[e] * h[pre[e]];
+        const hn = hs[k + 1]; for (let i = 0; i < N; i++) hn[i] = Math.tanh(a[i]);
+      }
+      const hL = hs[UNROLL];
+      for (let t = 0; t < NB; t++) { let a = rb[t]; OUTPUT.forEach((n, j) => { a += hL[n] * R[j * NB + t]; }); out[t] = a; }
+      return out;
+    },
+    backward(gl) {
+      const [gw, gwin, gbias, gR, grb] = grads; gw.fill(0); gbias.fill(0);
+      grb.set(gl);
+      let gh = new Float64Array(N); const hL = hs[UNROLL];
+      OUTPUT.forEach((n, j) => { let s = 0; for (let t = 0; t < NB; t++) { gR[j * NB + t] = hL[n] * gl[t]; s += R[j * NB + t] * gl[t]; } gh[n] = s; });
+      for (let k = UNROLL - 1; k >= 0; k--) {
+        const hn = hs[k + 1], h = hs[k], ga = new Float64Array(N), ghPrev = new Float64Array(N);
+        for (let i = 0; i < N; i++) { ga[i] = gh[i] * (1 - hn[i] * hn[i]); gbias[i] += ga[i]; }
+        for (let e = 0; e < E; e++) { gw[e] += ga[post[e]] * h[pre[e]]; ghPrev[pre[e]] += w[e] * ga[post[e]]; }
+        gh = ghPrev;
+      }
+      INPUT.forEach((n, j) => { gwin[j] = gbias[n]; });
+    },
+  };
+}
+
+// ---------- simulation state
+const S = { brain: "fly", rho: 1, M: 8, speed: 8, playing: true };
+let agents, round, fights, hist, graphEdges;
+
+function makeBrain() {
+  if (S.brain === "table") return Table();
+  if (S.brain === "dense") return Dense();
+  return Circuit(graphEdges);
+}
+function softmax(l) { let m = -Infinity; for (const x of l) if (x > m) m = x; const p = new Float64Array(NB); let s = 0; for (let i = 0; i < NB; i++) { p[i] = Math.exp(l[i] - m); s += p[i]; } for (let i = 0; i < NB; i++) p[i] /= s; return p; }
+function sample(p) { let u = rand(), c = 0; for (let i = 0; i < NB; i++) { c += p[i]; if (u < c) return i; } return NB - 1; }
+
+function reset() {
+  seed = 12345;
+  graphEdges = S.brain === "shuffled" ? rewire(REAL) : S.brain === "random" ? randomSparse(REAL.length) : REAL;
+  agents = Array.from({ length: S.M }, () => { const b = makeBrain(); return { brain: b, opt: makeOpt(b.params.map(p => p.length)), pi: softmax(b.forward()), base: 0, seen: false }; });
+  round = 0; fights = 0; hist = [];
+  record(); drawCircuitBase(); updateStats();
+}
+
+function lrScale() { return LR_FLOOR + (1 - LR_FLOOR) * 0.5 * (1 + Math.cos(Math.PI * Math.min(round, COOL_ROUNDS) / COOL_ROUNDS)); }
+function step() {
+  const M = S.M, aw = 2 / (1 + S.rho), al = 2 * S.rho / (1 + S.rho);
+  for (const a of agents) a.pi = softmax(a.brain.forward());
+  const coef = agents.map(() => new Float64Array(NB)), tot = new Float64Array(M), rsum = new Float64Array(M);
+  const idx = [...Array(M).keys()];
+  const records = agents.map(() => []);
+  for (let r = 0; r < MATCHES; r++) {
+    for (let i = M - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+    for (let k = 0; k < M; k += 2) {
+      const x = idx[k], y = idx[k + 1], tx = sample(agents[x].pi), ty = sample(agents[y].pi);
+      const xWins = tx > ty || (tx === ty && rand() < 0.5);
+      const rx = xWins ? 1 - TIMES[ty] : -TIMES[tx], ry = xWins ? -TIMES[ty] : 1 - TIMES[tx];
+      records[x].push([tx, rx, xWins]); records[y].push([ty, ry, !xWins]);
+      rsum[x] += rx; rsum[y] += ry; fights++;
+    }
+  }
+  agents.forEach((a, m) => {
+    const recs = records[m], n = recs.length, mean = rsum[m] / n;
+    if (a.seen) {
+      for (const [t, r, won] of recs) { const adv = (won ? aw : al) * (r - a.base); coef[m][t] += adv; tot[m] += adv; }
+      const gl = new Float64Array(NB);
+      for (let t = 0; t < NB; t++) gl[t] = -(coef[m][t] - tot[m] * a.pi[t]) / n;
+      a.brain.backward(gl); adam(a.opt, a.brain.params, a.brain.grads, LR[S.brain] * lrScale());
+      a.base += BASE_RATE * (mean - a.base);
+    } else { a.base = mean; a.seen = true; }
+  });
+  round++;
+}
+
+function record() {
+  const M = S.M, mix = new Float64Array(NB); for (const a of agents) for (let i = 0; i < NB; i++) mix[i] += a.pi[i] / M;
+  let indiv = 0;
+  for (const a of agents) { const opp = new Float64Array(NB); for (let i = 0; i < NB; i++) opp[i] = (mix[i] * M - a.pi[i]) / (M - 1); indiv += exploitability(a.pi, opp) / M; }
+  hist.push([round, indiv, exploitability(mix, mix)]);
+  if (hist.length > 1600) hist = hist.filter((_, i) => i % 2 === 0 || i === hist.length - 1);
+  return mix;
+}
+
+// ---------- drawing helpers
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function setupCanvas(c) {
+  const dpr = window.devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight || +c.getAttribute("height");
+  if (c.width !== Math.round(w * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); }
+  const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h); return [g, w, h];
+}
+function axes(g, w, h, pad, xTicks, yTicks, xLab, yLab, fx, fy) {
+  g.strokeStyle = css("--grid"); g.lineWidth = 1; g.fillStyle = css("--ink-3"); g.font = "11px " + css("--mono");
+  g.textAlign = "right"; g.textBaseline = "middle";
+  for (const [v, lab] of yTicks) { const y = fy(v); g.beginPath(); g.moveTo(pad.l, y); g.lineTo(w - pad.r, y); g.stroke(); g.fillText(lab, pad.l - 6, y); }
+  g.textAlign = "center"; g.textBaseline = "top";
+  for (const [v, lab] of xTicks) { const x = fx(v); g.fillText(lab, x, h - pad.b + 6); }
+  g.fillStyle = css("--ink-2"); g.font = "11.5px " + css("--sans");
+  g.fillText(xLab, pad.l + (w - pad.l - pad.r) / 2, h - 15);
+  g.save(); g.translate(12, pad.t + (h - pad.t - pad.b) / 2); g.rotate(-Math.PI / 2); g.fillText(yLab, 0, -6); g.restore();
+}
+
+function drawExpl() {
+  const [g, w, h] = setupCanvas(document.getElementById("cExpl"));
+  const pad = { l: 52, r: 12, t: 10, b: 40 };
+  const xmax = Math.max(50, round), lo = Math.log10(0.001), hi = Math.log10(3);
+  const fx = x => pad.l + (x / xmax) * (w - pad.l - pad.r);
+  const fy = v => pad.t + (1 - (Math.log10(Math.max(v, 0.001)) - lo) / (hi - lo)) * (h - pad.t - pad.b);
+  const nice = [0, 0.25, 0.5, 0.75, 1].map(f => { const v = Math.round(xmax * f); return [v, v.toLocaleString()]; });
+  axes(g, w, h, pad, nice, [[0.001, "0.001"], [0.01, "0.01"], [0.1, "0.1"], [1, "1"]], "practice rounds", "exploitability (log)", fx, fy);
+  const pred = predictedExpl[S.rho];
+  if (S.rho > 1) { g.strokeStyle = css("--predict"); g.setLineDash([2, 4]); g.lineWidth = 1.5; g.beginPath(); g.moveTo(pad.l, fy(pred)); g.lineTo(w - pad.r, fy(pred)); g.stroke(); }
+  g.setLineDash([5, 4]); g.strokeStyle = css("--ink-3"); g.lineWidth = 1.4; line(g, hist, 2, fx, fy);
+  g.setLineDash([]); g.strokeStyle = css("--accent"); g.lineWidth = 2; line(g, hist, 1, fx, fy);
+  const last = hist[hist.length - 1]; g.fillStyle = css("--accent"); g.beginPath(); g.arc(fx(last[0]), fy(last[1]), 3.5, 0, 7); g.fill();
+}
+function line(g, pts, k, fx, fy) { g.beginPath(); pts.forEach((p, i) => { const x = fx(p[0]), y = fy(p[k]); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); }
+
+function survival(p) { const s = new Float64Array(NB); let c = 0; for (let i = 0; i < NB; i++) { c += p[i]; s[i] = 1 - c; } return s; }
+function drawSurv(mix) {
+  const [g, w, h] = setupCanvas(document.getElementById("cSurv"));
+  const pad = { l: 52, r: 12, t: 10, b: 40 }, xmax = 5, lo = -3, hi = 0;
+  const fx = t => pad.l + (t / xmax) * (w - pad.l - pad.r);
+  const fy = s => pad.t + (1 - (Math.log10(Math.max(s, 1e-3)) - lo) / (hi - lo)) * (h - pad.t - pad.b);
+  axes(g, w, h, pad, [0, 1, 2, 3, 4, 5].map(v => [v, String(v)]), [[1, "1"], [0.1, "0.1"], [0.01, "0.01"], [0.001, "0.001"]], "time t (seconds of fighting)", "P(still fighting)", fx, fy);
+  const curve = (s, color, width, dash, alpha) => {
+    g.save(); g.beginPath(); g.rect(pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b); g.clip();
+    g.strokeStyle = color; g.lineWidth = width; g.setLineDash(dash); g.globalAlpha = alpha; g.beginPath();
+    let started = false;
+    for (let i = 0; i < NB && TIMES[i] <= xmax + DT; i++) { const v = i === 0 ? 1 : s[i - 1]; const x = fx(TIMES[i]), y = fy(v); started ? g.lineTo(x, y) : g.moveTo(x, y); started = true; }
+    g.stroke(); g.restore();
+  };
+  for (const a of agents) curve(survival(a.pi), css("--accent"), 1, [], 0.28);
+  if (S.rho > 1) curve(survival(DATA.predicted[S.rho]), css("--predict"), 1.6, [6, 4], 1);
+  curve(survival(DATA.ideal), css("--ideal"), 1.6, [2, 3], 1);
+  curve(survival(mix), css("--accent"), 2.4, [], 1);
+}
+
+// ---------- circuit view
+const GROUPS = [
+  { key: "ppl1", label: "PPL1 (16)", sub: "dopamine input", x: 0.07 },
+  { key: "mbon", label: "MBON18/19 (6)", sub: "mushroom body", x: 0.25 },
+  { key: "connecting", label: "path neurons (54)", sub: "MBON to Tk", x: 0.46 },
+  { key: "expansion", label: "neighbours (177)", sub: "one hop out", x: 0.72 },
+  { key: "tk", label: "Tk / AVLP727m (5)", sub: "keep fighting", x: 0.94 },
+];
+let nodePos = [], circStep = 1;
+function layoutNodes(w, h) {
+  const top = 34, bottom = h - 18; nodePos = new Array(N);
+  for (const G of GROUPS) {
+    const members = DATA.group.map((g, i) => g === G.key ? i : -1).filter(i => i >= 0);
+    const cols = G.key === "expansion" ? 9 : G.key === "connecting" ? 3 : 1;
+    const rows = Math.ceil(members.length / cols), colW = G.key === "expansion" ? 0.024 : 0.028;
+    members.forEach((n, k) => {
+      const c = k % cols, r = Math.floor(k / cols);
+      const x = (G.x + (c - (cols - 1) / 2) * colW) * w, y = top + (rows === 1 ? 0.5 : r / (rows - 1)) * (bottom - top);
+      nodePos[n] = [x, y];
+    });
+  }
+}
+let circBase = null;
+function drawCircuitBase() {
+  const c = document.getElementById("cCirc"), [g, w, h] = setupCanvas(c);
+  layoutNodes(w, h);
+  const isCircuit = !["table", "dense"].includes(S.brain);
+  if (isCircuit) {
+    g.strokeStyle = css("--ink-3"); g.globalAlpha = 0.05; g.lineWidth = 0.6; g.beginPath();
+    for (const [a, b] of graphEdges) { g.moveTo(nodePos[a][0], nodePos[a][1]); g.lineTo(nodePos[b][0], nodePos[b][1]); }
+    g.stroke(); g.globalAlpha = 1;
+  }
+  g.fillStyle = css("--ink-2"); g.textAlign = "center"; g.textBaseline = "top";
+  for (const G of GROUPS) {
+    g.font = "600 11.5px " + css("--cond"); g.fillText(G.label, Math.min(Math.max(G.x * w, 50), w - 50), 2);
+    g.font = "10.5px " + css("--sans"); g.fillStyle = css("--ink-3"); g.fillText(G.sub, Math.min(Math.max(G.x * w, 50), w - 50), 16); g.fillStyle = css("--ink-2");
+  }
+  circBase = g.getImageData(0, 0, c.width, c.height);
+  document.getElementById("circNote").textContent = isCircuit
+    ? (S.brain === "fly"
+      ? "Real fly wiring. Faint lines are the 4,952 connections. Dots light up as the signal spreads from the dopamine neurons, one synaptic step at a time, before the Tk neurons set the quitting strategy."
+      : S.brain === "shuffled"
+        ? "Same neurons and every neuron keeps its number of connections, but who connects to whom is shuffled. This control tests whether the fly's exact wiring matters."
+        : "Same neurons and the same number of connections, placed at random. This control tests whether sparseness alone matters.")
+    : "This brain has no fly wiring (" + (S.brain === "dense" ? "a standard fully connected network of about the same size" : "just a list of 64 chances") + "). Pick a fly-style brain to see circuit activity.";
+}
+function drawCircuit() {
+  const c = document.getElementById("cCirc"), g = c.getContext("2d");
+  if (!circBase || circBase.width !== c.width) drawCircuitBase();
+  g.putImageData(circBase, 0, 0);
+  const dpr = window.devicePixelRatio || 1; g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const b = agents[0].brain, isCircuit = !!b.hs;
+  const accent = css("--accent"), idle = css("--idle-node");
+  let maxA = 1e-9; if (isCircuit) for (let i = 0; i < N; i++) maxA = Math.max(maxA, Math.abs(b.hs[circStep][i]));
+  for (let i = 0; i < N; i++) {
+    const [x, y] = nodePos[i]; const grp = DATA.group[i]; const big = grp === "ppl1" || grp === "mbon" || grp === "tk";
+    const a = isCircuit ? Math.abs(b.hs[circStep][i]) / maxA : 0;
+    g.beginPath(); g.arc(x, y, big ? 4.2 : 2.6, 0, 7);
+    g.fillStyle = idle; g.fill();
+    if (a > 0.02) { g.globalAlpha = Math.min(1, 0.15 + a); g.fillStyle = accent; g.fill(); g.globalAlpha = 1; }
+  }
+  document.getElementById("stepLbl").textContent = isCircuit ? "signal step " + circStep + " of " + UNROLL : "";
+}
+
+// ---------- a live fight between player 1 and a random opponent
+let bout = null;
+function newBout() {
+  const opp = 1 + Math.floor(rand() * (S.M - 1));
+  const ta = sample(agents[0].pi), tb = sample(agents[opp].pi), aWins = ta > tb || (ta === tb && rand() < 0.5);
+  bout = { opp, ta: TIMES[ta], tb: TIMES[tb], aWins, t0: performance.now() };
+  document.getElementById("nB").textContent = "Player " + (opp + 1);
+  document.getElementById("verdict").textContent = "";
+  document.getElementById("rA").textContent = ""; document.getElementById("rB").textContent = "";
+}
+function drawBout(now) {
+  if (!bout) newBout();
+  const end = Math.min(bout.ta, bout.tb), span = Math.max(bout.ta, bout.tb, 0.5) * 1.15;
+  const dur = reduceMotion ? 0 : 1400 * Math.max(end, 0.35) / 1.5;
+  const tNow = dur === 0 ? end : Math.min(end, ((now - bout.t0) / Math.max(dur, 1)) * end);
+  const pct = v => (100 * v / span).toFixed(2) + "%";
+  document.getElementById("bA").style.width = pct(Math.min(tNow, bout.ta));
+  document.getElementById("bB").style.width = pct(Math.min(tNow, bout.tb));
+  if (tNow >= end && !bout.done) {
+    bout.done = now;
+    const winner = bout.aWins ? "Player 1" : "Player " + (bout.opp + 1), loser = bout.aWins ? "Player " + (bout.opp + 1) : "Player 1";
+    const tie = bout.ta === bout.tb;
+    document.getElementById("rA").textContent = bout.aWins ? "wins" : "quits " + bout.ta.toFixed(2);
+    document.getElementById("rB").textContent = bout.aWins ? "quits " + bout.tb.toFixed(2) : "wins";
+    document.getElementById("rA").style.color = bout.aWins ? css("--win") : css("--lose");
+    document.getElementById("rB").style.color = bout.aWins ? css("--lose") : css("--win");
+    const v = document.getElementById("verdict");
+    v.innerHTML = `<b>${loser}</b> gave up at t = ${end.toFixed(2)}${tie ? " (a tie, settled by a coin flip)" : ""}. <b>${winner}</b> takes the prize of 1. Both paid ${end.toFixed(2)}, so the winner nets ${(1 - end).toFixed(2)}.`;
+  }
+  if (bout.done && now - bout.done > 2200) newBout();
+}
+
+// ---------- stats + loop
+const predictedExpl = {};
+for (const r of [1, 2, 4, 8]) predictedExpl[r] = exploitability(DATA.predicted[r], DATA.predicted[r]);
+let lastMix = null;
+function updateStats() {
+  const last = hist[hist.length - 1], means = agents.map(a => a.pi.reduce((s, p, i) => s + p * TIMES[i], 0));
+  const mu = means.reduce((a, b) => a + b, 0) / means.length, sd = Math.sqrt(means.reduce((a, b) => a + (b - mu) ** 2, 0) / means.length);
+  document.getElementById("sRound").textContent = round.toLocaleString();
+  document.getElementById("sMatches").textContent = fights.toLocaleString() + " fights";
+  document.getElementById("sExpl").textContent = last[1].toFixed(3);
+  document.getElementById("sMean").textContent = mu.toFixed(2);
+  document.getElementById("sSpread").textContent = sd.toFixed(2);
+  document.getElementById("sLr").textContent = Math.round(100 * lrScale()) + "%";
+}
+let lastCirc = 0;
+function frame(now) {
+  if (S.playing) {
+    const t0 = performance.now();
+    for (let k = 0; k < S.speed && performance.now() - t0 < 40; k++) step();
+    lastMix = record(); updateStats();
+  } else if (!lastMix) lastMix = record();
+  drawExpl(); drawSurv(lastMix);
+  if (now - lastCirc > 320) { circStep = circStep % UNROLL + 1; lastCirc = now; }
+  drawCircuit(); drawBout(now);
+  requestAnimationFrame(frame);
+}
+
+// ---------- controls
+function seg(id, key, parse) {
+  const el = document.getElementById(id);
+  el.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    el.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    S[key] = parse(b.dataset.v); document.getElementById("predLegend").hidden = S.rho === 1;
+    if (key !== "rho") reset();
+  });
+}
+seg("brain", "brain", String); seg("rho", "rho", Number); seg("players", "M", Number);
+document.getElementById("speed").addEventListener("input", e => { S.speed = +e.target.value; });
+document.getElementById("play").addEventListener("click", e => { S.playing = !S.playing; e.target.textContent = S.playing ? "Pause" : "Play"; });
+document.getElementById("reset").addEventListener("click", () => { reset(); lastMix = null; });
+window.addEventListener("resize", () => { circBase = null; });
+reset();
+requestAnimationFrame(frame);
+</script>
