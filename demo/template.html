@@ -18,6 +18,11 @@
     --win: #1d8a5b;
     --lose: #b8452f;
     --idle-node: #c9cdc4;
+    --rival: #3f6f8c;
+    --food: #e8c15a;
+    --food-2: #c99a2e;
+    --wing: rgba(170, 190, 205, 0.45);
+    --eye: #b3261e;
     --focus: #2a6fc4;
     --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
     --cond: "IBM Plex Sans Condensed", "Arial Narrow", "IBM Plex Sans", system-ui, sans-serif;
@@ -28,12 +33,14 @@
       --ground: #111412; --panel: #181c19; --ink: #e5e9e4; --ink-2: #a9b2ab; --ink-3: #737d76;
       --rule: #2a302b; --grid: #232824; --accent: #e3963d; --accent-soft: rgba(227, 150, 61, 0.16);
       --ideal: #e5e9e4; --predict: #5b9be8; --win: #3cb07c; --lose: #e0715a; --idle-node: #39413b; --focus: #5b9be8;
+      --rival: #7fb0d0; --food: #b8912f; --food-2: #8f6f1f; --wing: rgba(190, 205, 220, 0.30); --eye: #e0534a;
     }
   }
   :root[data-theme="dark"] {
     --ground: #111412; --panel: #181c19; --ink: #e5e9e4; --ink-2: #a9b2ab; --ink-3: #737d76;
     --rule: #2a302b; --grid: #232824; --accent: #e3963d; --accent-soft: rgba(227, 150, 61, 0.16);
     --ideal: #e5e9e4; --predict: #5b9be8; --win: #3cb07c; --lose: #e0715a; --idle-node: #39413b; --focus: #5b9be8;
+      --rival: #7fb0d0; --food: #b8912f; --food-2: #8f6f1f; --wing: rgba(190, 205, 220, 0.30); --eye: #e0534a;
   }
   * { box-sizing: border-box; }
   body { background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
@@ -66,12 +73,6 @@
   .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); }
   .legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 6px; }
   .note { font-size: 12.5px; color: var(--ink-2); margin: 0; max-width: 72ch; }
-  .bout { display: grid; gap: 8px; }
-  .lane { display: grid; grid-template-columns: 86px 1fr 76px; align-items: center; gap: 10px; font-size: 13px; }
-  .lane .name { font-weight: 600; }
-  .track { position: relative; height: 18px; background: var(--grid); border-radius: 4px; overflow: hidden; }
-  .bar { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--accent); border-radius: 4px; }
-  .lane .res { font-family: var(--mono); font-size: 12.5px; text-align: right; }
   .verdict { font-size: 13px; color: var(--ink-2); min-height: 1.5em; }
   .verdict b { color: var(--ink); }
   .circuit-head { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline; justify-content: space-between; }
@@ -138,6 +139,13 @@
       </div>
     </section>
 
+    <section class="panel full" aria-label="Arena">
+      <div class="circuit-head"><h2>Arena: one fight at a time</h2><span class="steps" id="arenaClock"></span></div>
+      <canvas id="cArena" height="260" role="img" aria-label="Two flies fighting over food; the loser walks away"></canvas>
+      <div class="verdict" id="verdict" aria-live="polite"></div>
+      <p class="note">Player 1 fights a random opponent from the population, using the strategies they have learned so far. Every tick (0.127 s of fighting) each fly decides &ldquo;keep going or leave?&rdquo; with the give-up chance shown. Deciding step by step like this is exactly the same game as picking a quitting time in advance, so the arena and the charts always agree. The pushing and lunging is only for show: in this game nothing but time decides the winner.</p>
+    </section>
+
     <section class="panel" aria-label="Exploitability over time">
       <h2>How beatable are the players?</h2>
       <canvas id="cExpl" height="250" role="img" aria-label="Exploitability against practice rounds, log scale"></canvas>
@@ -161,17 +169,7 @@
       <p class="note">On this log scale the perfect strategy is a straight line. That is the same pattern Ventimiglia et al. found in real fly fights.</p>
     </section>
 
-    <section class="panel" aria-label="A live fight">
-      <h2>A fight right now</h2>
-      <div class="bout">
-        <div class="lane"><span class="name" id="nA">Player 1</span><div class="track"><div class="bar" id="bA"></div></div><span class="res" id="rA"></span></div>
-        <div class="lane"><span class="name" id="nB">Player 2</span><div class="track"><div class="bar" id="bB"></div></div><span class="res" id="rB"></span></div>
-        <div class="verdict" id="verdict" aria-live="polite"></div>
-      </div>
-      <p class="note">Each player picks its quitting time by rolling dice weighted by its current strategy. The clock costs both of them the same, so the winner only profits if the fight was short.</p>
-    </section>
-
-    <section class="panel" aria-label="Brain activity">
+    <section class="panel full" aria-label="Brain activity">
       <div class="circuit-head"><h2>Inside player 1's brain</h2><span class="steps" id="stepLbl"></span></div>
       <canvas id="cCirc" height="250" role="img" aria-label="Activity of the 258 circuit neurons, grouped by role"></canvas>
       <p class="note" id="circNote"></p>
@@ -321,7 +319,7 @@ function reset() {
   seed = 12345;
   graphEdges = S.brain === "shuffled" ? rewire(REAL) : S.brain === "random" ? randomSparse(REAL.length) : REAL;
   agents = Array.from({ length: S.M }, () => { const b = makeBrain(); return { brain: b, opt: makeOpt(b.params.map(p => p.length)), pi: softmax(b.forward()), base: 0, seen: false }; });
-  round = 0; fights = 0; hist = [];
+  round = 0; fights = 0; hist = []; if (typeof ARENA !== "undefined") ARENA.phase = "idle";
   record(); drawCircuitBase(); updateStats();
 }
 
@@ -482,36 +480,131 @@ function drawCircuit() {
   document.getElementById("stepLbl").textContent = isCircuit ? "signal step " + circStep + " of " + UNROLL : "";
 }
 
-// ---------- a live fight between player 1 and a random opponent
-let bout = null;
-function newBout() {
-  const opp = 1 + Math.floor(rand() * (S.M - 1));
-  const ta = sample(agents[0].pi), tb = sample(agents[opp].pi), aWins = ta > tb || (ta === tb && rand() < 0.5);
-  bout = { opp, ta: TIMES[ta], tb: TIMES[tb], aWins, t0: performance.now() };
-  document.getElementById("nB").textContent = "Player " + (opp + 1);
-  document.getElementById("verdict").textContent = "";
-  document.getElementById("rA").textContent = ""; document.getElementById("rB").textContent = "";
+// ---------- the arena: one fight at a time, decided tick by tick
+// Each tick (DT seconds of fighting) a fly that is still fighting gives up with its
+// hazard h_k = p_k / P(still fighting at t_k), read from its learned strategy. Deciding
+// tick by tick this way is exactly equivalent to drawing a quitting time up front: the
+// same game, shown as a sequence of keep-going-or-leave decisions (a Markov game).
+const REAL_PER_GAME = 1.25; // real seconds shown per second of fighting
+const ARENA = { phase: "idle" };
+function hazardFrom(pi) {
+  const h = new Float64Array(NB); let s = 1;
+  for (let k = 0; k < NB; k++) { h[k] = s > 1e-12 ? Math.min(1, pi[k] / s) : 1; s -= pi[k]; }
+  h[NB - 1] = 1; return h;
 }
-function drawBout(now) {
-  if (!bout) newBout();
-  const end = Math.min(bout.ta, bout.tb), span = Math.max(bout.ta, bout.tb, 0.5) * 1.15;
-  const dur = reduceMotion ? 0 : 1400 * Math.max(end, 0.35) / 1.5;
-  const tNow = dur === 0 ? end : Math.min(end, ((now - bout.t0) / Math.max(dur, 1)) * end);
-  const pct = v => (100 * v / span).toFixed(2) + "%";
-  document.getElementById("bA").style.width = pct(Math.min(tNow, bout.ta));
-  document.getElementById("bB").style.width = pct(Math.min(tNow, bout.tb));
-  if (tNow >= end && !bout.done) {
-    bout.done = now;
-    const winner = bout.aWins ? "Player 1" : "Player " + (bout.opp + 1), loser = bout.aWins ? "Player " + (bout.opp + 1) : "Player 1";
-    const tie = bout.ta === bout.tb;
-    document.getElementById("rA").textContent = bout.aWins ? "wins" : "quits " + bout.ta.toFixed(2);
-    document.getElementById("rB").textContent = bout.aWins ? "quits " + bout.tb.toFixed(2) : "wins";
-    document.getElementById("rA").style.color = bout.aWins ? css("--win") : css("--lose");
-    document.getElementById("rB").style.color = bout.aWins ? css("--lose") : css("--win");
-    const v = document.getElementById("verdict");
-    v.innerHTML = `<b>${loser}</b> gave up at t = ${end.toFixed(2)}${tie ? " (a tie, settled by a coin flip)" : ""}. <b>${winner}</b> takes the prize of 1. Both paid ${end.toFixed(2)}, so the winner nets ${(1 - end).toFixed(2)}.`;
+function makeFly(idx, side, colorVar) {
+  return { idx, side, colorVar, x: 0, y: 0, vx: 0, vy: 0, ang: side < 0 ? 0 : Math.PI, leg: Math.random() * 6, wing: 0, h: null };
+}
+function verdict(html) { document.getElementById("verdict").innerHTML = html; }
+function newFight(w, h) {
+  const opp = 1 + Math.floor(Math.random() * (S.M - 1)), cx = w / 2, cy = h / 2 + 14;
+  const A = makeFly(0, -1, "--accent"), B = makeFly(opp, 1, "--rival");
+  A.x = -40; A.y = cy + 10; B.x = w + 40; B.y = cy - 10;
+  A.h = hazardFrom(agents[0].pi); B.h = hazardFrom(agents[opp].pi);
+  Object.assign(ARENA, { phase: "enter", A, B, cx, cy, w, h, t: 0, tick: 0, phaseT: 0, winner: null, loser: null, tie: false, endT: 0 });
+  verdict("<b>Player 1</b> and <b>Player " + (opp + 1) + "</b> walk up to the food.");
+}
+function steer(f, tx, ty, speed, dt) {
+  const dx = tx - f.x, dy = ty - f.y, d = Math.hypot(dx, dy) || 1, v = Math.min(speed, d * 4);
+  const k = Math.min(1, 8 * dt);
+  f.vx += ((dx / d) * v - f.vx) * k; f.vy += ((dy / d) * v - f.vy) * k;
+  f.x += f.vx * dt; f.y += f.vy * dt;
+  const sp = Math.hypot(f.vx, f.vy);
+  if (sp > 12) f.ang = Math.atan2(f.vy, f.vx);
+  f.leg += dt * (4 + sp * 0.12);
+}
+function decide(k) {
+  const R = ARENA, qa = Math.random() < R.A.h[k], qb = Math.random() < R.B.h[k];
+  if (!qa && !qb) return;
+  R.tie = qa && qb;
+  const aWins = R.tie ? Math.random() < 0.5 : qb;
+  R.winner = aWins ? R.A : R.B; R.loser = aWins ? R.B : R.A;
+  R.endT = k * DT; R.t = R.endT; R.phase = "leave"; R.phaseT = 0;
+  const wn = "Player " + (R.winner.idx + 1), ln = "Player " + (R.loser.idx + 1);
+  verdict("<b>" + ln + "</b> gives up at t = " + R.endT.toFixed(2) + " s" +
+    (R.tie ? " (both quit on the same tick; a coin flip decides)" : "") +
+    ". <b>" + wn + "</b> takes the food, worth 1. Both paid " + R.endT.toFixed(2) +
+    ", so the winner nets " + (1 - R.endT).toFixed(2) + ".");
+}
+function arenaStep(dt) {
+  const R = ARENA, A = R.A, B = R.B, cx = R.cx, cy = R.cy; R.phaseT += dt;
+  if (R.phase === "enter") {
+    steer(A, cx - 24, cy + 6, 150, dt); steer(B, cx + 24, cy - 6, 150, dt);
+    if (R.phaseT > 1.2) { R.phase = "fight"; R.phaseT = 0; verdict("They shove and lunge at each other. Every second of fighting costs <b>both</b> of them 1."); }
+  } else if (R.phase === "fight") {
+    R.t += reduceMotion ? 99 : dt / REAL_PER_GAME;
+    while (R.phase === "fight" && R.t >= R.tick * DT) { decide(R.tick); R.tick++; }
+    if (R.phase === "fight") {
+      for (const [f, o] of [[A, B], [B, A]]) {
+        const dx = o.x - f.x, dy = o.y - f.y, d = Math.hypot(dx, dy) || 1;
+        f.vx += ((cx + f.side * 22 - f.x) * 6 + (dx / d) * 45) * dt;
+        f.vy += ((cy - f.side * 6 - f.y) * 6 + (dy / d) * 45) * dt;
+        if (Math.random() < dt * 1.7) { f.vx += (dx / d) * 150; f.vy += (dy / d) * 150; f.wing = 1; }
+        if (d < 30) { const push = (30 - d) * 22 * dt; f.vx -= (dx / d) * push; f.vy -= (dy / d) * push; }
+        const damp = Math.exp(-4 * dt); f.vx *= damp; f.vy *= damp;
+        f.x += f.vx * dt; f.y += f.vy * dt; f.ang = Math.atan2(dy, dx);
+        f.leg += dt * (6 + Math.hypot(f.vx, f.vy) * 0.1); f.wing = Math.max(0, f.wing - dt * 3);
+      }
+    }
+  } else if (R.phase === "leave") {
+    const L = R.loser, W = R.winner;
+    steer(L, L.side < 0 ? -80 : R.w + 80, L.y + (L.side < 0 ? 30 : -30), 170, dt);
+    steer(W, cx + Math.sin(R.phaseT * 3) * 3, cy + Math.cos(R.phaseT * 2) * 2, 60, dt);
+    W.wing = Math.max(0, W.wing - dt * 3);
+    if (R.phaseT > 3.2) newFight(R.w, R.h);
   }
-  if (bout.done && now - bout.done > 2200) newBout();
+}
+function drawFly(g, f, body) {
+  g.save(); g.translate(f.x, f.y); g.rotate(f.ang);
+  g.strokeStyle = css("--ink-2"); g.lineWidth = 1.3; g.lineCap = "round";
+  const base = [0.95, 1.57, 2.2];
+  for (let i = 0; i < 3; i++) for (const s of [-1, 1]) {
+    const swing = 0.32 * Math.sin(f.leg + i * Math.PI + (s > 0 ? Math.PI : 0));
+    const a = s * (base[i] + swing), x0 = 4 - i * 4;
+    g.beginPath(); g.moveTo(x0, 0); g.lineTo(x0 + Math.cos(a) * 12, Math.sin(a) * 12); g.stroke();
+  }
+  g.fillStyle = css("--wing"); g.strokeStyle = css("--ink-3"); g.lineWidth = 0.8;
+  for (const s of [-1, 1]) {
+    g.save(); g.translate(-3, 0); g.rotate(Math.PI + s * (0.28 + f.wing * 0.7));
+    g.beginPath(); g.ellipse(9, 0, 10, 4.2, 0, 0, 7); g.fill(); g.stroke(); g.restore();
+  }
+  g.fillStyle = body;
+  g.beginPath(); g.ellipse(-7, 0, 9, 5.6, 0, 0, 7); g.fill();
+  g.beginPath(); g.arc(3, 0, 5.2, 0, 7); g.fill();
+  g.beginPath(); g.arc(10, 0, 3.8, 0, 7); g.fill();
+  g.fillStyle = css("--eye");
+  g.beginPath(); g.arc(11, -2.6, 1.9, 0, 7); g.arc(11, 2.6, 1.9, 0, 7); g.fill();
+  g.restore();
+}
+function flyCard(g, f, x, align, R) {
+  const done = R.phase === "leave", name = "Player " + (f.idx + 1);
+  const k = Math.min(R.tick, NB - 1), paid = done ? R.endT : Math.min(R.t, TIMES[k]);
+  let line2;
+  if (R.phase === "enter") line2 = "arriving";
+  else if (done) line2 = f === R.winner ? "wins the food" : "gave up";
+  else line2 = "give-up chance this tick: " + (100 * f.h[k]).toFixed(0) + "%";
+  g.textAlign = align; g.textBaseline = "top";
+  g.fillStyle = css(f.colorVar); g.font = "600 13px " + css("--sans"); g.fillText(name, x, 10);
+  g.fillStyle = css("--ink-2"); g.font = "12px " + css("--sans"); g.fillText(line2, x, 28);
+  g.font = "12px " + css("--mono"); g.fillText("energy paid " + paid.toFixed(2), x, 45);
+}
+let arenaLast = 0;
+function drawArena(now) {
+  const c = document.getElementById("cArena"), dims = setupCanvas(c), g = dims[0], w = dims[1], h = dims[2];
+  const dt = Math.min(0.05, (now - (arenaLast || now)) / 1000); arenaLast = now;
+  if (ARENA.phase === "idle" || Math.abs(ARENA.w - w) > 1) newFight(w, h);
+  arenaStep(dt);
+  const R = ARENA;
+  g.fillStyle = css("--food"); g.globalAlpha = 0.9;
+  g.beginPath(); g.ellipse(R.cx, R.cy, 52, 40, 0.2, 0, 7); g.fill(); g.globalAlpha = 1;
+  g.fillStyle = css("--food-2");
+  for (let i = 0; i < 14; i++) { const a = i * 2.39, r = 8 + (i * 11) % 34; g.beginPath(); g.arc(R.cx + Math.cos(a) * r, R.cy + Math.sin(a) * r * 0.75, 1.6, 0, 7); g.fill(); }
+  g.fillStyle = css("--ink-3"); g.font = "11px " + css("--sans"); g.textAlign = "center"; g.textBaseline = "top";
+  g.fillText("food (worth 1)", R.cx, R.cy + 46);
+  drawFly(g, R.A, css("--accent")); drawFly(g, R.B, css("--rival"));
+  flyCard(g, R.A, 12, "left", R); flyCard(g, R.B, w - 12, "right", R);
+  document.getElementById("arenaClock").textContent =
+    R.phase === "enter" ? "fight starts soon" : "t = " + (R.phase === "leave" ? R.endT : R.t).toFixed(2) + " s";
 }
 
 // ---------- stats + loop
@@ -537,7 +630,7 @@ function frame(now) {
   } else if (!lastMix) lastMix = record();
   drawExpl(); drawSurv(lastMix);
   if (now - lastCirc > 320) { circStep = circStep % UNROLL + 1; lastCirc = now; }
-  drawCircuit(); drawBout(now);
+  drawCircuit(); drawArena(now);
   requestAnimationFrame(frame);
 }
 
