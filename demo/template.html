@@ -1,3 +1,4 @@
+<!-- Source template for demo/index.html. Open index.html, not this file: scripts/build_demo.py fills in the circuit data. -->
 <title>Give-Up Game Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -181,6 +182,10 @@
 <script>
 "use strict";
 const DATA = /*__DATA__*/null;
+if (!DATA) { // this is the unbuilt template: point to the real page instead of failing silently
+  document.querySelector(".wrap").innerHTML = '<header><h1>Give-Up Game Lab: source template</h1><p class="lede">This file is the template the demo is built from, so it has no circuit data yet. Open <b>demo/index.html</b> instead, or rebuild it with <code>python scripts/build_demo.py</code>.</p></header>';
+  throw new Error("template without data: open demo/index.html");
+}
 const NB = DATA.nBins, TMAX = DATA.tMax, DT = TMAX / (NB - 1);
 const TIMES = Float64Array.from({ length: NB }, (_, i) => i * DT);
 const MATCHES = 64, BASE_RATE = 0.05, DENSE_H = 48, UNROLL = 6;
