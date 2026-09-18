@@ -16,8 +16,9 @@ network:
   unroll_steps: 6         # PPL1 -> MBON -> X -> Y -> AVLP727m is 4 synapses; 6 leaves slack
   init_gain: 1.0          # recurrent weight std = gain / sqrt(in-degree of the post neuron)
   dense_hidden_layers: 2
-  dense_width: 47         # INTERIM (milestone 3); milestone 4 switches to "matched"
+  dense_width: matched    # width solved so the dense arm matches the connectome arm
   param_tolerance: 0.05   # arms 2-5 must match within 5% or the run aborts
+  sparse_max_batch: 8     # circuit forward: edge-list below this many contexts, dense matmul above (speed only)
 
 training:
   mode: exact             # exact | sampled
@@ -44,11 +45,34 @@ stats:
 lr: {default: 0.05}
 
 tuning:
-  seeds: {start: 1000, count: 3}   # disjoint from evaluation seeds
+  seeds: {start: 1000, count: 2}   # disjoint from evaluation seeds (2 to fit the laptop budget)
   lr_grid:
     exact:
       tabular: [0.03, 0.1, 0.3]
-      network: [0.001, 0.003, 0.01]
+      network: [0.001, 0.003, 0.01, 0.03, 0.1]
     sampled:
       tabular: [0.003, 0.01, 0.03]
-      network: [0.0003, 0.001, 0.003]
+      network: [0.0003, 0.001, 0.003, 0.01]
+
+connectome:
+  dataset: male-cns:v1.0
+  base_url: https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome
+  raw_dir: data/raw
+  files:
+    annotations: {name: body-annotations-male-cns-v1.0-minconf-0.5.feather, bytes: 14483314}
+    neurotransmitters: {name: body-neurotransmitters-male-cns-v1.0.feather, bytes: 43282834}
+    weights: {name: connectome-weights-male-cns-v1.0-minconf-0.5-traced-only.feather, bytes: 508025642}
+  cache: data/connectome/give_up_circuit.npz
+  provenance: data/connectome/give_up_circuit.provenance.json
+  min_synapses: 5          # Ventimiglia et al. 2026 connection threshold
+  core:
+    ppl1: {type_regex: '^PPL1[0-9]+$'}       # PPL101-PPL108
+    mbon: {types: [MBON18, MBON19]}        # V2 MBONs implicated by silencing (MBON-18/-19)
+    tk: {types: [AVLP727m]}                # MaleCNS type of Tk-GAL4^FruM neurons (paper, MCNS v0.9)
+  path: {source: mbon, target: tk, max_synapses: 3}   # the paper's 4-neuron MBON->...->AVLP727m paths
+  expansion:
+    min_exchanged_synapses: 400   # one-hop partners exchanging >= 400 synapses with the circuit
+    target_range: [100, 500]
+  roles: {input: ppl1, output: tk}
+  sign_map: {acetylcholine: 1, gaba: -1, glutamate: -1, histamine: -1}   # others unconstrained
+  rewire_swaps_per_edge: 10

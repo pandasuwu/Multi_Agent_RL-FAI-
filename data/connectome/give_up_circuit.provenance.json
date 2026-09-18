@@ -1,0 +1,116 @@
+{
+  "dataset": "male-cns:v1.0",
+  "source_url": "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome",
+  "license": "CC-BY 4.0 (Berg et al., Cell 2026, MaleCNS v1.0)",
+  "raw_files": {
+    "annotations": {
+      "name": "body-annotations-male-cns-v1.0-minconf-0.5.feather",
+      "bytes": 14483314,
+      "sha256": "2177e246113e4cfbf1e7772ec37c6da1955ff22e8063d0b1f833101f99a9a3b2"
+    },
+    "neurotransmitters": {
+      "name": "body-neurotransmitters-male-cns-v1.0.feather",
+      "bytes": 43282834,
+      "sha256": "95c9289220663abeb3409f3ad9e5a7f8a53f8093f5139d15502cd08da8879621"
+    },
+    "weights": {
+      "name": "connectome-weights-male-cns-v1.0-minconf-0.5-traced-only.feather",
+      "bytes": 508025642,
+      "sha256": "9b3beab17bad5f618be3f2c02d3139a8d07b822565919c013f1e5506d93e604b"
+    }
+  },
+  "query": {
+    "min_synapses": 5,
+    "core": {
+      "ppl1": {
+        "type_regex": "^PPL1[0-9]+$"
+      },
+      "mbon": {
+        "types": [
+          "MBON18",
+          "MBON19"
+        ]
+      },
+      "tk": {
+        "types": [
+          "AVLP727m"
+        ]
+      }
+    },
+    "path": {
+      "source": "mbon",
+      "target": "tk",
+      "max_synapses": 3
+    },
+    "expansion": {
+      "min_exchanged_synapses": 400,
+      "target_range": [
+        100,
+        500
+      ]
+    },
+    "roles": {
+      "input": "ppl1",
+      "output": "tk"
+    },
+    "sign_map": {
+      "acetylcholine": 1,
+      "gaba": -1,
+      "glutamate": -1,
+      "histamine": -1
+    }
+  },
+  "resolved_core": {
+    "ppl1": [
+      "PPL101 (11327)",
+      "PPL101 (11900)",
+      "PPL102 (11618)",
+      "PPL102 (13428)",
+      "PPL103 (11752)",
+      "PPL103 (14182)",
+      "PPL104 (21145)",
+      "PPL104 (515048)",
+      "PPL105 (14225)",
+      "PPL105 (512326)",
+      "PPL106 (529512)",
+      "PPL106 (529516)",
+      "PPL107 (14705)",
+      "PPL107 (519616)",
+      "PPL108 (12902)",
+      "PPL108 (15310)"
+    ],
+    "mbon": [
+      "MBON18 (14221)",
+      "MBON18 (512788)",
+      "MBON19 (26853)",
+      "MBON19 (33617)",
+      "MBON19 (36094)",
+      "MBON19 (47551)"
+    ],
+    "tk": [
+      "AVLP727m (18792)",
+      "AVLP727m (18987)",
+      "AVLP727m (50960)",
+      "AVLP727m (530190)",
+      "AVLP727m (533662)"
+    ]
+  },
+  "counts": {
+    "core_neurons": 27,
+    "connecting_neurons": 54,
+    "exact_circuit_neurons": 81,
+    "expansion_neurons": 177,
+    "nodes": 258,
+    "edges": 4952,
+    "self_loops_dropped": 1,
+    "synapses_in_edges": 220286,
+    "input_nodes": 16,
+    "output_nodes": 5,
+    "signed_excitatory_nodes": 137,
+    "signed_inhibitory_nodes": 95,
+    "unsigned_nodes": 26
+  },
+  "subgraph_sha256": "48ef287df3584ff57b702a416274a68d55d28ea4bed10c5513bada67764902ed",
+  "created": "2026-09-18T18:13:08+00:00",
+  "code_commit": "06df8492f633a33f3dd70a0159e655b130c2d873"
+}

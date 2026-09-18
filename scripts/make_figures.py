@@ -114,7 +114,180 @@ def fig_convergence_all_arms() -> None:
     save(fig, str(FIG / "fig2_convergence_all_arms"))
 
 
-FIGURES = [fig_tabular_convergence, fig_convergence_all_arms]
+EXPERIMENT_TITLES = {
+    "game_a_exact": "Game A, exact",
+    "game_a_sampled": "Game A, sampled (ratio 1)",
+    "game_b_exact": "Game B, exact",
+    "game_b_sampled": "Game B, sampled",
+}
+
+
+def _tables() -> dict[str, pd.DataFrame] | None:
+    d = RES / "tables"
+    if not (d / "per_arm.csv").exists():
+        return None
+    return {p.stem: pd.read_csv(p) for p in d.glob("*.csv")}
+
+
+def _marker(arm: str) -> dict:
+    st = arm_style(arm)
+    return {"color": st["color"], "mfc": "white" if arm.endswith("+sign") else st["color"], "mew": 1.8}
+
+
+def _dot_panel(ax: plt.Axes, t: pd.DataFrame, metric: str, arms: list[str], log: bool) -> None:
+    for y, arm in enumerate(arms):
+        row = t[t["arm"] == arm]
+        if row.empty:
+            continue
+        r = row.iloc[0]
+        err = [[r[metric] - r[f"{metric}_lo"]], [r[f"{metric}_hi"] - r[metric]]]
+        ax.errorbar(r[metric], y, xerr=err, fmt="o", ms=7, capsize=3, lw=1.6, **_marker(arm))
+    ax.set_yticks(range(len(arms)))
+    ax.set_yticklabels([arm_style(a)["label"] for a in arms])
+    ax.set_ylim(len(arms) - 0.5, -0.5)
+    ax.grid(axis="y", visible=False)
+    if log:
+        ax.set_xscale("log")
+
+
+def fig_main_comparison() -> None:
+    """Dot + 95% CI per arm: final utility loss and episodes to threshold."""
+    tables = _tables()
+    if tables is None:
+        return
+    per = tables["per_arm"]
+    arms = [a for a in sort_arms(list(per["arm"].unique())) if a != "oracle"]
+    exps = [e for e in EXPERIMENT_TITLES if e in set(per["experiment"])]
+    fig, axes = plt.subplots(2, len(exps), figsize=(4.2 * len(exps), 7.8), sharey=True, squeeze=False)
+    for j, exp in enumerate(exps):
+        t = per[per["experiment"] == exp]
+        _dot_panel(axes[0, j], t, "final_exploitability", arms, log=True)
+        oracle = t[t["arm"] == "oracle"]
+        if len(oracle):
+            axes[0, j].axvline(oracle["final_exploitability"].iloc[0], color=INK, ls=":", lw=1.2, label="oracle (grid floor)")
+        axes[0, j].set(title=EXPERIMENT_TITLES[exp], xlabel="final utility loss (log scale)")
+        _dot_panel(axes[1, j], t, "steps_to_threshold_c", arms, log=False)
+        axes[1, j].set(xlabel="episodes to threshold (censored at max)")
+    axes[0, 0].legend(loc="lower right")
+    fig.suptitle("Mean and 95% bootstrap CI over evaluation seeds; hollow markers = sign-constrained", fontsize=10, color=INK_2)
+    fig.tight_layout()
+    save(fig, str(FIG / "fig3_main_comparison"))
+
+
+def fig_asymmetric_sweep() -> None:
+    """Asymmetric win/loss updates: final loss vs predicted floor, distance to the
+    predicted rest point, and the loser effect."""
+    tables = _tables()
+    if tables is None or "asym_per_arm" not in tables:
+        return
+    t = tables["asym_per_arm"]
+    arms = [a for a in sort_arms(list(t["arm"].unique())) if a != "oracle"]
+    ratios = sorted(t["loss_win_ratio"].unique())
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4.4))
+    pred = t.groupby("loss_win_ratio")["predicted_exploitability"].first()
+    axes[0].plot(pred.index, pred.values, color=INK, ls=":", lw=1.4, marker="s", ms=5, label="predicted rest point (theory sec. 3)")
+    panels = (
+        (axes[0], "final_exploitability"),
+        (axes[1], "tv_to_prediction"),
+        (axes[2], "wl_dmu_per_loss_all"),
+    )
+    for k, arm in enumerate(arms):
+        sub = t[t["arm"] == arm].sort_values("loss_win_ratio")
+        st = arm_style(arm)
+        x = sub["loss_win_ratio"].to_numpy() * (1 + 0.03 * (k - len(arms) / 2))
+        for ax, metric in panels:
+            err = [sub[metric] - sub[f"{metric}_lo"], sub[f"{metric}_hi"] - sub[metric]]
+            ax.errorbar(x, sub[metric], yerr=err, ls=st["linestyle"], marker="o", ms=5, capsize=2, lw=1.3,
+                        label=st["label"], **_marker(arm))
+    for ax in axes:
+        ax.set_xscale("log", base=2)
+        ax.set_xticks(ratios)
+        ax.set_xticklabels([f"{r:g}" for r in ratios])
+        ax.set_xlabel("alpha_loss / alpha_win")
+    axes[0].set(title="Final utility loss", ylabel="utility loss")
+    axes[1].set(title="Distance to predicted rest point", ylabel="TV(learned, predicted)")
+    axes[2].axhline(0, color=INK_2, lw=1)
+    axes[2].set(title="Loser effect (within-agent)", ylabel="change in mean quit time per loss vs win")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=5, bbox_to_anchor=(0.5, -0.07))
+    fig.tight_layout(rect=(0, 0.09, 1, 1))
+    save(fig, str(FIG / "fig4_asymmetric_sweep"))
+
+
+def fig_survival_by_arm() -> None:
+    res = load("game_a_exact")
+    if res is None:
+        return
+    cfg = res[2]["game"]
+    game = GameA(cfg["prize"], cfg["cost_rate"], TimeGrid(cfg["t_max"], cfg["n_bins"]))
+    t = game.grid.times
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2))
+    for ax, exp, title in ((axes[0], "game_a_exact", "exact"), (axes[1], "game_a_sampled", "sampled, ratio 1")):
+        ax.plot(t, exponential_survival(t, game.prize, game.cost_rate), color=INK, ls=":", lw=1.4, label="analytic exp(-ct/V)")
+        loaded = load(exp)
+        if loaded is None:
+            continue
+        extra = {"loss_win_ratio": 1.0} if exp == "game_a_sampled" else None
+        for arm in sort_arms(list(loaded[0]["arm"].unique())):
+            if arm == "oracle":
+                continue
+            pols = final_policies(exp, arm, extra)[:, 0, :]
+            st = arm_style(arm)
+            ax.plot(t[:-1], np.mean([survival(p) for p in pols], axis=0)[:-1], color=st["color"], ls=st["linestyle"], lw=1.5, label=st["label"])
+        ax.set_yscale("log")
+        ax.set(ylim=(1e-3, 1.1), xlim=(0, 6), title=f"Learned survival, Game A {title} (mean over seeds)", xlabel="quitting time t", ylabel="P(T > t)")
+    axes[1].legend(loc="lower left", fontsize=7.5)
+    fig.tight_layout()
+    save(fig, str(FIG / "fig5_survival_by_arm"))
+
+
+def fig_game_b_bids() -> None:
+    res = load("game_b_exact")
+    tables = _tables()
+    if res is None or tables is None:
+        return
+    from src.games import GameB, game_b_bid
+
+    g = res[2]["game"]
+    game = GameB(g["value_rate"], g["cost_rate"], TimeGrid(g["t_max"], g["n_bins"]), g["n_types"])
+    v = game.values
+    fig, axes = plt.subplots(1, 3, figsize=(15.5, 4.3))
+    for ax, exp in ((axes[0], "game_b_exact"), (axes[1], "game_b_sampled")):
+        ax.plot(v, np.minimum(game_b_bid(v, game.value_rate, game.cost_rate), game.grid.t_max), color=INK, ls=":", lw=1.4, label="BNE b(v) = v^2/2")
+        loaded = load(exp)
+        if loaded is None:
+            continue
+        for arm in sort_arms(list(loaded[0]["arm"].unique())):
+            if arm == "oracle":
+                continue
+            bids = final_policies(exp, arm) @ game.grid.times
+            st = arm_style(arm)
+            ax.plot(v, bids.mean(axis=0), color=st["color"], ls=st["linestyle"], lw=1.4, label=st["label"])
+        ax.set(title=f"Learned bid function, {EXPERIMENT_TITLES[exp]}", xlabel="private value v", ylabel="mean quitting time")
+    axes[0].legend(fontsize=7.5)
+    dec = tables["game_b_deciles"]
+    dec = dec[dec["experiment"] == "game_b_exact"]
+    for arm in sort_arms(list(dec["arm"].unique())):
+        if arm == "oracle":
+            continue
+        sub = dec[dec["arm"] == arm]
+        st = arm_style(arm)
+        axes[2].plot(sub["decile"], sub["mse"], color=st["color"], ls=st["linestyle"], marker="o", ms=4, lw=1.4, label=st["label"])
+        axes[2].fill_between(sub["decile"], sub["lo"], sub["hi"], color=st["color"], alpha=0.15, lw=0)
+    axes[2].set_yscale("log")
+    axes[2].set(title="Bid MSE by value decile, Game B exact", xlabel="value decile", ylabel="MSE vs v^2/2", xticks=range(1, 11))
+    fig.tight_layout()
+    save(fig, str(FIG / "fig6_game_b_bids"))
+
+
+FIGURES = [
+    fig_tabular_convergence,
+    fig_convergence_all_arms,
+    fig_main_comparison,
+    fig_asymmetric_sweep,
+    fig_survival_by_arm,
+    fig_game_b_bids,
+]
 
 
 def main() -> None:

@@ -98,6 +98,7 @@ def build_policy(
             generator=gen,
             edge_sign=circuit.edge_sign,
             sign_constrained=bool(arm.get("sign_constrained", False)),
+            sparse_max_batch=int(net_cfg["sparse_max_batch"]),
         )
     raise ValueError(f"unknown arm {name!r}")
 

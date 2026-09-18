@@ -135,9 +135,11 @@ class SparseCircuitPolicy(Policy):
         generator: torch.Generator,
         edge_sign: np.ndarray | None = None,
         sign_constrained: bool = False,
+        sparse_max_batch: int = 8,
     ) -> None:
         super().__init__()
         self.n_agents, self.n_bins, self.n_neurons = n_agents, n_bins, n_neurons
+        self.sparse_max_batch = sparse_max_batch
         self.unroll_steps = unroll_steps
         self.act = ACTIVATIONS[activation]
         edges = np.asarray(edges, dtype=np.int64)
@@ -187,13 +189,36 @@ class SparseCircuitPolicy(Policy):
         return flat.view(m, n, n)
 
     def forward(self, features: torch.Tensor, type_index: torch.Tensor) -> torch.Tensor:
+        """Edge-list message passing: ``(A h)[post] = sum_e w_e h[pre_e]``.
+
+        Numerically identical to ``act(h @ A^T + drive)`` with the dense adjacency
+        (``test_sparse_forward_matches_dense``). O(E) per step, which is faster for
+        few contexts; for many contexts (Game B) the dense matmul is faster, so we
+        switch at ``sparse_max_batch``. Only speed differs, never the function.
+        """
         m, b, _ = features.shape
-        a_t = self.adjacency().transpose(1, 2)  # (M, pre, post) so that h @ a_t = (A h)^T
+        if b > self.sparse_max_batch:
+            return self.forward_dense(features)
+        w = self.edge_weights().unsqueeze(1)  # (M, 1, E)
+        pre = self.flat_index % self.n_neurons
+        post = self.flat_index // self.n_neurons
         drive = features.new_zeros(m, b, self.n_neurons)
         drive = drive.index_copy(2, self.input_nodes, torch.bmm(features, self.w_in))
         drive = drive + self.bias
         h = features.new_zeros(m, b, self.n_neurons)
         for _ in range(self.unroll_steps):
-            h = self.act(torch.bmm(h, a_t) + drive)
+            msg = h.index_select(2, pre) * w
+            h = self.act(features.new_zeros(m, b, self.n_neurons).index_add(2, post, msg) + drive)
         out = h.index_select(2, self.output_nodes)
         return torch.baddbmm(self.readout_bias, out, self.readout)
+
+    def forward_dense(self, features: torch.Tensor) -> torch.Tensor:
+        """Reference implementation through the dense adjacency (tests only)."""
+        m, b, _ = features.shape
+        a_t = self.adjacency().transpose(1, 2)
+        drive = features.new_zeros(m, b, self.n_neurons)
+        drive = drive.index_copy(2, self.input_nodes, torch.bmm(features, self.w_in)) + self.bias
+        h = features.new_zeros(m, b, self.n_neurons)
+        for _ in range(self.unroll_steps):
+            h = self.act(torch.bmm(h, a_t) + drive)
+        return torch.baddbmm(self.readout_bias, h.index_select(2, self.output_nodes), self.readout)
