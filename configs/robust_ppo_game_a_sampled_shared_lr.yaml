@@ -1,0 +1,22 @@
+# Robustness check for the PPO grid, the protocol of configs/robust_*_shared_lr.yaml.
+#
+# Why this exists: under PPO in Game A sampled the per-arm tuning gave the signed
+# connectome 0.003 and the signed rewire 0.001, and at those rates the connectome
+# looks worse by +0.016 [0.008, 0.023], Holm p = 0.031 -- the only distinguishable
+# wiring contrast in the PPO grid. RESULTS.md sec. 5 documents exactly this trap for
+# REINFORCE, so the effect only counts if it survives one shared rate per family.
+# The FlyGM arms already tuned to one rate (0.001), so for them this is a no-op and
+# the driver skips it.
+base: ppo_game_a_sampled.yaml
+experiment: robust_ppo_game_a_sampled_shared_lr
+arms:
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+  - {name: flygm}
+  - {name: flygm_rewired}
+  - {name: flygm_random_sparse}
+lr_from: {file: tuned_lr.yaml, experiment: ppo_game_a_sampled, share_circuit_lr: true}

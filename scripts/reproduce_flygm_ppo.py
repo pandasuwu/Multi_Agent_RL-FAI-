@@ -89,6 +89,8 @@ STEPS: list[tuple[str, str, list[str], int | None]] = [
     ("tune-ppo-b", "tune_lr", ["ppo_game_b_sampled"], None),
     ("run-ppo-b", "run_experiment", ["ppo_game_b_sampled"], None),
     ("run-ppo-b-flygm", "run_experiment", ["ppo_game_b_sampled_flygm"], FLYGM_PPO_WORKERS),
+    ("robust-ppo-a", "run_experiment", ["robust_ppo_game_a_sampled_shared_lr"], None),
+    ("robust-ppo-b", "run_experiment", ["robust_ppo_game_b_sampled_shared_lr"], None),
     (
         "robust",
         "run_experiment",

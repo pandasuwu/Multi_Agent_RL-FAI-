@@ -47,3 +47,15 @@ game_b_sampled:
   rewired: 0.003
   rewired+sign: 0.01
   tabular: 0.03
+ppo_game_a_sampled:
+  connectome: 0.003
+  connectome+sign: 0.003
+  dense: 0.0001
+  flygm: 0.001
+  flygm_random_sparse: 0.001
+  flygm_rewired: 0.001
+  random_sparse: 0.001
+  random_sparse+sign: 0.003
+  rewired: 0.001
+  rewired+sign: 0.001
+  tabular: 0.003
