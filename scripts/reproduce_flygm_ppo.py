@@ -53,27 +53,42 @@ CHILD_ENV = {
     "NUMEXPR_NUM_THREADS": "1",
 }
 
-# name -> (script, configs). "tune" steps pick learning rates on the tuning seeds and
-# write configs/tuned_lr.yaml; "run" steps run the evaluation seeds.
-STEPS: list[tuple[str, str, list[str]]] = [
+# Worker cap for the FlyGM Game B steps. Measured on this machine (8 physical cores):
+# a FlyGM Game B run takes 462 s alone, 420 s with 6 running at once (no contention at
+# all), and 1752 s with 14 -- so 14 workers deliver *half* the throughput of 6. Game B
+# puts 50 contexts x 8 agents x 258 neurons through f_psi every step, and past ~6
+# processes they evict each other's working sets. Game A is 50x smaller per step and
+# does not need the cap.
+HEAVY_WORKERS = 6
+# run-ppo-b-flygm is exactly 9 runs of about 4 hours each. At 6 workers that is two
+# waves (~7.6 h) and the second wave leaves the machine nearly idle; at 9 it is one
+# wave, which wins unless the per-run slowdown at 9 exceeds 1.9x. The measured
+# contention-free point is 6 and the collapse was at 14, so 9 is the better bet here.
+FLYGM_PPO_WORKERS = 9
+
+# name -> (script, configs, worker cap or None). "tune" steps pick learning rates on
+# the tuning seeds and write configs/tuned_lr.yaml; "run" steps run the evaluation seeds.
+STEPS: list[tuple[str, str, list[str], int | None]] = [
     (
         "tune-flygm-fast",
         "tune_lr",
         ["flygm_game_a_exact", "flygm_game_a_sampled", "flygm_game_b_exact"],
+        None,
     ),
     (
         "run-flygm-fast",
         "run_experiment",
         ["flygm_game_a_exact", "flygm_game_a_sampled", "flygm_game_b_exact"],
+        None,
     ),
-    ("eval1", "run_experiment", ["game_a_exact_eval1"]),
-    ("tune-ppo-a", "tune_lr", ["ppo_game_a_sampled"]),
-    ("run-ppo-a", "run_experiment", ["ppo_game_a_sampled"]),
-    ("tune-flygm-b-sampled", "tune_lr", ["flygm_game_b_sampled"]),
-    ("run-flygm-b-sampled", "run_experiment", ["flygm_game_b_sampled"]),
-    ("tune-ppo-b", "tune_lr", ["ppo_game_b_sampled"]),
-    ("run-ppo-b", "run_experiment", ["ppo_game_b_sampled"]),
-    ("run-ppo-b-flygm", "run_experiment", ["ppo_game_b_sampled_flygm"]),
+    ("eval1", "run_experiment", ["game_a_exact_eval1"], None),
+    ("tune-ppo-a", "tune_lr", ["ppo_game_a_sampled"], None),
+    ("run-ppo-a", "run_experiment", ["ppo_game_a_sampled"], None),
+    ("tune-flygm-b-sampled", "tune_lr", ["flygm_game_b_sampled"], HEAVY_WORKERS),
+    ("run-flygm-b-sampled", "run_experiment", ["flygm_game_b_sampled"], HEAVY_WORKERS),
+    ("tune-ppo-b", "tune_lr", ["ppo_game_b_sampled"], None),
+    ("run-ppo-b", "run_experiment", ["ppo_game_b_sampled"], None),
+    ("run-ppo-b-flygm", "run_experiment", ["ppo_game_b_sampled_flygm"], FLYGM_PPO_WORKERS),
     (
         "robust",
         "run_experiment",
@@ -82,9 +97,10 @@ STEPS: list[tuple[str, str, list[str]]] = [
             "robust_flygm_game_b_exact_shared_lr",
             "robust_flygm_game_b_sampled_shared_lr",
         ],
+        HEAVY_WORKERS,
     ),
-    ("asym-ppo", "run_experiment", ["ppo_game_a_sampled_asym"]),
-    ("analyze", "analyze", []),
+    ("asym-ppo", "run_experiment", ["ppo_game_a_sampled_asym"], None),
+    ("analyze", "analyze", [], None),
 ]
 
 
@@ -152,7 +168,10 @@ def sharing_changes_nothing(path: Path) -> bool:
     return all(shared.get(arm_label(a)) == plain.get(arm_label(a)) for a in cfg["arms"])
 
 
-def run_step(name: str, script: str, configs: list[str], workers: int) -> None:
+def run_step(name: str, script: str, configs: list[str], workers: int, cap: int | None) -> None:
+    if cap is not None and workers > cap:
+        note(f"{name}: capped at {cap} workers (measured: more than that cuts throughput here)")
+        workers = cap
     paths = [f"configs/{c}.yaml" for c in configs]
     missing = [p for p in paths if not (ROOT / p).exists()]
     if missing:
@@ -193,8 +212,9 @@ def main() -> None:
     if args.log_file is not None:
         detach_from_console(args.log_file)
     if args.list:
-        for name, script, configs in STEPS:
-            print(f"{name:22s} {script:15s} {' '.join(configs)}")
+        for name, script, configs, cap in STEPS:
+            tag = f"  [<= {cap} workers]" if cap else ""
+            print(f"{name:22s} {script:15s} {' '.join(configs)}{tag}")
         return
     steps = STEPS if args.only is None else [s for s in STEPS if s[0] in set(args.only)]
     unknown = set(args.only or []) - {s[0] for s in STEPS}
@@ -202,8 +222,8 @@ def main() -> None:
         raise SystemExit(f"unknown step(s): {sorted(unknown)}")
     note(f"=== {time.strftime('%Y-%m-%d %H:%M:%S')} steps: {', '.join(s[0] for s in steps)} ===")
     started = time.perf_counter()
-    for name, script, configs in steps:
-        run_step(name, script, configs, args.workers)
+    for name, script, configs, cap in steps:
+        run_step(name, script, configs, args.workers, cap)
     note(f"=== total {(time.perf_counter() - started) / 60:.1f} min wall ===")
 
 
