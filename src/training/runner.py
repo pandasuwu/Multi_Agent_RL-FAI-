@@ -145,6 +145,8 @@ def check_parameter_matching(cfg: dict[str, Any]) -> dict[str, int]:
 
 
 def run_job(job: dict[str, Any]) -> dict[str, Any]:
+    # one thread per worker: the pool is the parallelism, so BLAS must not also
+    # thread (a fresh process defaults to one thread per physical core)
     torch.set_num_threads(1)
     cfg, arm, seed = job["cfg"], job["arm"], job["seed"]
     game = build_game(cfg["game"])
@@ -191,8 +193,14 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
     record["summary"]["wall_seconds"] = time.perf_counter() - started
     out_dir = Path(job["out_dir"]) / "runs"
     out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_dir / f"{job['run_id']}.json", "w", encoding="utf-8") as fh:
+    # Write through a temporary file and rename: a run's JSON is what `resume` uses to
+    # decide the run is done, so a process killed mid-write must not leave a truncated
+    # file behind. os.replace is atomic on the same filesystem.
+    final = out_dir / f"{job['run_id']}.json"
+    tmp = final.with_suffix(".json.partial")
+    with open(tmp, "w", encoding="utf-8") as fh:
         json.dump(record, fh, default=_json_default)
+    os.replace(tmp, final)
     return {"run_id": job["run_id"], "wall": record["summary"]["wall_seconds"]}
 
 
@@ -245,6 +253,8 @@ def run_experiment(
     for job in jobs:
         job["out_dir"] = str(out_dir)
     if resume:
+        # one JSON per finished run, so an interrupted experiment loses only the runs
+        # that were in flight; `*.json.partial` leftovers are ignored and overwritten
         done = {p.stem for p in (out_dir / "runs").glob("*.json")} if (out_dir / "runs").exists() else set()
         jobs = [j for j in jobs if j["run_id"] not in done]
     print(f"[{cfg['experiment']}] {len(jobs)} runs to do on {workers} workers")

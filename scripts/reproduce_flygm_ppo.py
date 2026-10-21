@@ -12,11 +12,21 @@ must be tuned before its runs start.
 
 Every step appends ``<name>: <seconds> s`` to ``results/flygm_ppo_log.txt``, which is
 where the wall times quoted in RESULTS.md come from.
+
+Restartable. Each run writes its own ``results/<experiment>/runs/<run_id>.json`` and
+every step resumes, so re-running the same command after a crash, a sleep or a reboot
+redoes only the runs that were in flight. Re-running a finished step costs seconds.
+
+Single-threaded workers: the pool is the parallelism, so every child gets
+``OMP/MKL/OpenBLAS/numexpr = 1`` thread (``src.training.runner.run_job`` also calls
+``torch.set_num_threads(1)``) and ``--workers`` is the only knob that decides how many
+cores are busy.
 """
 
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 import time
@@ -25,6 +35,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PY = sys.executable
 LOG = ROOT / "results" / "flygm_ppo_log.txt"
+# BLAS must stay single-threaded in every child: a fresh process otherwise takes one
+# thread per physical core, and `--workers` of those would oversubscribe the machine.
+CHILD_ENV = {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+}
 
 # name -> (script, configs). "tune" steps pick learning rates on the tuning seeds and
 # write configs/tuned_lr.yaml; "run" steps run the evaluation seeds.
@@ -70,7 +88,30 @@ def note(line: str) -> None:
 
 def run(args: list[str]) -> None:
     print("+", " ".join(args), flush=True)
-    subprocess.run([PY, *args], cwd=ROOT, check=True)
+    subprocess.run([PY, *args], cwd=ROOT, check=True, env={**os.environ, **CHILD_ENV})
+
+
+def sharing_changes_nothing(path: Path) -> bool:
+    """True if a ``share_circuit_lr`` config would run at the rates already measured.
+
+    A shared-rate robustness run is only informative when the arms were tuned to
+    *different* rates. If they all landed on the same one, the main experiment already
+    is the shared-rate run and re-running it would duplicate it exactly.
+    """
+    from src.agents.factory import arm_label
+    from src.config import load_config
+    from src.training.tuning import resolve_lr_table
+
+    cfg = load_config(path)
+    source = cfg.get("lr_from") or {}
+    if not source.get("share_circuit_lr"):
+        return False
+    try:
+        shared = resolve_lr_table(cfg)
+        plain = resolve_lr_table({**cfg, "lr_from": {k: v for k, v in source.items() if k != "share_circuit_lr"}})
+    except KeyError:
+        return False  # not tuned yet: let the run itself report the problem
+    return all(shared.get(arm_label(a)) == plain.get(arm_label(a)) for a in cfg["arms"])
 
 
 def run_step(name: str, script: str, configs: list[str], workers: int) -> None:
@@ -79,6 +120,14 @@ def run_step(name: str, script: str, configs: list[str], workers: int) -> None:
     if missing:
         note(f"{name}: SKIPPED, no config yet ({', '.join(missing)})")
         return
+    if script == "run_experiment":
+        keep = [q for q in paths if not sharing_changes_nothing(ROOT / q)]
+        for dropped in [q for q in paths if q not in keep]:
+            note(f"{name}: SKIPPED {Path(dropped).stem}, every arm tuned to the same rate "
+                 "(its main experiment already is the shared-rate run)")
+        paths = keep
+        if not paths:
+            return
     started = time.perf_counter()
     if script == "analyze":
         run(["scripts/analyze.py"])
