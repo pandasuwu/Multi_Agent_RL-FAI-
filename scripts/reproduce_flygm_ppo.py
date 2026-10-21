@@ -21,16 +21,25 @@ Single-threaded workers: the pool is the parallelism, so every child gets
 ``OMP/MKL/OpenBLAS/numexpr = 1`` thread (``src.training.runner.run_job`` also calls
 ``torch.set_num_threads(1)``) and ``--workers`` is the only knob that decides how many
 cores are busy.
+
+Unattended runs: ``--log-file PATH`` makes the driver write its own output, and every
+child's, to that file instead of to a console, and it ignores Ctrl-C and Ctrl-Break.
+Started with ``pythonw.exe`` there is then no console window anywhere in the tree, so
+nothing in the user's session can close one and take the run down with it. A run of
+this length needs that: the longest single run here is about 4 hours, and `resume`
+redoes any run that was in flight.
 """
 
 from __future__ import annotations
 
 import argparse
 import os
+import signal
 import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 PY = sys.executable
@@ -86,9 +95,38 @@ def note(line: str) -> None:
         fh.write(line + "\n")
 
 
+_CHILD_OUTPUT: Any = None  # file object when --log-file is used, else inherit
+
+
+def detach_from_console(path: Path) -> None:
+    """Send our own output, and our children's, to ``path``; ignore console signals.
+
+    Under ``pythonw.exe`` ``sys.stdout`` is None, so this also gives the driver (and
+    anything it prints through ``note``) somewhere real to write.
+    """
+    global _CHILD_OUTPUT
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _CHILD_OUTPUT = open(path, "a", buffering=1, encoding="utf-8", errors="replace")
+    sys.stdout = sys.stderr = _CHILD_OUTPUT
+    for name in ("SIGINT", "SIGBREAK"):
+        sig = getattr(signal, name, None)
+        if sig is not None:
+            try:
+                signal.signal(sig, signal.SIG_IGN)
+            except (ValueError, OSError):
+                pass
+
+
 def run(args: list[str]) -> None:
     print("+", " ".join(args), flush=True)
-    subprocess.run([PY, *args], cwd=ROOT, check=True, env={**os.environ, **CHILD_ENV})
+    subprocess.run(
+        [PY, *args],
+        cwd=ROOT,
+        check=True,
+        env={**os.environ, **CHILD_ENV},
+        stdout=_CHILD_OUTPUT,
+        stderr=_CHILD_OUTPUT,
+    )
 
 
 def sharing_changes_nothing(path: Path) -> bool:
@@ -145,7 +183,15 @@ def main() -> None:
     parser.add_argument("--workers", type=int, default=default_workers())
     parser.add_argument("--only", nargs="+", default=None, help="step names to run")
     parser.add_argument("--list", action="store_true", help="print the step names and exit")
+    parser.add_argument(
+        "--log-file",
+        type=Path,
+        default=None,
+        help="write all output here and ignore console signals (for pythonw.exe runs)",
+    )
     args = parser.parse_args()
+    if args.log_file is not None:
+        detach_from_console(args.log_file)
     if args.list:
         for name, script, configs in STEPS:
             print(f"{name:22s} {script:15s} {' '.join(configs)}")
