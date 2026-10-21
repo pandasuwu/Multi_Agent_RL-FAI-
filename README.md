@@ -23,12 +23,23 @@ The details, including small speed effects of inconsistent sign, are in
 | 3 | Connectome | recurrent circuit on the real 258-neuron / 4,952-edge MaleCNS subgraph (5,610 parameters); only existing edges have weights |
 | 4 | Degree-preserving rewire | same neurons, same in- and out-degree of every neuron, wiring shuffled by double-edge swaps, redrawn per seed |
 | 5 | Random sparse | same neurons and edge count, uniformly random edges |
+| 6 | FlyGM, real circuit | the same graph with its **synapse counts frozen** as the weights (`W[post, pre] = sign(pre)·synapses`, rescaled to spectral radius 1, never trained). What trains is a 9-dimensional descriptor per neuron, one shared update MLP `f_ψ(h_i, m_i, η_i)` with `m = W h`, the encoder and gate on PPL1, and the readout (5,638 parameters) |
+| 7 | FlyGM, rewire | the same, on the degree-preserving rewire |
+| 8 | FlyGM, random sparse | the same, on the random sparse graph |
 
 Arms 3–5 also run **sign-constrained** (Dale's law from MaleCNS transmitter predictions),
-giving 9 arms in all. Arms 2–5 match in trainable parameters within 5%. The runner
-asserts this before any run starts, and it is tested (`tests/test_connectome.py`).
-Arms 3–5 share node roles: context enters through the 16 PPL1 neurons, and the policy
+giving 9 trained-edge arms, and 12 with the FlyGM arms. Arms 2–8 match in trainable
+parameters within 5% (5,584 / 5,610 / 5,638). The runner asserts this before any run
+starts, and it is tested (`tests/test_connectome.py`, `tests/test_flygm.py`).
+Arms 3–8 share node roles: context enters through the 16 PPL1 neurons, and the policy
 is read out from the 5 AVLP727m neurons.
+
+Arms 3–5 ask whether the connectome's *sparsity* helps when every edge is free to
+learn its weight; arms 6–8 ask whether its *weights* help when they are kept exactly
+and the neurons learn instead (after Jin et al. 2026, arXiv:2602.17997). A control
+graph carries a seeded permutation of the real synapse-count multiset, so it matches
+the real circuit in sparsity, degree sequence (arm 7) and weight distribution, and
+differs only in which pair of neurons each count sits on.
 
 ## Games and protocol
 
@@ -47,6 +58,10 @@ the grid.
   sampled quitting times and payoffs (REINFORCE with a running-mean baseline). Ties
   are fair coin flips for the prize. Win/loss asymmetry scales the per-sample
   gradient by `α_loss` or `α_win`, with the ratio swept over {1, 2, 4, 8}.
+* **PPO** (`training.sampled_algorithm: ppo`) is the alternative sampled learner:
+  4 clipped updates per round on the same batch, clip 0.2, no entropy bonus, the same
+  running-mean baseline as critic, and the same win/loss weights. It runs for every
+  arm, FlyGM included.
 * **Optimizer:** the same for every arm (Adam with β₁ = 0, cosine decay). Learning
   rates are picked per arm from a fixed grid on tuning seeds 1000+, which are
   disjoint from evaluation seeds 0–19 (`configs/tuned_lr.yaml`,
@@ -85,6 +100,16 @@ On Linux/macOS use `.venv/bin/`. `make reproduce` does the same where `make` exi
 
 `--skip-connectome` and `--skip-tuning` reuse the committed subgraph and learning
 rates. The measured wall time is in RESULTS.md.
+
+The FlyGM and PPO experiments (RESULTS.md §9–§11) are a second, much longer grid:
+
+```bash
+.venv/Scripts/python scripts/reproduce_flygm_ppo.py --list
+.venv/Scripts/python scripts/reproduce_flygm_ppo.py --workers 14
+```
+
+It runs in named steps, and appends each step's measured wall time to
+`results/flygm_ppo_log.txt`.
 
 ## Layout
 

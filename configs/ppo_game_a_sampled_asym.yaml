@@ -1,0 +1,9 @@
+# Optional extension: does the asymmetric win/loss weighting of RESULTS.md sec. 6 do
+# the same thing under PPO? Same sweep over alpha_loss/alpha_win, same arms, PPO
+# instead of REINFORCE. Learning rates are the ones tuned at ratio 1
+# (ppo_game_a_sampled), so no asymmetric condition picks its own step size.
+base: ppo_game_a_sampled.yaml
+experiment: ppo_game_a_sampled_asym
+sweep:
+  training.loss_win_ratio: [1.0, 2.0, 4.0, 8.0]
+lr_from: {file: tuned_lr.yaml, experiment: ppo_game_a_sampled}

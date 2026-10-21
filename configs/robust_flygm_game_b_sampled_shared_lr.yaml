@@ -1,0 +1,13 @@
+# Robustness check for the FlyGM arm, the same protocol as configs/robust_*_shared_lr.yaml:
+# all three FlyGM graphs run at ONE learning rate (the modal tuned value within the
+# FlyGM family), so real / rewired / random differ only in the frozen matrix W.
+# The FlyGM family gets its own shared rate: it is a different architecture from the
+# trained-edge arms and the two are never compared at a shared rate.
+base: flygm_game_b_sampled.yaml
+experiment: robust_flygm_game_b_sampled_shared_lr
+arms:
+  - {name: flygm}
+  - {name: flygm_rewired}
+  - {name: flygm_random_sparse}
+sweep: null
+lr_from: {file: tuned_lr.yaml, experiment: flygm_game_b_sampled, share_circuit_lr: true}
