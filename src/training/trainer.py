@@ -7,11 +7,21 @@
 
 ``sampled`` A population of ``M`` independent agents is randomly re-matched every
             round. Each agent sees only its own sampled quitting time, the outcome and
-            its realised payoff, and updates by REINFORCE with a running-mean baseline.
+            its realised payoff, and updates by REINFORCE with a running-mean baseline,
+            or by PPO on the same batch (``training.sampled_algorithm``).
             Ties are resolved by a fair coin for the prize (expected payoff ``V/2 - ct``,
             exactly the game's tie rule; see docs/theory.md section 3.2), so every round
             is a win or a loss. The per-sample policy-gradient term is scaled by
             ``alpha_win`` after a win and ``alpha_loss`` after a loss.
+
+            With ``sampled_algorithm: ppo`` the single REINFORCE update per round is
+            replaced by ``ppo_epochs`` clipped-surrogate updates on that same batch
+            (Schulman et al. 2017), clip ``ppo_clip``, no entropy bonus. The critic is
+            the same running-mean baseline: the advantage is ``reward - baseline``,
+            computed once from the batch. The win/loss weights multiply the surrogate,
+            so asymmetric updates work exactly as they do under REINFORCE. Everything
+            else is shared: the same rollout, optimizer and cosine schedule (one
+            scheduler step per round, not per epoch).
 """
 
 from __future__ import annotations
@@ -100,8 +110,11 @@ class ExactObjective:
 
 
 # ---------------------------------------------------------------- sampled mode
+ALGORITHMS = ("reinforce", "ppo")
+
+
 class SampledSelfPlay:
-    """Random re-matching, REINFORCE with baseline and asymmetric win/loss weights."""
+    """Random re-matching, REINFORCE or PPO, with asymmetric win/loss weights."""
 
     def __init__(self, game: Game, n_agents: int, cfg: dict[str, Any], generator: torch.Generator) -> None:
         if n_agents != 1 and n_agents % 2:
@@ -110,6 +123,13 @@ class SampledSelfPlay:
         self.rounds = int(cfg["matches_per_step"])
         # a single shared policy plays both seats: 2R samples per step, slot j vs j + R
         self.shared = n_agents == 1
+        self.batch = self.rounds * (2 if self.shared else 1)
+        self.algorithm = str(cfg.get("sampled_algorithm", "reinforce"))
+        if self.algorithm not in ALGORITHMS:
+            raise ValueError(f"unknown sampled_algorithm {self.algorithm!r}, expected one of {ALGORITHMS}")
+        if self.algorithm == "ppo":
+            self.ppo_epochs = int(cfg["ppo_epochs"])
+            self.ppo_clip = float(cfg["ppo_clip"])
         self.baseline_rate = float(cfg["baseline_rate"])
         self.a_win, self.a_loss = asymmetric_weights(float(cfg["loss_win_ratio"]))
         self.times = torch.as_tensor(game.grid.times, dtype=torch.float32)
@@ -124,8 +144,13 @@ class SampledSelfPlay:
         self.baseline = torch.zeros(self.m, self.n_types)
         self.baseline_seen = torch.zeros(self.m, self.n_types, dtype=torch.bool)
 
-    def step(self, policy: Policy) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
-        m, r = self.m, self.rounds * (2 if self.shared else 1)
+    def rollout(self, policy: Policy) -> dict[str, Any]:
+        """Sample one round of matches and score it; no gradient step is taken.
+
+        Returns the per-sample log-probabilities (with gradient), the sampled bins,
+        the advantages and win/loss weights (detached), and the tracker info.
+        """
+        m, r = self.m, self.batch
         types = torch.randint(0, self.n_types, (m, r), generator=self.gen)
         # one forward pass per context, then gather: the policy of a context does not
         # depend on the match, so any number of matches costs a single forward pass
@@ -166,10 +191,60 @@ class SampledSelfPlay:
             blended = self.baseline + self.baseline_rate * (step_mean - self.baseline)
             self.baseline = torch.where(hit & self.baseline_seen, blended, torch.where(hit, step_mean, self.baseline))
             self.baseline_seen |= hit
-        logp = logp_all.gather(2, choice.unsqueeze(-1)).squeeze(-1)
-        loss = -(weight * advantage * logp).sum() / r
         info = {"won": won, "choice": choice, "probs": logp_ctx.detach().exp(), "types": types}
-        return loss, info
+        return {
+            "logp_all": logp_all,
+            "choice": choice,
+            "types": types,
+            "advantage": advantage,
+            "weight": weight,
+            "info": info,
+        }
+
+    def _logp(self, logp_all: torch.Tensor, choice: torch.Tensor) -> torch.Tensor:
+        return logp_all.gather(2, choice.unsqueeze(-1)).squeeze(-1)
+
+    def _logp_recomputed(self, policy: Policy, types: torch.Tensor, choice: torch.Tensor) -> torch.Tensor:
+        """Log-probabilities of the stored actions under the *current* parameters."""
+        logp_ctx = torch.log_softmax(policy(self.ctx_features, self.ctx_types), dim=-1)
+        logp_all = torch.gather(logp_ctx, 1, types.unsqueeze(-1).expand(-1, -1, logp_ctx.shape[-1]))
+        return self._logp(logp_all, choice)
+
+    def step(self, policy: Policy) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+        """One REINFORCE loss on a fresh round (the loss whose gradient PPO clips)."""
+        roll = self.rollout(policy)
+        logp = self._logp(roll["logp_all"], roll["choice"])
+        loss = -(roll["weight"] * roll["advantage"] * logp).sum() / self.batch
+        return loss, roll["info"]
+
+    def surrogate(
+        self,
+        logp: torch.Tensor,
+        logp_old: torch.Tensor,
+        advantage: torch.Tensor,
+        weight: torch.Tensor,
+    ) -> torch.Tensor:
+        """Clipped PPO objective, as a loss. At ``ratio = 1`` its gradient is REINFORCE's."""
+        ratio = torch.exp(logp - logp_old)
+        clipped = torch.clamp(ratio, 1.0 - self.ppo_clip, 1.0 + self.ppo_clip)
+        return -(weight * torch.minimum(ratio * advantage, clipped * advantage)).sum() / self.batch
+
+    def update(self, policy: Policy, optimizer: torch.optim.Optimizer) -> dict[str, torch.Tensor]:
+        """Collect one round and apply the update(s). Returns the tracker info."""
+        if self.algorithm == "reinforce":
+            optimizer.zero_grad(set_to_none=True)
+            loss, info = self.step(policy)
+            loss.backward()
+            optimizer.step()
+            return info
+        roll = self.rollout(policy)
+        logp_old = self._logp(roll["logp_all"], roll["choice"]).detach()
+        for _ in range(self.ppo_epochs):
+            optimizer.zero_grad(set_to_none=True)
+            logp = self._logp_recomputed(policy, roll["types"], roll["choice"])
+            self.surrogate(logp, logp_old, roll["advantage"], roll["weight"]).backward()
+            optimizer.step()
+        return roll["info"]
 
 
 class WinnerLoserTracker:
@@ -269,6 +344,8 @@ def train_run(
     if mode == "exact":
         if float(train_cfg.get("loss_win_ratio", 1.0)) != 1.0:
             raise ValueError("asymmetric win/loss weights are only defined for sampled mode")
+        if train_cfg.get("sampled_algorithm", "reinforce") != "reinforce":
+            raise ValueError("sampled_algorithm applies to sampled mode only")
         objective = ExactObjective(game, policy.n_agents)
     elif mode == "sampled":
         sampler = SampledSelfPlay(game, policy.n_agents, train_cfg, gen)
@@ -292,15 +369,14 @@ def train_run(
 
     record(0)
     for step in range(1, steps + 1):
-        optimizer.zero_grad(set_to_none=True)
         if mode == "exact":
-            loss = objective.loss(policy)
+            optimizer.zero_grad(set_to_none=True)
+            objective.loss(policy).backward()
+            optimizer.step()
         else:
-            loss, info = sampler.step(policy)
+            info = sampler.update(policy, optimizer)
             if tracker is not None:
                 tracker.update(step, info)
-        loss.backward()
-        optimizer.step()
         scheduler.step()
         if step % eval_every == 0 or step == steps:
             record(step)

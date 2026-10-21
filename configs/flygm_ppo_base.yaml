@@ -1,0 +1,27 @@
+# Shared parent of every experiment added for the FlyGM and PPO work. It only adds
+# settings; base.yaml and the existing experiment configs are untouched, so the
+# committed results stay reproducible from them.
+base: base.yaml
+network:
+  # FlyGM arm (src/agents/flygm.py): the synapses are frozen, the neurons train.
+  flygm:
+    descriptor_dim: 9       # eta_i in R^9: the only thing that distinguishes neurons
+    hidden_layers: 2        # f_psi(h_i, m_i, eta_i) -> h_i, shared by every neuron and step
+    hidden_width: matched   # solved so the trainable count matches the connectome arm (5,610)
+    unsigned_sign: 1        # sign given to the 26 neurons with no transmitter prediction.
+                            # 0 or 1. With 0 the 16 dopaminergic PPL1 input neurons have no
+                            # output at all in W and the input-output gain is exactly 0.
+    eta_init_std: 1.0       # eta ~ N(0, std): neurons start different from each other
+training:
+  # PPO (sampled mode only): `sampled_algorithm: ppo` replaces the single REINFORCE
+  # update per round with `ppo_epochs` clipped updates on the same batch. The
+  # running-mean baseline is the critic. No entropy bonus.
+  sampled_algorithm: reinforce
+  ppo_epochs: 4
+  ppo_clip: 0.2
+tuning:
+  lr_grid:
+    sampled:
+      # extended down to 0.0001: the dense arm's tuned rate sat on the old 0.0003
+      # edge of the grid in sampled mode (RESULTS.md sec. 8)
+      network: [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03]

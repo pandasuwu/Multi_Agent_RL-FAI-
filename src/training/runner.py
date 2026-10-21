@@ -27,12 +27,14 @@ import torch
 import yaml
 
 from ..agents.factory import (
-    CIRCUIT_ARMS,
+    FLYGM_ARMS,
+    GRAPH_ARMS,
     NETWORK_ARMS,
     arm_label,
     assert_matched,
     build_policy,
     circuit_param_count,
+    graph_name,
 )
 from ..config import REPO_ROOT, config_hash, deep_merge
 from ..games.equilibrium import game_a_analytic_policy, game_b_analytic_policy
@@ -98,12 +100,22 @@ def n_agents_for(cfg: dict[str, Any]) -> int:
 def circuit_for(cfg: dict[str, Any], arm: dict[str, Any], seed: int):
     from ..connectome.circuit import circuit_spec_for_arm  # heavy import only when needed
 
-    return circuit_spec_for_arm(cfg["connectome"], arm["name"], seed)
+    return circuit_spec_for_arm(cfg["connectome"], graph_name(arm["name"]), seed)
+
+
+def needs_budget(cfg: dict[str, Any], arm_name: str) -> bool:
+    """Whether this arm's size is solved from the connectome arm's parameter count."""
+    net = cfg["network"]
+    if arm_name == "dense":
+        return net["dense_width"] == "matched"
+    if arm_name in FLYGM_ARMS:
+        return net.get("flygm", {}).get("hidden_width") == "matched"
+    return False
 
 
 def parameter_budget(cfg: dict[str, Any]) -> int | None:
-    """Trainable parameters of the connectome arm; the budget the dense arm matches."""
-    if cfg["network"]["dense_width"] != "matched" or not any(a["name"] == "dense" for a in cfg["arms"]):
+    """Trainable parameters of the connectome arm; the budget other arms match."""
+    if not any(needs_budget(cfg, a["name"]) for a in cfg["arms"]):
         return None
     spec = circuit_for(cfg, {"name": "connectome"}, 0)
     return circuit_param_count(spec, int(cfg["game"]["n_bins"]))
@@ -117,9 +129,16 @@ def check_parameter_matching(cfg: dict[str, Any]) -> dict[str, int]:
     for arm in cfg["arms"]:
         if arm["name"] not in NETWORK_ARMS:
             continue
-        circuit = circuit_for(cfg, arm, 0) if arm["name"] in CIRCUIT_ARMS else None
+        circuit = circuit_for(cfg, arm, 0) if arm["name"] in GRAPH_ARMS else None
         policy = build_policy(arm, game, 1, cfg["network"], 0, circuit, budget)
         counts[arm_label(arm)] = policy.trainable_parameters_per_agent()
+    if counts:
+        # Every network arm is sized against the connectome arm's count, so that count
+        # joins the comparison even when no connectome arm runs in this experiment
+        # (the FlyGM-only configs) and even when a width was set by hand.
+        counts["connectome(budget)"] = circuit_param_count(
+            circuit_for(cfg, {"name": "connectome"}, 0), int(cfg["game"]["n_bins"])
+        )
     if len(counts) > 1:
         assert_matched(counts, float(cfg["network"]["param_tolerance"]))
     return counts
@@ -153,8 +172,8 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             final_policy=probs[0].tolist(),
         )
     else:
-        circuit = circuit_for(cfg, arm, seed) if arm["name"] in CIRCUIT_ARMS else None
-        budget = parameter_budget(cfg) if arm["name"] == "dense" else None
+        circuit = circuit_for(cfg, arm, seed) if arm["name"] in GRAPH_ARMS else None
+        budget = parameter_budget(cfg) if needs_budget(cfg, arm["name"]) else None
         torch.manual_seed(seed)
         policy = build_policy(arm, game, n_agents_for(cfg), cfg["network"], seed, circuit, budget)
         out = train_run(game, policy, cfg["training"], cfg["metrics"], learning_rate(cfg, arm), seed)
@@ -165,6 +184,9 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             summary=out.summary,
             winner_loser=out.winner_loser,
             final_policy=out.final_policy,
+            # arm-specific diagnostics (FlyGM: unsigned_sign used, spectral radius
+            # before scaling, input-to-output gain of the frozen W)
+            diagnostics=dict(getattr(policy, "diagnostics", {}) or {}),
         )
     record["summary"]["wall_seconds"] = time.perf_counter() - started
     out_dir = Path(job["out_dir"]) / "runs"
@@ -197,6 +219,7 @@ def collect(out_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
                 "config_hash": rec["config_hash"],
                 **rec["summary"],
                 **{f"wl_{k}": v for k, v in rec["winner_loser"].items()},
+                **{f"diag_{k}": v for k, v in rec.get("diagnostics", {}).items()},
             }
         )
         for row in rec["curve"]:

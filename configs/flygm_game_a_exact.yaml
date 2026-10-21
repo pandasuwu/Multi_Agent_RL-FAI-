@@ -1,0 +1,15 @@
+# FlyGM arm (frozen connectome synapses, trained neurons) on all three graphs,
+# Game A, exact gradients. New experiment and new results directory: the committed
+# game_a_exact experiment and its results are untouched.
+base: flygm_ppo_base.yaml
+experiment: flygm_game_a_exact
+arms:
+  - {name: oracle}
+  - {name: flygm}
+  - {name: flygm_rewired}
+  - {name: flygm_random_sparse}
+training:
+  mode: exact
+  steps: 3000
+  eval_every: 25
+lr_from: {file: tuned_lr.yaml, experiment: flygm_game_a_exact}

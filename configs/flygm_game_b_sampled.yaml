@@ -1,0 +1,25 @@
+# FlyGM arm, Game B, sampled self-play (REINFORCE).
+# COMPUTE REDUCTION (recorded in RESULTS.md sec. 9): this is the most expensive cell
+# in the project (50 contexts x 8 agents through a 258-neuron update network), so the
+# learning-rate grid is screened on shorter runs (`tuning.steps`) before the full
+# 3,000-episode runs on the evaluation seeds.
+base: flygm_ppo_base.yaml
+experiment: flygm_game_b_sampled
+game:
+  name: B
+  t_max: 12.0
+arms:
+  - {name: oracle}
+  - {name: flygm}
+  - {name: flygm_rewired}
+  - {name: flygm_random_sparse}
+seeds: {start: 0, count: 10}
+training:
+  mode: sampled
+  steps: 3000
+  eval_every: 50
+metrics:
+  threshold: 0.05
+tuning:
+  steps: 1000
+lr_from: {file: tuned_lr.yaml, experiment: flygm_game_b_sampled}

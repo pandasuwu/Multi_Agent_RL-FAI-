@@ -1,0 +1,16 @@
+# FlyGM arm, Game B (private values), exact gradients.
+base: flygm_ppo_base.yaml
+experiment: flygm_game_b_exact
+game:
+  name: B
+  t_max: 12.0
+arms:
+  - {name: oracle}
+  - {name: flygm}
+  - {name: flygm_rewired}
+  - {name: flygm_random_sparse}
+training:
+  mode: exact
+  steps: 4000
+  eval_every: 50
+lr_from: {file: tuned_lr.yaml, experiment: flygm_game_b_exact}

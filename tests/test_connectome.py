@@ -129,8 +129,8 @@ def test_parameter_counts_match_across_arms(config):
     cfg = load_config(config)
     cfg["arms"] = ALL_NETWORK_ARMS
     counts = check_parameter_matching(cfg)  # raises if > 5% apart
-    assert set(counts) == {arm_label(a) for a in ALL_NETWORK_ARMS}
-    circuit = [v for k, v in counts.items() if k != "dense"]
+    assert {arm_label(a) for a in ALL_NETWORK_ARMS} <= set(counts)
+    circuit = [v for k, v in counts.items() if k not in ("dense", "connectome(budget)")]
     assert len(set(circuit)) == 1  # arms 3-5 are exactly equal
     assert abs(counts["dense"] - circuit[0]) / circuit[0] < 0.05
 
@@ -174,7 +174,15 @@ def test_sign_constraint_holds_after_training():
 
 
 def test_network_arms_listed():
-    assert set(NETWORK_ARMS) == {"dense", "connectome", "rewired", "random_sparse"}
+    assert set(NETWORK_ARMS) == {
+        "dense",
+        "connectome",
+        "rewired",
+        "random_sparse",
+        "flygm",
+        "flygm_rewired",
+        "flygm_random_sparse",
+    }
 
 
 @pytest.mark.parametrize("sign", [False, True])

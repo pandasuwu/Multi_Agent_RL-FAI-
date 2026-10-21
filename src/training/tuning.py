@@ -8,6 +8,12 @@ final level. Ties go to the smaller learning rate. Sweep experiments are tuned a
 their first sweep point (``loss_win_ratio = 1``, the symmetric control), so the
 asymmetric conditions never get to pick their own step size.
 
+An experiment may set ``tuning.steps`` to screen the grid on shorter runs than the
+experiment itself uses. The criterion is unchanged (mean log10 exploitability over
+the curve); only the curve is shorter. This is a compute reduction, used for the
+settings where a full-length grid does not fit the laptop budget, and it is recorded
+in the experiment's config and in RESULTS.md.
+
 The chosen rates are written to ``configs/tuned_lr.yaml``, which experiment
 configs read through ``lr_from``.
 """
@@ -21,7 +27,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from ..agents.factory import NETWORK_ARMS, arm_label
+from ..agents.factory import CIRCUIT_ARMS, FLYGM_ARMS, NETWORK_ARMS, arm_label
 from ..config import CONFIG_DIR, REPO_ROOT
 from .runner import run_experiment
 
@@ -47,6 +53,8 @@ def tune_experiment(cfg: dict[str, Any], workers: int) -> tuple[dict[str, float]
     base["sweep"] = {}
     base.pop("lr_from", None)
     base["seeds"] = dict(cfg["tuning"]["seeds"])
+    if "steps" in cfg["tuning"]:
+        base["training"]["steps"] = int(cfg["tuning"]["steps"])
     arms = [a for a in cfg["arms"] if a["name"] == "tabular" or a["name"] in NETWORK_ARMS]
     rows = []
     scratch = REPO_ROOT / "results" / "_scratch" / "tuning"
@@ -101,13 +109,19 @@ def resolve_lr_table(cfg: dict[str, Any]) -> dict[str, Any]:
         raise KeyError(f"{path} has no tuned learning rates for {key!r}; run scripts/tune_lr.py first")
     lrs = dict(table[key])
     if source.get("share_circuit_lr"):
-        # Robustness protocol: arms 3-5 have one architecture and differ only in the
-        # mask, so give them all one step size, the most common tuned choice (ties to
-        # the smaller rate). Removes tuning noise from the wiring contrasts.
-        circuit = [v for k, v in lrs.items() if k.split("+")[0] in ("connectome", "rewired", "random_sparse")]
-        values, counts = np.unique(circuit, return_counts=True)
-        shared = float(values[np.argmax(counts)])
-        for k in lrs:
-            if k.split("+")[0] in ("connectome", "rewired", "random_sparse"):
-                lrs[k] = shared
+        # Robustness protocol: within one architecture family the arms differ only in
+        # the graph, so give the whole family one step size, its most common tuned
+        # choice (ties to the smaller rate). Removes tuning noise from the wiring
+        # contrasts. The trained-edge arms 3-5 and the FlyGM arms are separate
+        # families: they are different architectures and are never compared directly
+        # at a shared rate.
+        for family in (CIRCUIT_ARMS, FLYGM_ARMS):
+            present = [v for k, v in lrs.items() if k.split("+")[0] in family]
+            if not present:
+                continue
+            values, counts = np.unique(present, return_counts=True)
+            shared = float(values[np.argmax(counts)])
+            for k in lrs:
+                if k.split("+")[0] in family:
+                    lrs[k] = shared
     return lrs

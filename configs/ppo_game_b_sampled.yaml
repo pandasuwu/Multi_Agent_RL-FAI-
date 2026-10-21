@@ -1,0 +1,36 @@
+# PPO instead of REINFORCE in sampled self-play: 4 clipped updates per round on the
+# same batch, clip 0.2, no entropy bonus, the same running-mean baseline as critic
+# (src/training/trainer.py). Every arm that trains by sampling, Game B, symmetric
+# updates. New experiment; game_b_sampled and its results are untouched.
+base: flygm_ppo_base.yaml
+experiment: ppo_game_b_sampled
+game:
+  name: B
+  t_max: 12.0
+arms:
+  - {name: oracle}
+  - {name: tabular}
+  - {name: dense}
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+  - {name: flygm}
+  - {name: flygm_rewired}
+  - {name: flygm_random_sparse}
+seeds: {start: 0, count: 10}
+training:
+  mode: sampled
+  sampled_algorithm: ppo
+  steps: 3000
+  eval_every: 50
+metrics:
+  threshold: 0.05
+tuning:
+  # COMPUTE REDUCTION (recorded in RESULTS.md sec. 10): the learning-rate grid is
+  # screened on shorter runs here. Game B sampled is the most expensive setting and
+  # PPO costs 4 updates per round; the chosen rate is then used for full-length runs.
+  steps: 1000
+lr_from: {file: tuned_lr.yaml, experiment: ppo_game_b_sampled}

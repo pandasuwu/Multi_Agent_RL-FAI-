@@ -1,0 +1,19 @@
+# FlyGM arm, Game A, sampled self-play (REINFORCE), symmetric updates only.
+# COMPUTE REDUCTION (recorded in RESULTS.md sec. 9): 10 seeds as in the existing
+# sampled configs, and no asymmetric win/loss sweep. The sweep is about the
+# learning rule, which FlyGM shares with the other arms; it costs 4x this run.
+base: flygm_ppo_base.yaml
+experiment: flygm_game_a_sampled
+arms:
+  - {name: oracle}
+  - {name: flygm}
+  - {name: flygm_rewired}
+  - {name: flygm_random_sparse}
+seeds: {start: 0, count: 10}
+training:
+  mode: sampled
+  steps: 3000
+  eval_every: 50
+metrics:
+  threshold: 0.05
+lr_from: {file: tuned_lr.yaml, experiment: flygm_game_a_sampled}
