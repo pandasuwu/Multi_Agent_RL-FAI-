@@ -2,3 +2,6 @@
 === 2026-10-21 13:02:26 steps: tune-flygm-fast, run-flygm-fast, eval1, tune-ppo-a, run-ppo-a, tune-flygm-b-sampled, run-flygm-b-sampled, tune-ppo-b, run-ppo-b, run-ppo-b-flygm, robust ===
 === 2026-10-21 14:49:50 steps: tune-flygm-fast, run-flygm-fast, eval1, tune-ppo-a, run-ppo-a, tune-flygm-b-sampled, run-flygm-b-sampled, tune-ppo-b, run-ppo-b, run-ppo-b-flygm, robust ===
 eval1: 306 s wall (8 workers, alongside tune-flygm-fast)
+=== 2026-10-21 15:29:04 steps: tune-flygm-fast, run-flygm-fast, eval1, tune-ppo-a, run-ppo-a, tune-flygm-b-sampled, run-flygm-b-sampled, tune-ppo-b, run-ppo-b, run-ppo-b-flygm, robust ===
+=== 2026-10-21 15:39:07 steps: tune-flygm-fast, run-flygm-fast, eval1, tune-ppo-a, run-ppo-a, tune-flygm-b-sampled, run-flygm-b-sampled, tune-ppo-b, run-ppo-b, run-ppo-b-flygm, robust ===
+tune-flygm-fast: 1518 s wall (14 workers)
