@@ -11,6 +11,10 @@ flygm_game_b_exact:
   flygm: 0.01
   flygm_random_sparse: 0.01
   flygm_rewired: 0.01
+flygm_game_b_sampled:
+  flygm: 0.03
+  flygm_random_sparse: 0.03
+  flygm_rewired: 0.03
 game_a_exact:
   connectome: 0.03
   connectome+sign: 0.03
