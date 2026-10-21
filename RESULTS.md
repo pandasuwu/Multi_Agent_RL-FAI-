@@ -265,5 +265,69 @@ with loss-weighting, and it comes from the learning rule, not from the fly wirin
   * whether the Game B top-decile deficit of the signed connectome reflects its
     reciprocity and clustering (0.43 and 0.39, vs 0.10 and 0.21 after rewiring) or
     something else;
-  * whether the Game A exact speed-up (unsigned) is real beyond its 25-episode
-    evaluation resolution.
+  * ~~whether the Game A exact speed-up (unsigned) is real beyond its 25-episode
+    evaluation resolution~~ — **settled in §11**: it is real, at 15–20 episodes
+    rather than 19–24.
+
+---
+
+## 11. Does the Game A speed-up survive full time resolution?
+
+§4 reported the unsigned connectome crossing the 0.01 threshold 19–24 episodes before
+its controls, and §8 listed as not established whether that is real beyond the
+25-episode evaluation interval. `configs/game_a_exact_eval1.yaml` reruns the whole
+Game A exact grid — the same 9 arms, the same 20 evaluation seeds, the same tuned
+learning rates (`configs/tuned_lr.yaml`, `game_a_exact`) — with `eval_every: 1`.
+
+**Compute.** 180 runs, **306 s wall** on 8 workers (CPU only), run alongside the FlyGM
+tuning. Evaluating after every episode makes the per-run records 3,001 points instead
+of 121, so `results/game_a_exact_eval1/runs/` and its `curves.csv` are 168 MB and 68 MB
+and are *not* committed (`.gitignore` says so, with the command to rebuild them); the
+committed `summary.csv` holds every crossing time this section uses.
+
+**The comparison is exactly paired.** Evaluation reads the policy under `no_grad` and
+draws no random numbers, so for a given seed the two runs are the *same* training
+trajectory, observed 3,001 times instead of 121. Verified per seed: every coarse
+crossing time is the exact one rounded up to the next multiple of 25 (gap in [0, 25)
+for all 180 runs), and final exploitability agrees. Mean episodes to 0.01, 20 seeds:
+
+| arm | `eval_every: 1` | `eval_every: 25` | rounding gap |
+|---|---|---|---|
+| connectome | **216.6** | 226.2 | 9.7 |
+| connectome, signed | 239.5 | 251.2 | 11.8 |
+| rewire | 231.6 | 245.0 | 13.4 |
+| rewire, signed | 227.3 | 236.2 | 8.9 |
+| random sparse | 236.7 | 250.0 | 13.3 |
+| random sparse, signed | 228.9 | 241.2 | 12.3 |
+| dense MLP | 327.4 | 341.2 | 13.9 |
+| tabular | 629.0 | 650.0 | 21.0 |
+
+**The speed-up is real, and about a fifth smaller than the coarse grid suggested.**
+Differences in episodes to 0.01, 95% CI [Holm p]; source `results/tables/pairwise.csv`
+(experiment `game_a_exact_eval1`).
+
+| contrast | `eval_every: 1` | `eval_every: 25` (§4) |
+|---|---|---|
+| connectome − rewire | **−15.1 [−18.4, −11.7]**, g = −2.7 [0.001] | −18.8 [−23.8, −13.8] [0.001] |
+| connectome − random sparse | **−20.1 [−25.1, −15.5]**, g = −2.5 [0.001] | −23.8 [−27.5, −20.0] [0.001] |
+| connectome − dense | −110.8 [−114.6, −106.9] [0.001] | −115.0 [−120.0, −108.8] [0.001] |
+| connectome, signed − rewire, signed | +12.2 [3.0, 21.9] [0.088], not distinguishable | +15.0 [5.0, 25.0] [0.093] |
+| connectome, signed − random, signed | +10.6 [1.8, 19.6] [0.115], not distinguishable | +10.0 [0.0, 20.0] [0.321] |
+| connectome, signed − connectome | +23.0 [15.0, 31.9] [0.001] | +25.0 [16.3, 33.8] [0.001] |
+
+The coarse grid inflated the gap because the rounding is not the same for every arm:
+the connectome's mean rounding gap is 9.7 episodes against 13.4 (rewire) and 13.3
+(random), so roughly 4 of the reported 19–24 episodes were an artefact of where the
+evaluation grid happened to fall. What remains — 15 and 20 episodes, 6–8% — is
+distinguishable with a tight CI and a large effect size.
+
+**Caveats.** Three things this does not change.
+
+* It is a *speed* result only. The trajectories are identical, so final exploitability
+  is identical too, and §3–§4's conclusion that no final-loss contrast is
+  distinguishable is untouched.
+* The sign-constrained version still shows nothing, and with the opposite sign. The
+  effect does not survive Dale's law, which is the §4 reading unchanged.
+* 15 episodes out of 217 is small in a setting where the dense MLP needs 327 and the
+  tabular baseline 629, and Game A has a single context, so any policy there is a
+  reparameterisation of one distribution (§8).
