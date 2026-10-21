@@ -1,10 +1,12 @@
 """One figure style for the whole project.
 
-Colour encodes the arm *family* (fixed order, never cycled); the sign-constrained
-variant of a circuit arm keeps its family's hue and is drawn dashed, so identity
-never rests on colour alone. Every curve is a mean across seeds with a pointwise
-95% bootstrap band. Palette validated with the dataviz skill's CVD checker
-(worst all-pairs deutan Delta E 9.2).
+Colour encodes the *graph* (fixed order, never cycled). Line style encodes what
+trains on it: solid for one weight per edge, dashed for the same under Dale's law,
+dotted for the FlyGM arm, whose synapses are frozen at their real counts and whose
+neurons train instead. So the real circuit and its two controls keep their hues
+across all three architectures, and identity never rests on colour alone.
+Every curve is a mean across seeds with a pointwise 95% bootstrap band. Palette
+validated with the dataviz skill's CVD checker (worst all-pairs deutan Delta E 9.2).
 """
 
 from __future__ import annotations
@@ -31,9 +33,13 @@ FAMILY_COLOR = {
     "connectome": "#eb6834",
     "rewired": "#1baf7a",
     "random_sparse": "#4a3aa7",
+    "flygm": "#eb6834",  # same graph as "connectome", frozen synapses
+    "flygm_rewired": "#1baf7a",
+    "flygm_random_sparse": "#4a3aa7",
     "tabular": NEUTRAL,
     "oracle": INK,
 }
+FROZEN_ARMS = ("flygm", "flygm_rewired", "flygm_random_sparse")
 PRETTY = {
     "oracle": "Oracle (analytic NE)",
     "tabular": "Tabular",
@@ -44,6 +50,9 @@ PRETTY = {
     "rewired+sign": "Degree-preserving rewire, signed",
     "random_sparse": "Random sparse",
     "random_sparse+sign": "Random sparse, signed",
+    "flygm": "FlyGM, real circuit",
+    "flygm_rewired": "FlyGM, rewired",
+    "flygm_random_sparse": "FlyGM, random sparse",
 }
 ARM_ORDER = list(PRETTY)
 
@@ -81,9 +90,15 @@ def apply_style() -> None:
 
 def arm_style(label: str) -> dict[str, Any]:
     family = label.split("+")[0]
+    if label.endswith("+sign"):
+        style = "--"
+    elif family in FROZEN_ARMS:
+        style = ":"
+    else:
+        style = "-"
     return {
         "color": FAMILY_COLOR.get(family, INK_2),
-        "linestyle": "--" if label.endswith("+sign") else "-",
+        "linestyle": style,
         "label": PRETTY.get(label, label),
     }
 

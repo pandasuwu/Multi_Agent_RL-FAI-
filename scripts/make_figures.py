@@ -120,7 +120,36 @@ EXPERIMENT_TITLES = {
     "game_a_sampled": "Game A, sampled (ratio 1)",
     "game_b_exact": "Game B, exact",
     "game_b_sampled": "Game B, sampled",
+    "flygm_game_a_exact": "Game A, exact",
+    "flygm_game_a_sampled": "Game A, sampled",
+    "flygm_game_b_exact": "Game B, exact",
+    "flygm_game_b_sampled": "Game B, sampled",
+    "ppo_game_a_sampled": "Game A, sampled, PPO",
+    "ppo_game_b_sampled": "Game B, sampled, PPO",
 }
+
+# (title, trained-edge experiment, FlyGM experiment) for the same game and mode
+FROZEN_VS_TRAINED = (
+    ("Game A, exact", "game_a_exact", "flygm_game_a_exact"),
+    ("Game A, sampled", "game_a_sampled", "flygm_game_a_sampled"),
+    ("Game B, exact", "game_b_exact", "flygm_game_b_exact"),
+    ("Game B, sampled", "game_b_sampled", "flygm_game_b_sampled"),
+)
+TRAINED_EDGE_ARMS = ("dense", "connectome", "rewired", "random_sparse")
+FROZEN_ARMS = ("flygm", "flygm_rewired", "flygm_random_sparse")
+# PPO (experiment) vs REINFORCE (experiment) for the same arms
+PPO_PAIRS = (
+    ("Game A, sampled", "ppo_game_a_sampled", {
+        **{a: "game_a_sampled" for a in ("tabular", *TRAINED_EDGE_ARMS)},
+        **{a: "flygm_game_a_sampled" for a in FROZEN_ARMS},
+    }),
+    ("Game B, sampled", "ppo_game_b_sampled", {
+        **{a: "game_b_sampled" for a in ("tabular", *TRAINED_EDGE_ARMS)},
+    }),
+    ("Game B, sampled (FlyGM)", "ppo_game_b_sampled_flygm", {
+        **{a: "flygm_game_b_sampled" for a in FROZEN_ARMS},
+    }),
+)
 
 
 def _tables() -> dict[str, pd.DataFrame] | None:
@@ -175,6 +204,124 @@ def fig_main_comparison() -> None:
     fig.suptitle("Mean and 95% bootstrap CI over evaluation seeds; hollow markers = sign-constrained", fontsize=10, color=INK_2)
     fig.tight_layout()
     save(fig, str(FIG / "fig3_main_comparison"))
+
+
+def _rows_for(per: pd.DataFrame, experiment: str, arms: tuple[str, ...]) -> pd.DataFrame:
+    sub = per[(per["experiment"] == experiment) & (per["arm"].isin(arms))]
+    return sub
+
+
+def fig_flygm_vs_trained_edges() -> None:
+    """FlyGM (frozen synapses, trained neurons) against the trained-edge circuits.
+
+    Four dot panels, one per setting; the convergence curves where both architectures
+    are fastest (Game A exact); and the frozen matrix's input-to-output gain against
+    what the arm actually achieved.
+    """
+    tables = _tables()
+    if tables is None or "flygm_diagnostics" not in tables or tables["flygm_diagnostics"].empty:
+        return
+    per = tables["per_arm"]
+    arms = [*TRAINED_EDGE_ARMS, *FROZEN_ARMS]
+    fig, axes = plt.subplots(2, 3, figsize=(15.5, 8.4))
+    for ax, (title, trained, frozen) in zip(axes.flat, FROZEN_VS_TRAINED):
+        rows = pd.concat([_rows_for(per, trained, tuple(arms)), _rows_for(per, frozen, tuple(arms))])
+        if rows.empty:
+            ax.set_axis_off()
+            continue
+        _dot_panel(ax, rows, "final_exploitability", [a for a in arms if a in set(rows["arm"])], log=True)
+        oracle = per[(per["experiment"] == trained) & (per["arm"] == "oracle")]
+        if len(oracle):
+            ax.axvline(oracle["final_exploitability"].iloc[0], color=INK, ls=":", lw=1.2, label="oracle (grid floor)")
+            ax.legend(loc="lower right")
+        ax.set(title=title, xlabel="final utility loss (log scale)")
+
+    ax = axes.flat[4]
+    for exp in ("game_a_exact", "flygm_game_a_exact"):
+        loaded = load(exp)
+        if loaded is None:
+            continue
+        shown = [a for a in (*TRAINED_EDGE_ARMS, *FROZEN_ARMS) if a in set(loaded[1]["arm"])]
+        plot_curves(ax, loaded[1][loaded[1]["arm"].isin(shown)], "exploitability", np.random.default_rng(7), N_BOOT, shown)
+    ax.set(title="Game A exact: convergence", xlabel="episode (update)", ylabel="utility loss")
+    ax.legend(loc="upper right", fontsize=7)
+
+    ax = axes.flat[5]
+    diag = tables["flygm_diagnostics"]
+    for exp, marker in (("flygm_game_a_exact", "o"), ("flygm_game_b_exact", "s")):
+        sub = diag[diag["experiment"] == exp]
+        for _, r in sub.iterrows():
+            ax.errorbar(
+                r["input_output_gain"], r["final_exploitability"],
+                xerr=[[max(r["input_output_gain"] - r["input_output_gain_lo"], 0)], [max(r["input_output_gain_hi"] - r["input_output_gain"], 0)]],
+                yerr=[[max(r["final_exploitability"] - r["final_exploitability_lo"], 0)], [max(r["final_exploitability_hi"] - r["final_exploitability"], 0)]],
+                fmt=marker, ms=7, capsize=2, lw=1.4, **_marker(r["arm"]),
+            )
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set(
+        title="Frozen W: input-to-output gain vs result",
+        xlabel="sum_k |(W^k)[AVLP727m, PPL1]|, k = 1..6",
+        ylabel="final utility loss",
+    )
+    ax.plot([], [], "o", color=INK_2, label="Game A exact")
+    ax.plot([], [], "s", color=INK_2, label="Game B exact")
+    ax.legend(loc="best", fontsize=7.5)
+    fig.suptitle(
+        "Dotted line style / open row = FlyGM (synapses frozen at their real counts, neurons trained); "
+        "colour is the graph",
+        fontsize=9.5,
+        color=INK_2,
+    )
+    fig.tight_layout()
+    save(fig, str(FIG / "fig7_flygm_vs_trained_edges"))
+
+
+def fig_reinforce_vs_ppo() -> None:
+    """Same arms, same games: one REINFORCE update per round vs 4 clipped PPO updates."""
+    tables = _tables()
+    if tables is None:
+        return
+    per = tables["per_arm"]
+    panels = [(t, ppo, src) for t, ppo, src in PPO_PAIRS if ppo in set(per["experiment"])]
+    if not panels:
+        return
+    fig, axes = plt.subplots(1, len(panels) + 1, figsize=(4.6 * (len(panels) + 1), 4.6), squeeze=False)
+    for ax, (title, ppo_exp, sources) in zip(axes[0], panels):
+        arms = [a for a in sort_arms(list(sources)) if a in set(per.loc[per["experiment"] == ppo_exp, "arm"])]
+        for y, arm in enumerate(arms):
+            a = per[(per["experiment"] == ppo_exp) & (per["arm"] == arm)]
+            b = per[(per["experiment"] == sources[arm]) & (per["arm"] == arm)]
+            if a.empty or b.empty:
+                continue
+            st = _marker(arm)
+            ax.plot(
+                [b["final_exploitability"].iloc[0], a["final_exploitability"].iloc[0]],
+                [y, y], color=st["color"], lw=1.2, alpha=0.6, zorder=1,
+            )
+            ax.plot(b["final_exploitability"].iloc[0], y, "o", ms=7, mfc="white", mec=st["color"], mew=1.8, zorder=2)
+            ax.plot(a["final_exploitability"].iloc[0], y, "o", ms=7, color=st["color"], zorder=2)
+        ax.set_yticks(range(len(arms)))
+        ax.set_yticklabels([arm_style(a)["label"] for a in arms])
+        ax.set_ylim(len(arms) - 0.5, -0.5)
+        ax.grid(axis="y", visible=False)
+        ax.set_xscale("log")
+        ax.xaxis.set_minor_formatter(NullFormatter())
+        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{x:g}"))
+        ax.set(title=title, xlabel="final utility loss (log scale)")
+    ax = axes[0][-1]
+    loaded = load("ppo_game_a_sampled")
+    if loaded is not None:
+        plot_curves(ax, loaded[1], "exploitability", np.random.default_rng(8), N_BOOT)
+        ax.axhline(loaded[2]["metrics"]["threshold"], color=INK_2, lw=1, ls="-.", label="convergence threshold")
+        ax.set(title="Game A sampled, PPO: convergence", xlabel="episode (update)", ylabel="utility loss")
+        ax.legend(loc="upper right", fontsize=6.5, ncol=2)
+    axes[0][0].plot([], [], "o", ms=7, mfc="white", mec=INK_2, mew=1.8, label="REINFORCE")
+    axes[0][0].plot([], [], "o", ms=7, color=INK_2, label="PPO")
+    axes[0][0].legend(loc="lower right", fontsize=8)
+    fig.suptitle("Filled = PPO (4 clipped updates per round), hollow = REINFORCE (1 update)", fontsize=9.5, color=INK_2)
+    fig.tight_layout()
+    save(fig, str(FIG / "fig8_reinforce_vs_ppo"))
 
 
 def fig_asymmetric_sweep() -> None:
@@ -290,6 +437,8 @@ FIGURES = [
     fig_asymmetric_sweep,
     fig_survival_by_arm,
     fig_game_b_bids,
+    fig_flygm_vs_trained_edges,
+    fig_reinforce_vs_ppo,
 ]
 
 

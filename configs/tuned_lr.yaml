@@ -1,4 +1,8 @@
 # Written by scripts/tune_lr.py; do not edit by hand.
+flygm_game_a_exact:
+  flygm: 0.03
+  flygm_random_sparse: 0.03
+  flygm_rewired: 0.03
 game_a_exact:
   connectome: 0.03
   connectome+sign: 0.03
