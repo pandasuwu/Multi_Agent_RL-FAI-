@@ -439,7 +439,13 @@ def run_all(n_boot: int, seed: int = 20260918) -> dict[str, pd.DataFrame]:
 
 
 def write_tables(tables: dict[str, pd.DataFrame], directory: Path | None = None) -> None:
+    """Write every non-trivial table. A table with no columns at all (an analysis whose
+    experiments have not been run yet) is skipped rather than written as a 0-byte file:
+    readers glob this directory, and an empty file is not a readable CSV."""
     directory = directory or RESULTS / "tables"
     directory.mkdir(parents=True, exist_ok=True)
     for name, t in tables.items():
+        if t.empty and not len(t.columns):
+            print(f"[analysis] {name}: nothing to write yet, skipped")
+            continue
         t.to_csv(directory / f"{name}.csv", index=False, float_format="%.6g")

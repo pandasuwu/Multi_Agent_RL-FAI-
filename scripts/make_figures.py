@@ -156,7 +156,12 @@ def _tables() -> dict[str, pd.DataFrame] | None:
     d = RES / "tables"
     if not (d / "per_arm.csv").exists():
         return None
-    return {p.stem: pd.read_csv(p) for p in d.glob("*.csv")}
+    out = {}
+    for p in d.glob("*.csv"):
+        if p.stat().st_size == 0:
+            continue  # an analysis with no rows yet; figures that need it skip themselves
+        out[p.stem] = pd.read_csv(p)
+    return out
 
 
 def _marker(arm: str) -> dict:
