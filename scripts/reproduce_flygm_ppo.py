@@ -53,18 +53,40 @@ CHILD_ENV = {
     "NUMEXPR_NUM_THREADS": "1",
 }
 
-# Worker cap for the FlyGM Game B steps. Measured on this machine (8 physical cores):
-# a FlyGM Game B run takes 462 s alone, 420 s with 6 running at once (no contention at
-# all), and 1752 s with 14 -- so 14 workers deliver *half* the throughput of 6. Game B
-# puts 50 contexts x 8 agents x 258 neurons through f_psi every step, and past ~6
-# processes they evict each other's working sets. Game A is 50x smaller per step and
-# does not need the cap.
-HEAVY_WORKERS = 6
-# run-ppo-b-flygm is exactly 9 runs of about 4 hours each. At 6 workers that is two
-# waves (~7.6 h) and the second wave leaves the machine nearly idle; at 9 it is one
-# wave, which wins unless the per-run slowdown at 9 exceeds 1.9x. The measured
-# contention-free point is 6 and the collapse was at 14, so 9 is the better bet here.
-FLYGM_PPO_WORKERS = 9
+# Worker cap for the FlyGM Game B steps. Measured on the laptop (AMD Ryzen AI 7 350,
+# 8 physical cores): a FlyGM Game B run takes 462 s alone, 420 s with 6 running at once
+# (no contention at all), and 1752 s with 14 -- so 14 workers deliver *half* the
+# throughput of 6. Game B puts 50 contexts x 8 agents x 258 neurons through f_psi every
+# step, and past ~6 processes they evict each other's working sets. Game A is 50x
+# smaller per step and does not need the cap.
+#
+# Re-measured on the cloud machine the last two steps were actually run on (Intel Xeon
+# @ 2.10 GHz, 4 physical cores, no SMT, 15 GiB RAM, no cgroup CPU quota). Throughput
+# for 12 runs x 400 steps of flygm_game_b_sampled, pool kept saturated, one thread per
+# worker, each count measured on the same total work:
+#     3 workers   760.5 s   6.31 steps/s
+#     4 workers   699.3 s   6.86 steps/s   <- peak
+#     6 workers   759.3 s   6.32 steps/s
+# One worker per physical core wins here and oversubscription costs ~8%, so on this
+# box the cap is the core count rather than the laptop's 6. (A first pass that used
+# runs == workers appeared to peak at 6 instead; that was an artefact of the ~15 s of
+# per-run spawn/import/connectome-load overlapping compute more at higher worker
+# counts, which measuring equal total work on a saturated pool removes.)
+HEAVY_WORKERS = 4
+# run-ppo-b-flygm is exactly 9 runs, so how 9 divides matters as much as peak
+# throughput. Measured on the same cloud machine, on this cell's own config and in its
+# real 9-run shape (9 runs x 100 steps of ppo_game_b_sampled_flygm):
+#     3 workers   675.7 s   1.332 steps/s
+#     5 workers   486.0 s   1.852 steps/s   <- peak
+#     9 workers   529.1 s   1.701 steps/s
+# The per-run slowdown at 9 workers is 2.59x (5.29 s/step against 2.04 s/step
+# uncontended), past the ~1.9x break-even, so one wave of 9 loses to 5+4 after all.
+# PPO is ~5x the arithmetic per step of REINFORCE and so tolerates oversubscription
+# better than the step above (5 workers on 4 cores still wins), but 9 is too many. 5
+# also packs 9 runs as 5+4, avoiding the lone-run tail that 4 would leave (4+4+1,
+# three cores idle for a whole run). Memory is not the binding constraint: 9 workers
+# peaked at 12.8 GiB RSS with 4.5 GiB still available.
+FLYGM_PPO_WORKERS = 5
 
 # name -> (script, configs, worker cap or None). "tune" steps pick learning rates on
 # the tuning seeds and write configs/tuned_lr.yaml; "run" steps run the evaluation seeds.
