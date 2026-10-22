@@ -136,15 +136,16 @@ FROZEN_VS_TRAINED = (
     ("Game B, sampled", "game_b_sampled", "flygm_game_b_sampled"),
 )
 TRAINED_EDGE_ARMS = ("dense", "connectome", "rewired", "random_sparse")
+SIGNED_ARMS = ("connectome+sign", "rewired+sign", "random_sparse+sign")
 FROZEN_ARMS = ("flygm", "flygm_rewired", "flygm_random_sparse")
 # PPO (experiment) vs REINFORCE (experiment) for the same arms
 PPO_PAIRS = (
     ("Game A, sampled", "ppo_game_a_sampled", {
-        **{a: "game_a_sampled" for a in ("tabular", *TRAINED_EDGE_ARMS)},
+        **{a: "game_a_sampled" for a in ("tabular", *TRAINED_EDGE_ARMS, *SIGNED_ARMS)},
         **{a: "flygm_game_a_sampled" for a in FROZEN_ARMS},
     }),
     ("Game B, sampled", "ppo_game_b_sampled", {
-        **{a: "game_b_sampled" for a in ("tabular", *TRAINED_EDGE_ARMS)},
+        **{a: "game_b_sampled" for a in ("tabular", *TRAINED_EDGE_ARMS, *SIGNED_ARMS)},
     }),
     ("Game B, sampled (FlyGM)", "ppo_game_b_sampled_flygm", {
         **{a: "flygm_game_b_sampled" for a in FROZEN_ARMS},
@@ -169,6 +170,11 @@ def _marker(arm: str) -> dict:
     return {"color": st["color"], "mfc": "white" if arm.endswith("+sign") else st["color"], "mew": 1.8}
 
 
+def _shape(arm: str) -> str:
+    """Square for the FlyGM arms (frozen synapses), circle for one weight per edge."""
+    return "s" if arm.split("+")[0] in FROZEN_ARMS else "o"
+
+
 def _dot_panel(ax: plt.Axes, t: pd.DataFrame, metric: str, arms: list[str], log: bool) -> None:
     for y, arm in enumerate(arms):
         row = t[t["arm"] == arm]
@@ -176,7 +182,7 @@ def _dot_panel(ax: plt.Axes, t: pd.DataFrame, metric: str, arms: list[str], log:
             continue
         r = row.iloc[0]
         err = [[r[metric] - r[f"{metric}_lo"]], [r[f"{metric}_hi"] - r[metric]]]
-        ax.errorbar(r[metric], y, xerr=err, fmt="o", ms=7, capsize=3, lw=1.6, **_marker(arm))
+        ax.errorbar(r[metric], y, xerr=err, fmt=_shape(arm), ms=7, capsize=3, lw=1.6, **_marker(arm))
     ax.set_yticks(range(len(arms)))
     ax.set_yticklabels([arm_style(a)["label"] for a in arms])
     ax.set_ylim(len(arms) - 0.5, -0.5)
@@ -273,8 +279,8 @@ def fig_flygm_vs_trained_edges() -> None:
     ax.plot([], [], "s", color=INK_2, label="Game B exact")
     ax.legend(loc="best", fontsize=7.5)
     fig.suptitle(
-        "Dotted line style / open row = FlyGM (synapses frozen at their real counts, neurons trained); "
-        "colour is the graph",
+        "Square markers and dotted curves = FlyGM (synapses frozen at their real counts, neurons "
+        "trained); circles = one trained weight per edge; colour is the graph",
         fontsize=9.5,
         color=INK_2,
     )
@@ -320,12 +326,13 @@ def fig_reinforce_vs_ppo() -> None:
         plot_curves(ax, loaded[1], "exploitability", np.random.default_rng(8), N_BOOT)
         ax.axhline(loaded[2]["metrics"]["threshold"], color=INK_2, lw=1, ls="-.", label="convergence threshold")
         ax.set(title="Game A sampled, PPO: convergence", xlabel="episode (update)", ylabel="utility loss")
-        ax.legend(loc="upper right", fontsize=6.5, ncol=2)
+        handles, labels = ax.get_legend_handles_labels()
+        fig.legend(handles, labels, loc="lower center", ncol=6, bbox_to_anchor=(0.5, -0.08), fontsize=7.5)
     axes[0][0].plot([], [], "o", ms=7, mfc="white", mec=INK_2, mew=1.8, label="REINFORCE")
     axes[0][0].plot([], [], "o", ms=7, color=INK_2, label="PPO")
     axes[0][0].legend(loc="lower right", fontsize=8)
     fig.suptitle("Filled = PPO (4 clipped updates per round), hollow = REINFORCE (1 update)", fontsize=9.5, color=INK_2)
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.06, 1, 1))
     save(fig, str(FIG / "fig8_reinforce_vs_ppo"))
 
 
