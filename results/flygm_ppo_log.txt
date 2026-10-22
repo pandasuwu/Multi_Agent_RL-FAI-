@@ -16,3 +16,4 @@ run-ppo-a: 2841 s wall (14 workers)
 tune-flygm-b-sampled: capped at 6 workers (measured: more than that cuts throughput here)
 tune-flygm-b-sampled: 10555 s wall (6 workers)
 run-flygm-b-sampled: capped at 6 workers (measured: more than that cuts throughput here)
+=== 2026-10-22 11:08:47 steps: tune-ppo-b, run-ppo-b, robust-ppo-a, robust-ppo-b ===
