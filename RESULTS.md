@@ -266,8 +266,300 @@ with loss-weighting, and it comes from the learning rule, not from the fly wirin
     reciprocity and clustering (0.43 and 0.39, vs 0.10 and 0.21 after rewiring) or
     something else;
   * ~~whether the Game A exact speed-up (unsigned) is real beyond its 25-episode
-    evaluation resolution~~ — **settled in §11**: it is real, at 15–20 episodes
-    rather than 19–24.
+    evaluation resolution~~. **Settled in §11**: it is real, at 15 to 20 episodes
+    rather than 19 to 24.
+
+---
+
+## 9. What happens if you keep the real synapse strengths?
+
+### The idea, in plain terms
+
+Arms 3 to 5 keep the *shape* of the fly circuit. They know which neuron connects to
+which, and then they learn a strength for every one of those 4,952 connections from
+scratch. The real synapse counts are thrown away.
+
+The FlyGM arm (arms 6 to 8, after Jin et al. 2026) keeps the real numbers as well:
+
+* Every connection is fixed at its measured synapse count, with a plus or minus sign
+  taken from what the sending neuron releases. This matrix `W` never changes. It is
+  stored as a buffer, not a parameter, so no gradient can reach it.
+* The whole matrix is divided by one number so that its spectral radius is 1. Without
+  that, the weights are far too large to pass a signal through sensibly.
+* What learns instead is the *neurons*: a 9-number description per neuron, one small
+  network shared by all 258 neurons that updates them, the input layer on the 16 PPL1
+  neurons, and the readout from the 5 AVLP727m neurons.
+* Size is matched like every other arm: **5,638 trainable numbers against 5,610** for
+  the connectome arm, a difference of 0.5%. The runner checks this before every run.
+* All three graphs get the same treatment, so "real wiring" can still be compared with
+  "rewired" and "random".
+
+So arms 3 to 5 ask whether the connectome's *shape* helps. Arms 6 to 8 ask whether its
+*strengths* help.
+
+### Two numbers logged for every run
+
+| graph | spectral radius before scaling | input to output gain |
+|---|---|---|
+| real circuit | 1,230.4 | **0.0079** |
+| degree-preserving rewire | 170 to 920 (varies by seed) | 1.4 to 12.8 |
+| random sparse | 350 to 450 (varies by seed) | 7.5 to 12.9 |
+
+The gain is `sum over k = 1..6 of |(W^k)[AVLP727m, PPL1]|`. In plain terms: if you put a
+signal into the input neurons, how much of it arrives at the output neurons within the
+6 steps the network runs for. **The real circuit passes about 1,000 times less than its
+own controls do.** The reason is in the first column: the real circuit's radius is
+dominated by a strong loop elsewhere in the graph, so dividing by it shrinks the
+input-to-output path far more than it shrinks the controls' paths.
+
+One setting matters a lot here. 26 of the 258 neurons have no transmitter prediction,
+and **all 16 PPL1 input neurons are among them**. If those are given sign 0, they have
+no outgoing weight at all and the gain is exactly 0 on every graph, so the policy cannot
+see its input. `unsigned_sign` is therefore set to +1, and every run records which value
+it used (`results/tables/flygm_diagnostics.csv`).
+
+### Game A: the arm works, and the wiring makes no difference
+
+Final utility loss, 20 seeds, mean with 95% CI. Source: `results/tables/per_arm.csv`.
+
+| arm | final loss | episodes to 0.01 |
+|---|---|---|
+| FlyGM, real circuit | 0.001398 [0.001363, 0.001433] | 262.5 |
+| FlyGM, rewire | 0.001396 [0.001361, 0.001431] | 263.8 |
+| FlyGM, random sparse | 0.001391 [0.001357, 0.001428] | 262.5 |
+| oracle (the grid floor) | 0.001488 | n/a |
+
+* No contrast between the three graphs is distinguishable. The largest is 2.4e-06 with
+  an effect size of 0.03 and a Holm p of 1.0.
+* Speed is the same too: real minus rewire is **-1.25 episodes [-11.3, +8.8]**.
+* This is worth comparing with §11. With trained edges, the real circuit crosses the
+  threshold 15 episodes before its rewire, and that survives full time resolution. With
+  the synapses frozen, that advantage is gone. So the speed effect in §11 comes from the
+  *trainable* weights, not from the real connection pattern.
+* As with the circuit arms, all three sit just below the oracle, because they learn the
+  exact grid equilibrium rather than the floored analytic law.
+
+In Game A sampled the picture is the same: 0.0443, 0.0396 and 0.0439 for real, rewire
+and random, and no contrast is distinguishable (smallest Holm p is 0.35).
+
+### Game B: the arm stops working, on all three graphs
+
+This is the main finding of this section, and it is not about wiring.
+
+| arm | final loss | seeds reaching the 0.01 threshold |
+|---|---|---|
+| FlyGM, real circuit | 0.3311 [0.33112, 0.33114] | **0 of 20** |
+| FlyGM, rewire | 0.3290 | 0 of 20 |
+| FlyGM, random sparse | 0.3263 | 0 of 20 |
+| connectome, trained edges | 0.0082 | 20 of 20 |
+| dense MLP | 0.0029 | 20 of 20 |
+
+A confidence interval that narrow across 20 seeds is not noise. Every seed lands in the
+same place. Looking at what the policies actually do explains it. In Game B each player
+gets a private value `v` and should quit later when `v` is larger. Here is the mean
+quitting time each arm chooses for the smallest and the largest value:
+
+| arm | at the smallest value | at the largest value | spread | match to the correct answer |
+|---|---|---|---|---|
+| FlyGM, real circuit | 0.921 | 0.921 | **0.0000** | -0.00 |
+| FlyGM, rewire | 0.920 | 0.920 | **0.0000** | 0.69 |
+| FlyGM, random sparse | 0.923 | 0.923 | **0.0000** | 0.33 |
+| connectome, trained edges | 0.002 | 7.535 | 7.53 | 0.96 |
+| dense MLP | 0.000 | 10.569 | 10.57 | 1.00 |
+| correct answer, `b(v) = v²/2` | 0.000 | 10.604 | 10.60 | 1.00 |
+
+**The FlyGM arm plays exactly the same thing no matter what value it holds.** The stored
+policies are identical row for row, to the last digit. It is not bidding badly, it is
+not bidding at all.
+
+Why? The context does enter the network, but it does not arrive where the policy is read
+from. Measuring the spread across the 50 values at every stage of one forward pass:
+
+| graph | gain of `W` | spread across all 258 neurons | spread at the 5 readout neurons |
+|---|---|---|---|
+| real circuit | 0.008 | 0.92 | **0.000016** |
+| rewire | 12.8 | 0.93 | 0.039 |
+| random sparse | 12.9 | 0.83 | 0.042 |
+
+* The input signal is strong inside the network (spread of about 0.9) and almost absent
+  at the 5 neurons the policy is read from.
+* For the first two of the six steps the spread at the readout is exactly 0, because
+  those neurons are at least 3 connections away from the input.
+* The gain diagnostic predicts this well: 0.008 goes with 1.6e-05, and 12.8 goes with
+  0.039. **That is the diagnostic earning its place.**
+* But the controls fail too, with 1,000 times more signal to work with. So a weak path is
+  not the whole story. With `W` frozen and one update network shared by all neurons,
+  nothing in this architecture can strengthen the input to readout path on its own, and
+  the readout can only rescale what little it receives.
+
+What this means for reading the numbers:
+
+* The Game B rows above measure an arm that cannot condition on its input. They are not
+  a statement about fly wiring, and they should not be compared with dense or with the
+  trained-edge circuits as though they were.
+* The wiring comparison inside Game B is still "no difference", but for a degenerate
+  reason, so it carries no weight.
+* Game A is unaffected. It has a single context, so there is nothing to condition on,
+  and the arm performs like the circuit arms there.
+
+### FlyGM against the arms that train their edges
+
+Same game, same seeds, each arm at its own tuned rate. Source:
+`results/tables/cross_experiment.csv`.
+
+| setting | comparison | difference in final loss | episodes |
+|---|---|---|---|
+| A exact | FlyGM vs connectome (same graph) | +0.00013, not distinguishable | **+36.3**, distinguishable |
+| A exact | FlyGM rewire vs rewire | +0.00013, distinguishable | +18.8, distinguishable |
+| A exact | FlyGM vs dense MLP | **-0.00019**, distinguishable | **-78.8**, distinguishable |
+| A sampled | FlyGM vs connectome (same graph) | -0.0011, not distinguishable | +20, not distinguishable |
+| A sampled | FlyGM vs dense MLP | +0.011, distinguishable | -5, not distinguishable |
+
+* In Game A exact, freezing the synapses costs a little speed against trained edges
+  (about 36 episodes) but not accuracy.
+* The FlyGM arm still beats the dense MLP there, on both measures.
+* In Game A sampled it is as good as the trained-edge connectome and worse than dense,
+  which is the same pattern the circuit arms show (§7).
+
+### Compute and caveats
+
+* Tuning: 2 seeds per grid point, as everywhere else. The grid for sampled mode was
+  extended down to 0.0001 for this work. Every FlyGM graph picked the **same rate in
+  every setting** (0.03, 0.003, 0.01, 0.03), so this arm has none of the per-arm
+  learning-rate confound described in §5, and its shared-rate robustness runs are
+  no-ops that the driver skips.
+* The rate for Game B sampled, 0.03, sat at the top of the grid, and final loss was
+  still falling at that point. We extended the screen above the grid afterwards, same
+  protocol, and the best point is **0.1**, which beats 0.03 by 3.5% of final loss, while
+  0.3 is clearly worse (`results/tuning/flygm_game_b_sampled_grid_extension.csv`). The
+  runs were kept at 0.03. No rate in or above the grid fixes the problem described
+  above: the arm sits between 0.26 and 0.34 at every one of them.
+* Game B sampled was run as a cloud job because of its cost. Those numbers are added
+  when it finishes.
+* Measured wall times on the laptop (AMD Ryzen AI 7 350, 8 physical cores), from
+  `results/flygm_ppo_log.txt`: tuning for Game A exact, Game A sampled and Game B exact
+  took 1,518 s at 14 workers; the runs for those three settings took 8,483 s at 14
+  workers; tuning for Game B sampled took 10,555 s at 6 workers. The last of these ran
+  while the machine was also running a game, which cost about 1.9x, so it is an upper
+  bound.
+* Worker counts are not a free choice for this arm. One FlyGM Game B run takes 462 s
+  alone, 420 s with 6 running at once, and 1,752 s with 14. **Fourteen workers deliver
+  half the throughput of six**, because each step pushes 50 contexts by 8 agents by 258
+  neurons through the shared update network and they crowd each other out of cache.
+
+---
+
+## 10. PPO instead of REINFORCE
+
+### The idea, in plain terms
+
+Sampled self-play so far used REINFORCE: play 128 matches, take one gradient step, throw
+the matches away. PPO reuses them:
+
+* The same batch of matches is used for **4 updates instead of 1**.
+* Each update is clipped, with epsilon 0.2, so one batch cannot move the policy too far.
+* The critic is the running-mean baseline the project already had. There is no entropy
+  bonus.
+* The win/loss weighting still multiplies the update, so asymmetric learning still works.
+* Everything else is shared: same rollout, same optimizer, same cosine decay, one
+  scheduler step per round rather than per update.
+
+It is available to every arm, including FlyGM, by setting
+`training.sampled_algorithm: ppo`.
+
+### PPO is much faster to the threshold, and that is the clearest effect
+
+Episodes to reach the convergence threshold, 10 seeds, censored at the training length.
+
+| arm | Game A, REINFORCE | Game A, PPO | Game B, REINFORCE | Game B, PPO |
+|---|---|---|---|---|
+| dense MLP | 720 | 460 | 3,000 | **1,860** |
+| connectome | 695 | **175** | 3,000 | 3,000 |
+| connectome, signed | 680 | **160** | 3,000 | 2,675 |
+| rewire | 1,030 | 450 | 3,000 | 3,000 |
+| random sparse | 690 | 450 | 3,000 | 3,000 |
+| random sparse, signed | 710 | **155** | 3,000 | 2,350 |
+| FlyGM, real circuit | 715 | 460 | n/a | n/a |
+| tabular | 425 | 975 | 2,890 | 3,000 |
+
+* Every network arm reaches the threshold sooner under PPO in Game A, and the circuit
+  arms reach it about 4 times sooner.
+* In Game B, where almost nothing reached the threshold before, dense now does so at
+  1,860 episodes and two signed circuits get there as well.
+* The tabular baseline is the exception. It is slower under PPO in both games.
+
+### On final accuracy, PPO depends on the game
+
+Final utility loss, 10 seeds. A negative change means PPO ended closer to equilibrium.
+Bold rows are distinguishable (CI excludes 0 and Holm p < 0.05).
+
+| game | arm | REINFORCE | PPO | change |
+|---|---|---|---|---|
+| A | tabular | 0.0655 | 0.0351 | **-0.0304** |
+| A | dense MLP | 0.0333 | 0.0338 | +0.0004 |
+| A | connectome | 0.0454 | 0.0636 | +0.0182 |
+| A | connectome, signed | 0.0451 | 0.0596 | **+0.0145** |
+| A | rewire | 0.0568 | 0.0503 | -0.0064 |
+| A | FlyGM, rewire | 0.0396 | 0.0544 | **+0.0148** |
+| B | tabular | 0.0529 | 0.0811 | **+0.0282** |
+| B | dense MLP | 0.0716 | 0.0491 | **-0.0225** |
+| B | connectome, signed | 0.0942 | 0.0564 | **-0.0379** |
+| B | random sparse, signed | 0.0790 | 0.0510 | **-0.0280** |
+| B | connectome | 0.1536 | 0.1364 | -0.0172 |
+
+* In **Game A**, PPO helps the tabular baseline a lot and hurts the connectome arms.
+* In **Game B**, it is the other way round. PPO helps dense and the signed circuits and
+  hurts tabular.
+* A simple reading: PPO moves the policy faster per round. Where the limit is how fast
+  you can move (Game B, where nothing had converged), that helps. Where the limit is
+  sampling noise at a mixed equilibrium (Game A, see docs/theory.md §5), moving faster
+  just settles sooner in a worse place.
+* Late-training policy variance rises under PPO almost everywhere, which fits that
+  reading: it is noisier at the end.
+
+### Does any wiring difference show up under PPO?
+
+This needed care, because §5 of this report documents a trap: if two arms tune to
+different learning rates, a difference between them may be the rate rather than the
+wiring. Two contrasts looked distinguishable at first, so both PPO grids were re-run
+with one shared rate per family.
+
+| contrast | at each arm's own rate | at one shared rate | verdict |
+|---|---|---|---|
+| A sampled, connectome signed minus rewire signed | +0.0159, Holm p = **0.032** | +0.0139, Holm p = 0.170 | does not survive |
+| B sampled, connectome signed minus rewire signed | -0.0294, Holm p = **0.035** | +0.0049, Holm p = 0.690 | **gone, and the sign flips** |
+| B sampled, connectome minus random sparse | +0.0417, Holm p = 0.015 | **+0.0417, Holm p = 0.008** | **survives** |
+
+* The first two were the §5 trap again. In Game B the two signed arms had tuned to 0.003
+  and 0.03, and once both run at 0.01 the difference disappears and changes direction.
+* The third is different. The connectome, rewire and random sparse arms had **all**
+  tuned to 0.01 in Game B sampled, so they were already sharing a rate and those runs
+  are identical in both grids. There is no rate confound to remove.
+* So under PPO in Game B sampled, the real circuit is worse than random wiring by
+  **+0.0417 [0.021, 0.061]**, effect size 1.68, Holm p = 0.008. Against the
+  degree-preserving rewire it is +0.0249 with p = 0.198, which is not distinguishable.
+* Read it carefully. This is "wiring and degrees together", not "the specific wiring",
+  because the rewire control is not distinguishable. It is one cell of the grid with 10
+  seeds. It is the first contrast anywhere in this project to survive the shared-rate
+  check, and it points the same way as §4: where the real wiring does anything at all in
+  Game B, it makes things slightly worse.
+
+### Compute and caveats
+
+* 10 seeds per arm, 3,000 episodes, symmetric updates. Learning rates were tuned for PPO
+  separately, with the sampled grid extended down to 0.0001.
+* The shared-rate re-runs (`configs/robust_ppo_game_*_shared_lr.yaml`) were added because
+  of what the data showed, not because the plan called for them.
+* The FlyGM arms in Game B sampled under PPO are a separate experiment at **3 seeds**,
+  not 10, and they reuse the rate tuned for the same arms under REINFORCE rather than
+  getting their own. At about 4 hours of CPU per run it was the most expensive cell in
+  the project. Given §9, it measures an arm that cannot condition on its input, so it is
+  reported for completeness rather than as evidence about wiring. Those numbers are added
+  when the cloud job finishes.
+* Wall times for `tune-ppo-a` (6,906 s) and `run-ppo-a` (2,841 s) were measured while the
+  machine was also running a game. They are upper bounds and not comparable with the
+  other steps. The rest, all at 6 workers on the laptop: `tune-ppo-b` 3,135 s,
+  `run-ppo-b` 7,366 s, `robust-ppo-a` 3,862 s, `robust-ppo-b` 5,777 s.
 
 ---
 
@@ -276,8 +568,8 @@ with loss-weighting, and it comes from the learning rule, not from the fly wirin
 §4 reported the unsigned connectome crossing the 0.01 threshold 19–24 episodes before
 its controls, and §8 listed as not established whether that is real beyond the
 25-episode evaluation interval. `configs/game_a_exact_eval1.yaml` reruns the whole
-Game A exact grid — the same 9 arms, the same 20 evaluation seeds, the same tuned
-learning rates (`configs/tuned_lr.yaml`, `game_a_exact`) — with `eval_every: 1`.
+Game A exact grid (the same 9 arms, the same 20 evaluation seeds, the same tuned
+learning rates in `configs/tuned_lr.yaml` under `game_a_exact`) with `eval_every: 1`.
 
 **Compute.** 180 runs, **306 s wall** on 8 workers (CPU only), run alongside the FlyGM
 tuning. Evaluating after every episode makes the per-run records 3,001 points instead
@@ -318,8 +610,8 @@ Differences in episodes to 0.01, 95% CI [Holm p]; source `results/tables/pairwis
 The coarse grid inflated the gap because the rounding is not the same for every arm:
 the connectome's mean rounding gap is 9.7 episodes against 13.4 (rewire) and 13.3
 (random), so roughly 4 of the reported 19–24 episodes were an artefact of where the
-evaluation grid happened to fall. What remains — 15 and 20 episodes, 6–8% — is
-distinguishable with a tight CI and a large effect size.
+evaluation grid happened to fall. What remains, 15 and 20 episodes or 6 to 8 percent,
+is distinguishable with a tight CI and a large effect size.
 
 **Caveats.** Three things this does not change.
 
