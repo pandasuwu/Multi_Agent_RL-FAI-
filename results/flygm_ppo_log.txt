@@ -20,3 +20,23 @@ run-flygm-b-sampled: capped at 6 workers (measured: more than that cuts throughp
 tune-ppo-b: 3135 s wall (6 workers)
 run-ppo-b: 7366 s wall (6 workers)
 robust-ppo-a: 3862 s wall (6 workers)
+robust-ppo-b: 5777 s wall (6 workers)
+=== total 335.7 min wall ===
+=== 2026-10-22 17:00:04 steps: tune-ppo-b, run-ppo-b, robust-ppo-a, robust-ppo-b ===
+tune-ppo-b: 5 s wall (6 workers)
+run-ppo-b: 4 s wall (6 workers)
+robust-ppo-a: 4 s wall (6 workers)
+robust-ppo-b: 4 s wall (6 workers)
+=== total 0.3 min wall ===
+=== 2026-10-22 17:20:05 steps: tune-ppo-b, run-ppo-b, robust-ppo-a, robust-ppo-b ===
+tune-ppo-b: 6 s wall (6 workers)
+run-ppo-b: 5 s wall (6 workers)
+robust-ppo-a: 4 s wall (6 workers)
+robust-ppo-b: 3 s wall (6 workers)
+=== total 0.3 min wall ===
+=== 2026-10-22 17:40:04 steps: tune-ppo-b, run-ppo-b, robust-ppo-a, robust-ppo-b ===
+tune-ppo-b: 3 s wall (6 workers)
+run-ppo-b: 2 s wall (6 workers)
+robust-ppo-a: 2 s wall (6 workers)
+robust-ppo-b: 2 s wall (6 workers)
+=== total 0.2 min wall ===
