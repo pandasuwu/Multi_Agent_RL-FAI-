@@ -402,6 +402,21 @@ What this means for reading the numbers:
 * Game A is unaffected. It has a single context, so there is nothing to condition on,
   and the arm performs like the circuit arms there.
 
+**Sampled Game B behaves the same way.** 10 seeds per graph, 3,000 episodes:
+
+| arm | final loss | bid L2 | seeds reaching the 0.05 threshold | bid spread across the 50 values |
+|---|---|---|---|---|
+| FlyGM, real circuit | 0.2805 [0.2672, 0.2941] | 2.14 | 0 of 10 | **0.0000** |
+| FlyGM, rewire | 0.2761 [0.2514, 0.3056] | 2.23 | 0 of 10 | **0.0000** |
+| FlyGM, random sparse | 0.2551 [0.2408, 0.2709] | 2.50 | 0 of 10 | **0.0000** |
+| oracle (the grid floor) | 0.0058 | 0.0 | 10 of 10 | n/a |
+
+* Every one of the 30 runs plays one policy for all 50 values. The collapse is not
+  specific to exact gradients.
+* No wiring contrast is distinguishable. The closest is real against random sparse,
+  +0.0253 [0.0048, 0.0449], Holm p = 0.089.
+* Every arm is about 45 times the grid floor, and no seed got near the threshold.
+
 ### FlyGM against the arms that train their edges
 
 Same game, same seeds, each arm at its own tuned rate. Source:
@@ -429,8 +444,10 @@ Same game, same seeds, each arm at its own tuned rate. Source:
   learning-rate confound described in §5, and its shared-rate robustness runs are
   no-ops that the driver skips.
 * The rate for Game B sampled needs a longer note, below.
-* Game B sampled was run as a cloud job because of its cost. Those numbers are added
-  when it finishes.
+* Game B sampled was split across two machines because of its cost: 23 runs on a
+  4-core cloud box and the last 7 on the laptop. The per-run wall times in its
+  `summary.csv` are therefore a mix of two machines and are not one measurement. The
+  laptop logged 8,200 s at 6 workers for its share.
 * Measured wall times on the laptop (AMD Ryzen AI 7 350, 8 physical cores), from
   `results/flygm_ppo_log.txt`: tuning for Game A exact, Game A sampled and Game B exact
   took 1,518 s at 14 workers; the runs for those three settings took 8,483 s at 14
@@ -458,7 +475,7 @@ That is exactly what happened. Looking at every completed run's own curve:
 |---|---|---|---|---|---|
 | FlyGM, real circuit | 10 | 0.2511 | 0.2806 | 12.1% | 10 of 10 |
 | FlyGM, rewire | 10 | 0.2426 | 0.2761 | 14.1% | 6 of 10 |
-| FlyGM, random sparse | 3 | 0.2420 | 0.2679 | 10.6% | 3 of 3 |
+| FlyGM, random sparse | 10 | 0.2457 | 0.2545 | 3.6% | 6 of 10 |
 
 * Nothing is NaN or infinite, so this is not numerical blow-up. It is overshoot: the
   runs descend quickly, reach their best point early, then drift back up and stay there.
