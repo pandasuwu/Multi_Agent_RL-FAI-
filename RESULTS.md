@@ -491,8 +491,23 @@ Two further points, both against our own earlier reading:
   3.5% (`results/tuning/flygm_game_b_sampled_grid_extension.csv`). But that extension
   used the **same 1,000-step screen**, so it carries the same bias. It shows the grid
   was truncated. It does not show which rate is best over 3,000 steps.
-* The honest summary is therefore: the rate used here was picked on a shorter horizon
-  than the runs it was used for, and the runs overshoot as a result.
+* So we tested the thing the screen could not: the next rate down, 0.01, run for the
+  **full 3,000 steps**, 3 seeds per graph, matched seed for seed against the 0.03 runs
+  (`results/tuning/flygm_game_b_sampled_horizon_check.csv`).
+
+| arm | final at 0.03 | final at 0.01 | best reached at 0.03 |
+|---|---|---|---|
+| FlyGM, real circuit | 0.2868 | 0.2870 | 0.2506 |
+| FlyGM, rewire | 0.2968 | 0.2647 | 0.2486 |
+| FlyGM, random sparse | 0.2679 | 0.2635 | 0.2420 |
+
+  The lower rate ends better on 5 of the 9 matched runs, which is a coin flip, and the
+  means are the same for the real circuit. So the overshoot is real and visible in the
+  curves, but **lowering the rate does not fix it**: a smaller step overshoots less and
+  also descends less far, and both land in the same place.
+* The honest summary is therefore: the rate was picked on a shorter horizon than the
+  runs it was used for, and that shows up as overshoot, but it is not what holds this
+  arm at 0.27. Nothing between 0.001 and 0.3 moves it.
 
 What it does not change:
 
