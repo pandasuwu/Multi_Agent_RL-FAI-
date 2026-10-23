@@ -11,3 +11,7 @@ results/_scratch/
 #   python scripts/run_experiment.py configs/game_a_exact_eval1.yaml
 results/game_a_exact_eval1/runs/
 results/game_a_exact_eval1/curves.csv
+
+# the user's own working files, untracked at the start of this work
+report/
+Claude outputs/
