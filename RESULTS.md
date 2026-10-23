@@ -428,12 +428,7 @@ Same game, same seeds, each arm at its own tuned rate. Source:
   every setting** (0.03, 0.003, 0.01, 0.03), so this arm has none of the per-arm
   learning-rate confound described in §5, and its shared-rate robustness runs are
   no-ops that the driver skips.
-* The rate for Game B sampled, 0.03, sat at the top of the grid, and final loss was
-  still falling at that point. We extended the screen above the grid afterwards, same
-  protocol, and the best point is **0.1**, which beats 0.03 by 3.5% of final loss, while
-  0.3 is clearly worse (`results/tuning/flygm_game_b_sampled_grid_extension.csv`). The
-  runs were kept at 0.03. No rate in or above the grid fixes the problem described
-  above: the arm sits between 0.26 and 0.34 at every one of them.
+* The rate for Game B sampled needs a longer note, below.
 * Game B sampled was run as a cloud job because of its cost. Those numbers are added
   when it finishes.
 * Measured wall times on the laptop (AMD Ryzen AI 7 350, 8 physical cores), from
@@ -446,6 +441,52 @@ Same game, same seeds, each arm at its own tuned rate. Source:
   alone, 420 s with 6 running at once, and 1,752 s with 14. **Fourteen workers deliver
   half the throughput of six**, because each step pushes 50 contexts by 8 agents by 258
   neurons through the shared update network and they crowd each other out of cache.
+
+### A problem with how the Game B sampled rate was chosen
+
+This one is worth spelling out, because the fix for one compute problem created
+another.
+
+To keep the cost down, `flygm_game_b_sampled.yaml` screens learning rates on
+**1,000 steps** (`tuning.steps`) but the real runs are **3,000 steps**. On a short
+horizon the rate that drops fastest wins. That is not always the rate that ends up in
+the best place.
+
+That is exactly what happened. Looking at every completed run's own curve:
+
+| arm | runs | best value reached | final value | ends worse than its own best by | best value reached in the first half |
+|---|---|---|---|---|---|
+| FlyGM, real circuit | 10 | 0.2511 | 0.2806 | 12.1% | 10 of 10 |
+| FlyGM, rewire | 10 | 0.2426 | 0.2761 | 14.1% | 6 of 10 |
+| FlyGM, random sparse | 3 | 0.2420 | 0.2679 | 10.6% | 3 of 3 |
+
+* Nothing is NaN or infinite, so this is not numerical blow-up. It is overshoot: the
+  runs descend quickly, reach their best point early, then drift back up and stay there.
+* Some are extreme. One seed reached its best value at **step 50 of 3,000** and got
+  worse for the remaining 2,950.
+* So the number reported for this arm is not its best under this setting. Reported is
+  about 0.28; the best reached during training is about 0.24.
+
+Two further points, both against our own earlier reading:
+
+* The grid for this setting stopped at 0.03 and final loss was still falling there, so
+  we extended the screen to 0.1 and 0.3 afterwards. 0.1 came out best, beating 0.03 by
+  3.5% (`results/tuning/flygm_game_b_sampled_grid_extension.csv`). But that extension
+  used the **same 1,000-step screen**, so it carries the same bias. It shows the grid
+  was truncated. It does not show which rate is best over 3,000 steps.
+* The honest summary is therefore: the rate used here was picked on a shorter horizon
+  than the runs it was used for, and the runs overshoot as a result.
+
+What it does not change:
+
+* The arm plays the same policy for every value, at every rate we have tried, between
+  0.001 and 0.3. A step size cannot fix an arm that does not read its input.
+* All three graphs share the rate, so the comparison between them is unaffected.
+* Game A is unaffected: its rates were screened on the full run length, and its runs do
+  not overshoot.
+
+This was found by the cloud session running the cell, from the shape of the curves, not
+by the tuner.
 
 ---
 
