@@ -46,3 +46,4 @@ robust-ppo-b: 2 s wall (6 workers)
 # --- cloud session (Intel Xeon 2.10 GHz, 4 physical cores) ---
 === 2026-10-22 08:35:23 steps: run-flygm-b-sampled, run-ppo-b-flygm ===
 run-flygm-b-sampled: capped at 4 workers (measured: more than that cuts throughput here)
+=== 2026-10-23 11:30:27 steps: run-flygm-b-sampled ===
