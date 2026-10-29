@@ -10,7 +10,15 @@ import torch
 
 from ..games.war_of_attrition import Game, GameA
 from .flygm import FlyGMPolicy, flygm_param_count, match_flygm_width
-from .policies import DenseMLP, Policy, SparseCircuitPolicy, TabularPolicy, dense_param_count, match_dense_width
+from .policies import (
+    DenseMLP,
+    Policy,
+    SparseCircuitPolicy,
+    TabularPolicy,
+    dense_param_count,
+    match_dense_width,
+    readout_param_count,
+)
 
 CIRCUIT_ARMS = ("connectome", "rewired", "random_sparse")
 # FlyGM arms: same three graphs, but the synapses are frozen and the neurons train
@@ -55,14 +63,22 @@ class CircuitSpec:
         return self.node_sign[self.edges[:, 0]]
 
 
-def circuit_param_count(spec: CircuitSpec, n_bins: int) -> int:
+def readout_settings(net_cfg: dict[str, Any], key: str = "readout") -> tuple[str, int]:
+    """``(nodes, rank)`` of the graph arms' readout. ``network.readout`` is ``output``
+    (the default: the 5 AVLP727m neurons) or ``all`` (every neuron, through a rank
+    ``network.readout_rank`` map). ``key = "budget_readout"`` gives the readout the
+    parameter budget is computed with, which defaults to the arms' own."""
+    nodes = net_cfg.get(key, net_cfg.get("readout", "output"))
+    return str(nodes), int(net_cfg.get("readout_rank", 0)) if nodes == "all" else 0
+
+
+def circuit_param_count(spec: CircuitSpec, n_bins: int, readout_nodes: str = "output", readout_rank: int = 0) -> int:
     """Trainable parameters of one :class:`SparseCircuitPolicy` agent."""
     return (
         D_IN * len(spec.input_nodes)
         + len(spec.edges)
         + spec.n_neurons
-        + len(spec.output_nodes) * n_bins
-        + n_bins
+        + readout_param_count(spec.n_neurons, len(spec.output_nodes), n_bins, readout_nodes, readout_rank)
     )
 
 
@@ -82,6 +98,8 @@ def flygm_hidden_width(net_cfg: dict[str, Any], target_params: int | None, n_bin
             n_bins,
             int(fly["descriptor_dim"]),
             int(fly["hidden_layers"]),
+            *readout_settings(net_cfg),
+            bool(fly.get("w_gain", False)),
         )
     return int(width)
 
@@ -139,6 +157,9 @@ def build_policy(
             unsigned_sign=float(fly["unsigned_sign"]),
             eta_init_std=float(fly["eta_init_std"]),
             generator=gen,
+            readout_nodes=readout_settings(net_cfg)[0],
+            readout_rank=readout_settings(net_cfg)[1],
+            w_gain=bool(fly.get("w_gain", False)),
         )
     if name in CIRCUIT_ARMS:
         if circuit is None:
@@ -158,6 +179,8 @@ def build_policy(
             edge_sign=circuit.edge_sign,
             sign_constrained=bool(arm.get("sign_constrained", False)),
             sparse_max_batch=int(net_cfg["sparse_max_batch"]),
+            readout_nodes=readout_settings(net_cfg)[0],
+            readout_rank=readout_settings(net_cfg)[1],
         )
     raise ValueError(f"unknown arm {name!r}")
 
@@ -191,4 +214,5 @@ __all__ = [
     "flygm_hidden_width",
     "flygm_param_count",
     "graph_name",
+    "readout_settings",
 ]

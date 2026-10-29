@@ -17,6 +17,10 @@ trains is
   ``drive_i = enc_i(x) * sigmoid(gate_i(x))``;
 * the readout from the output (AVLP727m) neurons to the ``n_bins`` logits,
   zero-initialised like every other arm so training starts from the uniform policy.
+  ``readout_nodes: all`` reads out from every neuron through a rank-``readout_rank``
+  map instead (:class:`~src.agents.policies.GraphReadoutMixin`);
+* optionally (``w_gain``), one trainable scalar ``g`` per agent on the frozen
+  matrix, ``m = g * W h + drive``, initialised to 1. ``W`` itself stays frozen.
 
 ``unroll_steps`` is shared with the circuit arms (6), so the two architectures see
 the graph for the same number of synaptic hops.
@@ -47,7 +51,7 @@ import numpy as np
 import torch
 from torch import nn
 
-from .policies import ACTIVATIONS, Policy
+from .policies import ACTIVATIONS, GraphReadoutMixin, Policy, readout_param_count
 
 
 def signed_weight_matrix(
@@ -95,12 +99,16 @@ def flygm_param_count(
     descriptor_dim: int,
     width: int,
     layers: int,
+    readout_nodes: str = "output",
+    readout_rank: int = 0,
+    w_gain: bool = False,
 ) -> int:
     """Trainable parameters of one :class:`FlyGMPolicy` agent (``W`` is not one)."""
     sizes = [2 + descriptor_dim, *([width] * layers), 1]
     mlp = sum(a * b + b for a, b in zip(sizes[:-1], sizes[1:]))
     encoder = 2 * (d_in * n_in + n_in)  # encoder and gate, each with a bias
-    return n_neurons * descriptor_dim + encoder + mlp + n_out * n_bins + n_bins
+    readout = readout_param_count(n_neurons, n_out, n_bins, readout_nodes, readout_rank)
+    return n_neurons * descriptor_dim + encoder + mlp + readout + int(w_gain)
 
 
 def match_flygm_width(
@@ -112,19 +120,23 @@ def match_flygm_width(
     n_bins: int,
     descriptor_dim: int,
     layers: int,
+    readout_nodes: str = "output",
+    readout_rank: int = 0,
+    w_gain: bool = False,
 ) -> int:
     """Width of ``f_psi`` whose trainable count is closest to ``target``."""
     best, best_gap = 1, float("inf")
     for h in range(1, 4096):
-        gap = abs(
-            flygm_param_count(n_neurons, d_in, n_in, n_out, n_bins, descriptor_dim, h, layers) - target
+        count = flygm_param_count(
+            n_neurons, d_in, n_in, n_out, n_bins, descriptor_dim, h, layers, readout_nodes, readout_rank, w_gain
         )
+        gap = abs(count - target)
         if gap < best_gap:
             best, best_gap = h, gap
     return best
 
 
-class FlyGMPolicy(Policy):
+class FlyGMPolicy(GraphReadoutMixin, Policy):
     """Frozen synapses, learned per-neuron descriptors and one shared update MLP."""
 
     def __init__(
@@ -146,6 +158,9 @@ class FlyGMPolicy(Policy):
         unsigned_sign: float,
         eta_init_std: float,
         generator: torch.Generator,
+        readout_nodes: str = "output",
+        readout_rank: int = 0,
+        w_gain: bool = False,
     ) -> None:
         super().__init__()
         self.n_agents, self.n_bins, self.n_neurons = n_agents, n_bins, n_neurons
@@ -156,7 +171,7 @@ class FlyGMPolicy(Policy):
         raw = signed_weight_matrix(n_neurons, edges, synapses, node_sign, unsigned_sign)
         radius = spectral_radius(raw)
         scaled = raw / radius if radius > 0 else raw
-        self.diagnostics: dict[str, Any] = {
+        self._diagnostics: dict[str, Any] = {
             "unsigned_sign": float(unsigned_sign),
             "spectral_radius_raw": radius,
             "input_output_gain": input_output_gain(scaled, input_nodes, output_nodes, self.unroll_steps),
@@ -190,8 +205,19 @@ class FlyGMPolicy(Policy):
             self.psi_weights.append(nn.Parameter(w0))
             self.psi_biases.append(nn.Parameter(torch.zeros(n_agents, 1, b)))
 
-        self.readout = nn.Parameter(torch.zeros(n_agents, n_out, n_bins))
-        self.readout_bias = nn.Parameter(torch.zeros(n_agents, 1, n_bins))
+        # Built last, so with the defaults every initialisation is bit-identical to
+        # what it was before these options existed.
+        self._init_readout(n_agents, n_neurons, n_out, n_bins, readout_nodes, readout_rank, generator)
+        self.w_gain = nn.Parameter(torch.ones(n_agents, 1, 1)) if w_gain else None
+
+    @property
+    def diagnostics(self) -> dict[str, Any]:
+        """Per-graph diagnostics fixed at construction, plus the trained gain on ``W``
+        (mean over agents) when there is one: read after training, it is the final value."""
+        out = dict(self._diagnostics)
+        if self.w_gain is not None:
+            out["w_gain"] = float(self.w_gain.detach().mean())
+        return out
 
     def _psi(self, z: torch.Tensor) -> torch.Tensor:
         """Shared update MLP on ``(M, P, 2 + D)`` features, returning ``(M, P, 1)``."""
@@ -211,11 +237,13 @@ class FlyGMPolicy(Policy):
         eta = self.eta.unsqueeze(1).expand(m, b, n, d)
         h = features.new_zeros(m, b, n)
         for _ in range(self.unroll_steps):
-            msg = torch.matmul(h, self.w.t()) + drive
+            recurrent = torch.matmul(h, self.w.t())
+            if self.w_gain is not None:
+                recurrent = recurrent * self.w_gain  # (M, 1, 1)
+            msg = recurrent + drive
             z = torch.cat([h.unsqueeze(-1), msg.unsqueeze(-1), eta], dim=-1).reshape(m, b * n, 2 + d)
             h = self.act(self._psi(z).reshape(m, b, n))
-        out = h.index_select(2, self.output_nodes)
-        return torch.baddbmm(self.readout_bias, out, self.readout)
+        return self._read(h)
 
 
 __all__ = [

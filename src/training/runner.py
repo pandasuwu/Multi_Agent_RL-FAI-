@@ -35,6 +35,7 @@ from ..agents.factory import (
     build_policy,
     circuit_param_count,
     graph_name,
+    readout_settings,
 )
 from ..config import REPO_ROOT, config_hash, deep_merge
 from ..games.equilibrium import game_a_analytic_policy, game_b_analytic_policy
@@ -118,7 +119,7 @@ def parameter_budget(cfg: dict[str, Any]) -> int | None:
     if not any(needs_budget(cfg, a["name"]) for a in cfg["arms"]):
         return None
     spec = circuit_for(cfg, {"name": "connectome"}, 0)
-    return circuit_param_count(spec, int(cfg["game"]["n_bins"]))
+    return circuit_param_count(spec, int(cfg["game"]["n_bins"]), *readout_settings(cfg["network"], "budget_readout"))
 
 
 def check_parameter_matching(cfg: dict[str, Any]) -> dict[str, int]:
@@ -136,9 +137,14 @@ def check_parameter_matching(cfg: dict[str, Any]) -> dict[str, int]:
         # Every network arm is sized against the connectome arm's count, so that count
         # joins the comparison even when no connectome arm runs in this experiment
         # (the FlyGM-only configs) and even when a width was set by hand.
-        counts["connectome(budget)"] = circuit_param_count(
-            circuit_for(cfg, {"name": "connectome"}, 0), int(cfg["game"]["n_bins"])
+        counts["connectome(budget)"] = budget if budget is not None else circuit_param_count(
+            circuit_for(cfg, {"name": "connectome"}, 0), int(cfg["game"]["n_bins"]), *readout_settings(cfg["network"])
         )
+        # Likewise the dense arm at the same budget, so an experiment without one (a
+        # FlyGM-only grid) is still checked against the dense MLP it is compared with.
+        if budget is not None and "dense" not in counts and cfg["network"]["dense_width"] == "matched":
+            dense = build_policy({"name": "dense"}, game, 1, cfg["network"], 0, None, budget)
+            counts["dense(budget)"] = dense.trainable_parameters_per_agent()
     if len(counts) > 1:
         assert_matched(counts, float(cfg["network"]["param_tolerance"]))
     return counts

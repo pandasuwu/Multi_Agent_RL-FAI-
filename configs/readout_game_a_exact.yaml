@@ -1,0 +1,36 @@
+# Readout fix, Game A exact: the sanity check (RESULTS.md sec. 12). Every graph arm
+# reads its policy out from all 258 neurons through a rank-4 map instead of from the 5
+# AVLP727m neurons.
+#
+# Why: in FlyGM Game B the 5 readout neurons saturate at +-1 during training, which
+# removes both the value signal and every gradient upstream of them (the collapse in
+# RESULTS.md sec. 9). The trained-edge circuit arms get the same readout, so FlyGM is
+# still compared with them like for like, and the parameter budget (the connectome
+# arm's count) rises from 5,610 to 6,578. Dense and FlyGM are re-matched to it, and
+# param_tolerance is tightened to 0.5%.
+#
+# Caveat: the input (PPL1) neurons are among the 258, so the policy can now be read
+# from neurons the context drives directly, bypassing the circuit.
+base: flygm_ppo_base.yaml
+experiment: readout_game_a_exact
+network:
+  readout: all
+  readout_rank: 4
+  param_tolerance: 0.005
+arms:
+  - {name: oracle}
+  - {name: dense}
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+  - {name: flygm}
+  - {name: flygm_rewired}
+  - {name: flygm_random_sparse}
+training:
+  mode: exact
+  steps: 3000
+  eval_every: 25
+lr_from: {file: tuned_lr.yaml, experiment: readout_game_a_exact}

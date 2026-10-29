@@ -125,6 +125,12 @@ STEPS: list[tuple[str, str, list[str], int | None]] = [
         HEAVY_WORKERS,
     ),
     ("asym-ppo", "run_experiment", ["ppo_game_a_sampled_asym"], None),
+    # The readout and gain fixes for the FlyGM Game B collapse (RESULTS.md sec. 12),
+    # Game B first, then Game A as the sanity check.
+    ("tune-readout-b", "tune_lr", ["readout_game_b_exact", "wgain_game_b_exact"], HEAVY_WORKERS),
+    ("run-readout-b", "run_experiment", ["readout_game_b_exact", "wgain_game_b_exact"], HEAVY_WORKERS),
+    ("tune-readout-a", "tune_lr", ["readout_game_a_exact", "wgain_game_a_exact"], HEAVY_WORKERS),
+    ("run-readout-a", "run_experiment", ["readout_game_a_exact", "wgain_game_a_exact"], HEAVY_WORKERS),
     ("analyze", "analyze", [], None),
 ]
 

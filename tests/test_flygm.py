@@ -72,7 +72,7 @@ def test_runner_asserts_matching_for_a_flygm_only_config():
     """The 5% assert fires for FlyGM too, against the connectome arm's count."""
     cfg = load_config("configs/flygm_game_a_exact.yaml")
     counts = check_parameter_matching(cfg)
-    assert set(counts) == {*FLYGM_ARMS, "connectome(budget)"}
+    assert set(counts) == {*FLYGM_ARMS, "connectome(budget)", "dense(budget)"}
     assert counts["connectome(budget)"] == 5610
     lo, hi = min(counts.values()), max(counts.values())
     assert (hi - lo) / lo < 0.05

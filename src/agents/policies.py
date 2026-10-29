@@ -87,6 +87,59 @@ class DenseMLP(Policy):
         return h
 
 
+READOUTS = ("output", "all")
+
+
+def readout_param_count(n_neurons: int, n_out: int, n_bins: int, nodes: str = "output", rank: int = 0) -> int:
+    """Trainable parameters of a graph arm's readout (logit bias included).
+
+    ``output``: a full ``n_out x n_bins`` map from the output (AVLP727m) neurons.
+    ``all``: a rank-``rank`` map from every neuron, ``h @ U @ V`` with ``U`` of
+    ``n_neurons x rank`` and ``V`` of ``rank x n_bins``. A full map from all 258
+    neurons would be 16,512 parameters, three times the whole budget."""
+    if nodes == "output":
+        return n_out * n_bins + n_bins
+    if nodes == "all":
+        return n_neurons * rank + rank * n_bins + n_bins
+    raise ValueError(f"readout must be one of {READOUTS}, got {nodes!r}")
+
+
+class GraphReadoutMixin:
+    """Readout of a graph arm, from the output neurons or (low rank) from all neurons.
+
+    Either way the last factor (``readout``) is zero-initialised, so the arm still
+    starts from the uniform policy. In the low-rank case ``readout_in`` is random
+    (``N(0, 1/n_neurons)``): with both factors at zero neither would get a gradient.
+    The parameters live on the policy itself, so names and state dicts of the
+    default readout are what they always were."""
+
+    def _init_readout(
+        self, n_agents: int, n_neurons: int, n_out: int, n_bins: int, nodes: str, rank: int,
+        generator: torch.Generator,
+    ) -> None:
+        if nodes not in READOUTS:
+            raise ValueError(f"readout must be one of {READOUTS}, got {nodes!r}")
+        self.readout_nodes = nodes
+        width = n_out
+        if nodes == "all":
+            if rank < 1:
+                raise ValueError("a readout from all neurons needs readout_rank >= 1")
+            self.readout_in = nn.Parameter(
+                torch.randn(n_agents, n_neurons, rank, generator=generator) / math.sqrt(n_neurons)
+            )
+            width = rank
+        self.readout = nn.Parameter(torch.zeros(n_agents, width, n_bins))
+        self.readout_bias = nn.Parameter(torch.zeros(n_agents, 1, n_bins))
+
+    def _read(self, h: torch.Tensor) -> torch.Tensor:
+        """``(M, B, N)`` neuron states to ``(M, B, n_bins)`` logits."""
+        if self.readout_nodes == "all":
+            z = torch.bmm(h, self.readout_in)
+        else:
+            z = h.index_select(2, self.output_nodes)
+        return torch.baddbmm(self.readout_bias, z, self.readout)
+
+
 def dense_param_count(d_in: int, hidden: list[int], n_bins: int) -> int:
     sizes = [d_in, *hidden, n_bins]
     return sum(a * b + b for a, b in zip(sizes[:-1], sizes[1:]))
@@ -102,7 +155,7 @@ def match_dense_width(target: int, d_in: int, n_layers: int, n_bins: int) -> int
     return best
 
 
-class SparseCircuitPolicy(Policy):
+class SparseCircuitPolicy(GraphReadoutMixin, Policy):
     """Recurrent network whose neuron-to-neuron weights live only on a fixed edge set.
 
     ``N`` neurons, directed edges ``(pre -> post)``. Context enters through a dense
@@ -136,6 +189,8 @@ class SparseCircuitPolicy(Policy):
         edge_sign: np.ndarray | None = None,
         sign_constrained: bool = False,
         sparse_max_batch: int = 8,
+        readout_nodes: str = "output",
+        readout_rank: int = 0,
     ) -> None:
         super().__init__()
         self.n_agents, self.n_bins, self.n_neurons = n_agents, n_bins, n_neurons
@@ -172,8 +227,9 @@ class SparseCircuitPolicy(Policy):
             torch.randn(n_agents, d_in, n_in, generator=generator) / math.sqrt(max(d_in, 1))
         )
         self.bias = nn.Parameter(torch.zeros(n_agents, 1, n_neurons))
-        self.readout = nn.Parameter(torch.zeros(n_agents, len(output_nodes), n_bins))
-        self.readout_bias = nn.Parameter(torch.zeros(n_agents, 1, n_bins))
+        # Built last, so the default readout draws nothing from the generator and every
+        # earlier initialisation is bit-identical with or without the low-rank option.
+        self._init_readout(n_agents, n_neurons, len(output_nodes), n_bins, readout_nodes, readout_rank, generator)
 
     def edge_weights(self) -> torch.Tensor:
         if not self.sign_constrained:
@@ -209,8 +265,7 @@ class SparseCircuitPolicy(Policy):
         for _ in range(self.unroll_steps):
             msg = h.index_select(2, pre) * w
             h = self.act(features.new_zeros(m, b, self.n_neurons).index_add(2, post, msg) + drive)
-        out = h.index_select(2, self.output_nodes)
-        return torch.baddbmm(self.readout_bias, out, self.readout)
+        return self._read(h)
 
     def forward_dense(self, features: torch.Tensor) -> torch.Tensor:
         """Reference implementation through the dense adjacency (tests only)."""
@@ -221,4 +276,4 @@ class SparseCircuitPolicy(Policy):
         h = features.new_zeros(m, b, self.n_neurons)
         for _ in range(self.unroll_steps):
             h = self.act(torch.bmm(h, a_t) + drive)
-        return torch.baddbmm(self.readout_bias, h.index_select(2, self.output_nodes), self.readout)
+        return self._read(h)

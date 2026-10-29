@@ -77,6 +77,15 @@ EXPERIMENTS = (
     "robust_flygm_game_b_sampled_shared_lr",
 )
 GAME_B_EXPERIMENTS = tuple(e for e in EXPERIMENTS if "game_b" in e)
+# The readout and gain fixes for the FlyGM collapse (RESULTS.md sec. 12). They are
+# analysed after everything else, on their own random stream and into their own
+# tables, so adding them changes no number in any table above.
+READOUT_EXPERIMENTS = (
+    "readout_game_b_exact",
+    "wgain_game_b_exact",
+    "readout_game_a_exact",
+    "wgain_game_a_exact",
+)
 
 FLYGM_ARMS = ("flygm", "flygm_rewired", "flygm_random_sparse")
 # FlyGM arm -> the trained-edge arm on the same graph
@@ -214,17 +223,48 @@ def cross_pairs(available: set[str]) -> list[dict[str, str]]:
     return [p for p in pairs if p["exp_a"] in available and p["exp_b"] in available]
 
 
-def cross_experiment_table(rng: np.random.Generator, n_boot: int) -> pd.DataFrame:
-    """Every contrast in :func:`cross_pairs`, Holm-adjusted within family x metric."""
+def readout_pairs(available: set[str]) -> list[dict[str, str]]:
+    """Each fix against the arm it fixes (same game, mode and seeds), and the two fixes
+    against each other. Every side keeps its own tuned rate, as in :func:`cross_pairs`."""
+    trained_edge = ["dense", "connectome", "connectome+sign", "rewired", "rewired+sign",
+                    "random_sparse", "random_sparse+sign"]
+    pairs: list[dict[str, str]] = []
+    for setting, low, gain, fly, trained in (
+        ("B exact", "readout_game_b_exact", "wgain_game_b_exact", "flygm_game_b_exact", "game_b_exact"),
+        ("A exact", "readout_game_a_exact", "wgain_game_a_exact", "flygm_game_a_exact", "game_a_exact"),
+    ):
+        for arm in FLYGM_ARMS:
+            for exp_a, exp_b, family, question in (
+                (low, fly, "readout_fix", f"all-neuron readout - 5-neuron readout ({arm})"),
+                (gain, fly, "gain_fix", f"gain on W - no gain ({arm})"),
+                (low, gain, "readout_vs_gain", f"all-neuron readout - gain on W ({arm})"),
+            ):
+                pairs.append({"family": family, "setting": setting, "exp_a": exp_a, "arm_a": arm,
+                              "exp_b": exp_b, "arm_b": arm, "question": question})
+        for arm in trained_edge:
+            pairs.append({"family": "readout_fix", "setting": setting, "exp_a": low, "arm_a": arm,
+                          "exp_b": trained, "arm_b": arm,
+                          "question": f"all-neuron readout - 5-neuron readout ({arm})"})
+    return [p for p in pairs if p["exp_a"] in available and p["exp_b"] in available]
+
+
+def cross_experiment_table(
+    rng: np.random.Generator,
+    n_boot: int,
+    pairs_for=cross_pairs,
+    experiments: tuple[str, ...] = EXPERIMENTS,
+) -> pd.DataFrame:
+    """Every contrast in ``pairs_for`` (default :func:`cross_pairs`), Holm-adjusted
+    within family x metric."""
     cache: dict[str, pd.DataFrame] = {}
-    for exp in EXPERIMENTS:
+    for exp in experiments:
         if (RESULTS / exp / "summary.csv").exists():
             df, _ = load_summary(exp)
             if "loss_win_ratio" in df.columns:
                 df = df[df["loss_win_ratio"] == 1.0]
             cache[exp] = df
     rows = []
-    for pair in cross_pairs(set(cache)):
+    for pair in pairs_for(set(cache)):
         a, b = cache[pair["exp_a"]], cache[pair["exp_b"]]
         xa, xb = a[a["arm"] == pair["arm_a"]], b[b["arm"] == pair["arm_b"]]
         if xa.empty or xb.empty:
@@ -263,14 +303,17 @@ def cross_experiment_table(rng: np.random.Generator, n_boot: int) -> pd.DataFram
     return table
 
 
-def flygm_diagnostics(rng: np.random.Generator, n_boot: int) -> pd.DataFrame:
+def flygm_diagnostics(
+    rng: np.random.Generator, n_boot: int, experiments: tuple[str, ...] = EXPERIMENTS
+) -> pd.DataFrame:
     """Per graph: spectral radius before scaling, input-to-output gain, unsigned sign.
 
     These come from the frozen matrix ``W`` of each run (``src/agents/flygm.py``), so
-    the controls vary by seed and the real circuit does not.
+    the controls vary by seed and the real circuit does not. Runs with a trainable gain
+    on ``W`` also report its final value (``w_gain``).
     """
     rows = []
-    for exp in EXPERIMENTS:
+    for exp in experiments:
         path = RESULTS / exp / "summary.csv"
         if not path.exists():
             continue
@@ -286,7 +329,10 @@ def flygm_diagnostics(rng: np.random.Generator, n_boot: int) -> pd.DataFrame:
                 ("diag_spectral_radius_raw", "spectral_radius_raw"),
                 ("diag_input_output_gain", "input_output_gain"),
                 ("final_exploitability", "final_exploitability"),
+                ("diag_w_gain", "w_gain"),
             ):
+                if col not in sub.columns:
+                    continue
                 ci = bootstrap_mean_ci(sub[col].to_numpy(float), n_boot, 0.95, rng)
                 row[name] = ci.mean
                 row[f"{name}_lo"], row[f"{name}_hi"] = ci.lo, ci.hi
@@ -442,6 +488,65 @@ def wiring_familywide(pairwise: pd.DataFrame, asym_pairwise: pd.DataFrame | None
     return t[cols].sort_values("p_perm", kind="stable").reset_index(drop=True)
 
 
+def value_dependence(experiments: tuple[str, ...]) -> pd.DataFrame:
+    """Game B: does each run's policy bid differently for different values at all?
+
+    From every run's final policy: the spread (max - min over the 50 types) of the mean
+    quitting time, how many seeds have a spread above ``1e-3``, and for those, the
+    correlation of their mean bid with ``b(v) = v^2 / 2``. A correlation is not defined
+    for a constant bid, so it is left out for the seeds that do not bid by value.
+    Deterministic: no resampling, so it draws nothing from the random stream."""
+    from .games import GameB, build_game
+
+    rows = []
+    for exp in experiments:
+        if not (RESULTS / exp / "summary.csv").exists():
+            continue
+        game = build_game(load_config(RESULTS / exp / "config.yaml")["game"])
+        if not isinstance(game, GameB):
+            continue
+        t, bne = game.grid.times, game.values ** 2 / 2
+        for arm, sub in final_policies(exp).groupby("arm"):
+            spreads, cors = [], []
+            for policy in sub["policy"]:
+                mq = np.asarray(policy) @ t
+                spreads.append(float(mq.max() - mq.min()))
+                if spreads[-1] > 1e-3:
+                    cors.append(float(np.corrcoef(mq, bne)[0, 1]))
+            rows.append({
+                "experiment": exp,
+                "arm": arm,
+                "n_seeds": len(spreads),
+                "seeds_bidding_by_value": int(sum(sp > 1e-3 for sp in spreads)),
+                "mean_quit_spread_median": float(np.median(spreads)),
+                "mean_quit_spread_max": float(np.max(spreads)),
+                "corr_with_bne_median": float(np.median(cors)) if cors else np.nan,
+            })
+    return pd.DataFrame(rows)
+
+
+def readout_analysis(rng: np.random.Generator, n_boot: int) -> dict[str, pd.DataFrame]:
+    """The tables of RESULTS.md sec. 12, from :data:`READOUT_EXPERIMENTS` only."""
+    per_arm, pairs = [], []
+    for exp in READOUT_EXPERIMENTS:
+        if not (RESULTS / exp / "summary.csv").exists():
+            continue
+        df, cfg = load_summary(exp)
+        metrics = METRICS_B if cfg["game"]["name"] == "B" else METRICS_A
+        t = per_arm_table(df, metrics, ["arm"], rng, n_boot)
+        t.insert(0, "experiment", exp)
+        per_arm.append(t)
+        pairs.append(pairwise_table(df[df["arm"] != "oracle"], metrics, rng, n_boot, exp))
+    if not per_arm:
+        return {}
+    return {
+        "readout_per_arm": pd.concat(per_arm, ignore_index=True),
+        "readout_pairwise": pd.concat(pairs, ignore_index=True),
+        "readout_cross": cross_experiment_table(rng, n_boot, readout_pairs, (*EXPERIMENTS, *READOUT_EXPERIMENTS)),
+        "readout_flygm_diagnostics": flygm_diagnostics(rng, n_boot, READOUT_EXPERIMENTS),
+    }
+
+
 def run_all(n_boot: int, seed: int = 20260918) -> dict[str, pd.DataFrame]:
     rng = np.random.default_rng(seed)
     out: dict[str, pd.DataFrame] = {}
@@ -472,6 +577,8 @@ def run_all(n_boot: int, seed: int = 20260918) -> dict[str, pd.DataFrame]:
     out["flygm_diagnostics"] = flygm_diagnostics(rng, n_boot)
     out["eval_resolution"] = eval_resolution(rng, n_boot)
     out["wiring_familywide"] = wiring_familywide(out["pairwise"], out.get("asym_pairwise"))
+    out["game_b_value_dependence"] = value_dependence((*EXPERIMENTS, *READOUT_EXPERIMENTS))
+    out.update(readout_analysis(np.random.default_rng(seed + 12), n_boot))
     return out
 
 
