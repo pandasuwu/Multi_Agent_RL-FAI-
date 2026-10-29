@@ -45,7 +45,8 @@ What *did* matter:
 * **Architecture class.** The dense MLP beat every circuit arm in 3 of 4 settings.
   The circuit arms beat dense only in Game A, exact.
 * **Sign constraints (Dale's law).** They improved all three circuit graphs in Game B,
-  real and control alike.
+  real and control alike, with the policy read out from the 5 AVLP727m neurons. When it
+  is read out from every neuron the advantage disappears (§12).
 * **The fly-like asymmetric learning rule.** It moved every arm away from equilibrium,
   exactly as the theory predicts, and amplified a loser effect that **wiring did not
   modulate**.
@@ -230,19 +231,24 @@ with loss-weighting, and it comes from the learning rule, not from the fly wirin
 
 ## 7. Other findings
 
-* **Sign constraints help in Game B.** Signed minus unsigned final loss:
+* **Sign constraints help in Game B, with the 5-neuron readout.** Signed minus unsigned
+  final loss:
   * exact: −0.0023 (connectome), −0.0026 (rewire), −0.058 (random); all Holm p ≤ 0.006;
   * sampled, shared-lr run: −0.059, −0.090, −0.064; all Holm p ≤ 0.016.
 
   Unsigned circuits are also less stable at high learning rates. In the shared-lr
   Game B exact run at lr 0.03, only 35% of unsigned-connectome seeds reached the
-  threshold. In Game A the constraint makes no difference.
+  threshold. In Game A the constraint makes no difference. With a readout from all 258
+  neurons the Game B advantage is gone: all three signed-minus-unsigned contrasts have
+  Holm p = 1.0 (§12).
 * **Dense vs circuit.** Dense is better in A sampled (0.033 vs 0.045), B exact (0.0029
   vs 0.0060) and B sampled (0.072 vs 0.094); all Holm p ≤ 0.04. The circuits are
   better and faster in A exact: 0.00127 vs 0.00159, and 226 vs 341 episodes. Plausible
   cause: the circuit reads out from only 5 AVLP727m neurons, which suits a
   one-context distribution but is a bottleneck for Game B's value-dependent bids. This
   is a property of the whole architecture, shared with its controls, not of the wiring.
+  §12 tests it: with a readout from all 258 neurons the Game B gap to dense mostly
+  closes (connectome 0.0039 against dense 0.0024).
 * **Stability.** Late-training policy variance is tiny in exact mode (< 2·10⁻⁶ for
   every arm in Game A). No arm orbits the equilibrium. In sampled mode the
   variance reflects sampling noise.

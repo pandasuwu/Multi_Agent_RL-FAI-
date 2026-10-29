@@ -7,8 +7,31 @@ networks of matched size? The circuit is PPL1 → V2 MBONs (MBON18/19) → Tk-GA
 (AVLP727m), from the MaleCNS v1.0 connectome, following Ventimiglia et al. 2026.
 
 **Answer:** connectome wiring made no difference to how well the agents converged.
-The details, including small speed effects of inconsistent sign, are in
-[`RESULTS.md`](RESULTS.md).
+That holds across every way we built and trained the networks, with one suggestive
+exception under PPO. The details, including small speed effects of inconsistent sign,
+are in [`RESULTS.md`](RESULTS.md), and the section numbers below refer to it.
+
+* **Trained edges.** The real circuit's final exploitability cannot be told apart from
+  a degree-preserving rewire or a random sparse graph of matched size, in either game,
+  with exact or sampled self-play (§3–§4).
+* **Frozen synapses (FlyGM).** Keeping the real synapse counts as fixed weights, and
+  training the neurons instead, works in Game A with no wiring effect (§9). In Game B it
+  collapses on all three graphs to one bid for every value. The cause is the 5-neuron
+  readout, not weak synapses: a trainable gain on the synapses changes nothing, while a
+  readout from all 258 neurons fixes the collapse. Final exploitability falls from 0.33
+  to 0.011, and all 60 seeds bid by value. Even then no wiring contrast survives, and
+  FlyGM stays behind the arms that train their edges (§12).
+* **PPO instead of REINFORCE.** PPO reaches the threshold up to 4 times sooner in
+  Game A. On final accuracy it depends on the game. In Game B it helps dense and the
+  signed circuits. In Game A it hurts the connectome arms. One Game B
+  sampled contrast, the real circuit ending worse than random wiring, passes Holm
+  within its own experiment. It does not survive a correction across the whole
+  project's 108 wiring tests, so we read it as suggestive only (§10).
+* **The readout matters more than the wiring.** Reading the policy out from every
+  neuron, rather than 5, improves every circuit arm in Game B. It also removes two
+  earlier findings: most of the circuit arms' gap to the dense MLP, and the advantage
+  of sign constraints (§12).
+
 **Live demo:** [Give-Up Game Lab](https://claude.ai/artifact/7RDFGua3hKQyYSKt8W7RKN), or open [`demo/index.html`](demo/index.html) in any browser. Players learn both games in real time, with brains wired like the fly circuit (all 4,952 real connections) or its controls. Rebuild it with `python scripts/build_demo.py` (source: `scripts/demo_template.html`).
 **Theory:** [`docs/theory.md`](docs/theory.md).
 **Circuit extraction:** [`docs/circuit.md`](docs/circuit.md).
@@ -32,7 +55,9 @@ giving 9 trained-edge arms, and 12 with the FlyGM arms. Arms 2–8 match in trai
 parameters within 5% (5,584 / 5,610 / 5,638). The runner asserts this before any run
 starts, and it is tested (`tests/test_connectome.py`, `tests/test_flygm.py`).
 Arms 3–8 share node roles: context enters through the 16 PPL1 neurons, and the policy
-is read out from the 5 AVLP727m neurons.
+is read out from the 5 AVLP727m neurons. RESULTS.md §12 also runs arms 2–8 with a
+rank-4 readout from all 258 neurons (`network.readout: all`), matched within 0.5% at
+6,578 parameters.
 
 Arms 3–5 ask whether the connectome's *sparsity* helps when every edge is free to
 learn its weight; arms 6–8 ask whether its *weights* help when they are kept exactly
