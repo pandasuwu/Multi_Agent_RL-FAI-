@@ -408,35 +408,53 @@ on bids that are constant to about 1e-9, so it was noise, ranging from -0.8 to +
 across seeds, and it has been replaced.)
 
 Why? The context does enter the network, but it does not arrive where the policy is read
-from. Measuring the spread across the 50 values at every stage of one forward pass, for
-one trained seed per graph (this was measured by hand: `src/analysis.py` does not
-produce it, and the run records store only the final policy, so it cannot be recomputed
-from them):
+from. The table gives the spread across the 50 values after the last of the six steps,
+for seed 0 of each graph, before and after training. It was measured by hand on
+retrained copies of those runs, which reproduce the committed policies exactly.
+`src/analysis.py` does not produce it, and the run records store only the final policy,
+so it cannot be recomputed from them.
 
-| graph | gain of `W` | spread across all 258 neurons | spread at the 5 readout neurons |
-|---|---|---|---|
-| real circuit | 0.008 | 0.92 | **0.000016** |
-| rewire | 12.8 | 0.93 | 0.039 |
-| random sparse | 12.9 | 0.83 | 0.042 |
+| graph | gain of `W` | before training: largest spread over all 258 neurons | before training: largest spread at the 5 readout neurons | after training: all 258 | after training: readout |
+|---|---|---|---|---|---|
+| real circuit | 0.008 | 0.92 | **0.000016** | 1.91 | **0** |
+| rewire | 12.8 | 0.93 | 0.039 | 1.30 | **1.2e-07** |
+| random sparse | 12.9 | 0.83 | 0.042 | 2.00 | **0** |
 
-* The input signal is strong inside the network (spread of about 0.9) and almost absent
-  at the 5 neurons the policy is read from.
-* For the first two of the six steps the spread at the readout is exactly 0, because
-  those neurons are at least 3 connections away from the input.
-* The gain diagnostic predicts this well: 0.008 goes with 1.6e-05, and 12.8 goes with
-  0.039. **That is the diagnostic earning its place.**
+(An earlier version of this table had only the "before training" columns and described
+them as trained networks. They were not.)
+
+* Before training, the input signal is strong inside the network and much weaker at the
+  5 neurons the policy is read from: 20 to 25 times weaker on the controls and about
+  57,000 times weaker on the real circuit.
+* After training, the signal at the readout is gone on all three graphs, even though it
+  is still strong elsewhere in the network. All 5 readout neurons end up pinned at +1 or
+  -1 of the tanh (pre-activations of 5.3 to 9.7 in size) for every value. The readout
+  weights then act as one fixed bias. And since the slope of the tanh is close to zero
+  there, almost no gradient reaches anything upstream that could make the readout depend
+  on value again (`d logits / d input` of 7e-14 on the real circuit, 6e-08 and 8e-20 on
+  the controls). Once a run falls into this state it stays there.
+* In the two seeds that escaped (rewire 3, random sparse 2), four readout neurons are
+  pinned. The fifth switches from -1 to +1 partway along the values (pre-activation from
+  about -4 to +4), and that switch is the bid.
+* For the first two of the six steps the readout spread on the real circuit is exactly
+  0. Its readout neurons are 2 connections from the input, and the input only enters at
+  step 1, so the signal reaches them at step 3. On the controls they are 1 or 2
+  connections away and the signal arrives from step 2.
+* The gain diagnostic predicts the spread *before training* well: 0.008 goes with
+  1.6e-05, and 12.8 goes with 0.039.
 * But the controls collapse too, in Game B exact and in Game B sampled, with 180 to 2,900
   times more gain to work with. So gain does not explain the collapse. Nor does it pick
   out the exceptions: the only two control seeds that bid by value have gains of 6.1 and
-  2.2, in the lower half of their arms. With `W` frozen and one update network shared by
-  all neurons, nothing in this architecture can strengthen the input to readout path on
-  its own, and the readout can only rescale what little it receives.
+  2.2, in the lower half of their arms. §12 tests the two obvious fixes: a trainable
+  gain on `W`, which does nothing, and reading the policy out from every neuron, which
+  removes the collapse.
 
 What this means for reading the numbers:
 
 * The Game B rows above measure an arm that almost never conditions on its input. They
   are not a statement about fly wiring, and they should not be compared with dense or
-  with the trained-edge circuits as though they were.
+  with the trained-edge circuits as though they were. §12 gives the arm with the
+  collapse fixed.
 * The wiring comparison inside Game B is still "no difference", but for a degenerate
   reason, so it carries no weight.
 * Game A is unaffected. It has a single context, so there is nothing to condition on,
@@ -754,3 +772,190 @@ is distinguishable with a tight CI and a large effect size.
 * 15 episodes out of 217 is small in a setting where the dense MLP needs 327 and the
   tabular baseline 629, and Game A has a single context, so any policy there is a
   reparameterisation of one distribution (§8).
+
+## 12. Fixing the FlyGM collapse: a wider readout, or a gain on the synapses
+
+### The idea, in plain terms
+
+§9 found that the FlyGM arm stops listening to its input in Game B: the 5 neurons it
+reads the policy from saturate, and once they do, no gradient can bring them back. Two
+small changes could plausibly fix that, and each tests a different explanation.
+
+* **A gain on `W`.** If the problem is that the frozen synapses are too weak to carry the
+  input to the readout (the real circuit's gain is 0.008), then letting the network learn
+  one number that scales all of `W` should help. The synapses themselves stay frozen.
+  This is `network.flygm.w_gain: true`, which starts at 1.
+* **A readout from every neuron.** If the problem is *where* the policy is read from,
+  then reading it from all 258 neurons should help. To keep the parameter count matched,
+  this goes through a rank-4 bottleneck: 258 × 4 + 4 × 64 + 64 = 1,352 parameters, in
+  place of the 5 × 64 + 64 = 384 of the 5-neuron readout. This is `network.readout: all`
+  with `readout_rank: 4`. The last factor starts at zero, so every arm still starts from
+  the uniform policy.
+
+Neither change touches the synapses, the update network or the encoder. With the
+defaults, the code reproduces the earlier runs bit for bit.
+
+The rank-4 readout is also given to dense and to the six trained-edge circuit arms, so
+the comparison between FlyGM and the arms that train their edges stays fair.
+
+### Setup
+
+| experiment | arms | readout | trainable parameters per agent |
+|---|---|---|---|
+| `readout_game_b_exact`, `readout_game_a_exact` | dense, 6 trained-edge circuit arms, 3 FlyGM graphs | rank 4 from all 258 neurons | 6,578 (circuit), 6,598 (dense), 6,606 (FlyGM) |
+| `wgain_game_b_exact`, `wgain_game_a_exact` | 3 FlyGM graphs | the original 5 neurons, plus the gain on `W` | 6,567 (update network widened to 55) |
+
+* **Matching.** Every arm in each experiment is within **0.5%** of the connectome arm
+  with the rank-4 readout (6,578), and the runner asserts this before any run starts.
+  The two FlyGM fixes differ from each other by 0.59%, because no single update-network
+  width gets both within 0.5% of the dense arm.
+* **Runs.** 20 seeds per arm, exact gradients, 4,000 steps for Game B and 3,000 for
+  Game A. Rates were tuned per arm on the usual grid.
+* **Learning rates inside the new experiments.** In `readout_game_b_exact` all six
+  circuit arms and all three FlyGM graphs chose 0.003, and dense chose 0.01. In
+  `readout_game_a_exact` every arm chose 0.003. So the wiring contrasts inside these
+  experiments are at one shared rate and do not have the §5 confound. The gain
+  experiments chose 0.01 (Game B) and 0.03 (Game A) for all three graphs.
+* **Learning rates across experiments.** The comparisons with the earlier runs are not
+  at a shared rate: the earlier circuit arms used 0.01 or 0.03. The tuning sweep at a
+  rate both share, 0.003 (2 seeds), shows the fix is not a rate effect. The 5-neuron
+  FlyGM is still collapsed there (0.330), against 0.011 with the new readout, and the
+  5-neuron connectome reaches 0.016, against 0.0037 with the new readout.
+* **Sources.** The new tables are `results/tables/readout_per_arm.csv`,
+  `readout_pairwise.csv`, `readout_cross.csv`, `readout_flygm_diagnostics.csv` and the
+  new rows of `game_b_value_dependence.csv`. They are computed on their own random
+  stream, so no number in any earlier table changed.
+* **Compute.** 286 minutes of wall time for Game B (tuning 101 minutes, runs 185
+  minutes) and 7 minutes for Game A, on 6 workers.
+
+### Game B: the wider readout removes the collapse, the gain does nothing
+
+Final exploitability, mean [95% CI], 20 seeds:
+
+| arm | 5-neuron readout (§9) | gain on `W` | readout from all 258 neurons |
+|---|---|---|---|
+| FlyGM, real circuit | 0.3311 | 0.3311 [0.33112, 0.33113] | **0.0114 [0.0109, 0.0121]** |
+| FlyGM, rewire | 0.3290 | 0.3222 [0.3041, 0.3314] | **0.0189 [0.0115, 0.0298]** |
+| FlyGM, random sparse | 0.3263 | 0.3293 [0.3256, 0.3313] | **0.0183 [0.0112, 0.0310]** |
+
+* **The wider readout.** Exploitability falls by 0.31 to 0.32 on every graph (Holm
+  p = 0.002 each).
+* **The gain on `W`.** No change on any graph (Holm p = 1.0 each). The learned gain stays
+  near where it started: a mean of 1.04 [1.01, 1.06] on the real circuit, and 1.06 and
+  1.17 on the controls (range over seeds 0.77 to 1.98). The network had the freedom to
+  strengthen its synapses and did not use it.
+
+So the explanation is *where* the policy is read from, not *how strong* the synapses
+are.
+
+**The arm now bids by value.**
+
+| arm | seeds whose bid varies with `v` | spread of the mean quitting time across values (median) | correlation with `b(v) = v²/2` (median) |
+|---|---|---|---|
+| FlyGM, real, 5 neurons (§9) | 0 of 20 | 0 | undefined |
+| FlyGM, real, gain on `W` | 0 of 20 | 0 | undefined |
+| FlyGM, real, all neurons | **20 of 20** | 5.97 | 0.94 |
+| FlyGM, rewire, all neurons | **20 of 20** | 5.98 | 0.94 |
+| FlyGM, random sparse, all neurons | **20 of 20** | 6.13 | 0.95 |
+| connectome, trained edges, all neurons | 20 of 20 | 10.46 | 0.9995 |
+| dense MLP, all neurons | 20 of 20 | 10.56 | 0.9997 |
+| correct answer | n/a | 10.60 | 1.00 |
+
+The bid now rises with value on all 60 FlyGM seeds, against 2 of 60 before. It is still
+compressed, though. The bid covers about 6 of the 10.6 units the correct answer spans,
+and only 3, 6 and 6 of 20 seeds reach the 0.01 threshold within 4,000 steps.
+
+**Fixed, FlyGM is still clearly worse than the arms that train their edges:**
+
+* +0.0075 [0.0064, 0.0086] above the trained-edge connectome (Holm p = 0.0017);
+* +0.0090 [0.0084, 0.0097] above dense (Holm p = 0.0017);
+* two to three times the grid floor of 0.0058.
+
+The trained-edge arms reach the threshold in about 350 steps on average. FlyGM's average
+is 3,500 to 3,900, counting the seeds that never reach it as 4,000.
+
+**Still no wiring effect inside FlyGM.** Real circuit against rewire is −0.0075
+[−0.0185, +0.0001], and against random sparse −0.0068 [−0.0193, +0.0004]. Both have
+Holm p = 1.0. The real circuit's mean is the lowest of the three, but both CIs reach
+zero. (The controls are wider because a few of their seeds end higher, up to 0.13.)
+
+### The trained-edge arms improve too, and their wiring and sign effects vanish
+
+The 5-neuron readout was also holding back the arms that train their edges. Final
+exploitability, mean, and the change with the wider readout (95% CI, Holm p):
+
+| arm | 5-neuron readout (§3) | all neurons | change |
+|---|---|---|---|
+| connectome | 0.0082 | 0.0039 | −0.0043 [−0.0057, −0.0031], p = 0.002 |
+| connectome, signed | 0.0060 | 0.0031 | −0.0029 [−0.0040, −0.0019], p = 0.002 |
+| rewire | 0.0078 | 0.0041 | −0.0037 [−0.0050, −0.0015], p = 0.002 |
+| rewire, signed | 0.0052 | 0.0030 | −0.0022 [−0.0026, −0.0018], p = 0.002 |
+| random sparse | 0.0639 | 0.0031 | −0.061 [−0.145, −0.007], p = 0.002 |
+| random sparse, signed | 0.0054 | 0.0029 | −0.0025 [−0.0033, −0.0019], p = 0.002 |
+| dense MLP | 0.0029 | 0.0024 | −0.0005 [−0.0009, −0.0001], p = 0.018 |
+
+* **The circuit arms now nearly match dense.** The unsigned connectome and rewire used
+  to stop at a bid spread of about 7.6 (correlation 0.96). With the wider readout every
+  circuit arm reaches 10.4 to 10.5 (correlation 0.9994 to 0.9995).
+* **Most of the old gap to dense was the readout.** Only the two connectome arms still
+  differ from dense under Holm: unsigned +0.0015 [0.0007, 0.0024], p = 0.015, and signed
+  +0.0007, p = 0.049. Random sparse is +0.0007, p = 0.12.
+* **Speed.** The circuit arms reach the threshold 175 to 1,300 steps sooner (Holm
+  p = 0.002 for each). Dense does not change (p = 1.0).
+* **No wiring contrast survives.** All six contrasts among real, rewire and random
+  sparse, signed and unsigned, have Holm p = 1.0. The largest is rewire against random
+  sparse, +0.0010 [−0.0005, +0.0033].
+* **The sign effect is gone.** The finding that sign constraints improved all three
+  graphs in Game B (§7, and the summary at the top) does not hold with this readout:
+  connectome −0.0008 [−0.0018, +0.0001], rewire −0.0011 [−0.0034, +0.0003], random
+  sparse −0.0002 [−0.0008, +0.0003], all with Holm p = 1.0. It looks like the sign
+  constraint was partly making up for the narrow readout.
+
+### Game A: a sanity check, and nothing breaks
+
+Game A has a single context, so the collapse cannot happen there, and every arm already
+converged. Every arm still converges with the new readout. Final exploitability:
+
+| arm | 5-neuron readout | gain on `W` | all neurons |
+|---|---|---|---|
+| FlyGM, real circuit | 0.00140 | 0.00138 | 0.00100 [0.00093, 0.00111] |
+| FlyGM, rewire | 0.00140 | 0.00136 | 0.00094 |
+| FlyGM, random sparse | 0.00139 | 0.00137 | 0.00095 |
+| connectome, trained edges | 0.00127 | n/a | 0.00093 |
+| dense MLP | 0.00159 | n/a | 0.00138 |
+
+* **The gain.** It does nothing again (Holm p = 1.0), and the learned gain stays at
+  0.99 to 1.01.
+* **The wider readout.** It lowers every arm by 0.0002 to 0.0005 (Holm p = 0.002).
+  Most arms also cross the threshold 29 to 64 episodes sooner. The signed circuit arms
+  are the exception: the signed connectome does not change, and signed rewire and signed
+  random sparse are 14 to 15 episodes slower.
+* **These Game A differences may be partly the rate.** The earlier Game A circuit arms
+  ran at 0.03, and every arm here chose 0.003.
+* **Wiring.** No contrast inside FlyGM is distinguishable. Among the trained-edge arms,
+  3 of the 6 wiring contrasts put the connectome ahead of its controls, by 1.5e-05 to
+  2.2e-05 (Holm p = 0.009 to 0.046). Those differences are 1 to 2.5% of the arms' own
+  loss and far below anything that matters.
+
+### What this changes, and caveats
+
+* **§9's main finding stands, and now has a cause.** FlyGM's collapse in Game B came
+  from the 5-neuron readout, not from the strength of the frozen synapses. With a readout
+  from every neuron, the arm learns a bid that rises with value on every seed.
+* **The wiring answer stays the same.** With the readout fixed, no contrast among real,
+  rewire and random wiring survives Holm in Game B, for FlyGM or the trained-edge arms.
+* **But two Game B findings came from the readout:**
+  * the gap between the circuit arms and dense, which mostly closes;
+  * the advantage of sign constraints, which disappears.
+
+  §3 and §7 reported both as properties of the architectures. With a different readout
+  they are not, so they should be read as findings about circuits read out through 5
+  neurons.
+* **The new readout sees the input neurons directly.** The 258 neurons include the 16
+  PPL1 neurons that receive the input. So part of the value signal can reach the policy
+  without passing through the circuit at all, which would dilute any wiring effect. A
+  readout from every neuron *except* the inputs would test this, and has not been run.
+* **One rank only.** Rank 4 was chosen to fit the parameter budget, and other ranks were
+  not tried.
+* **FlyGM against the earlier runs.** The two FlyGM fixes differ in parameter count by
+  0.59%, just over the 0.5% used inside each experiment.
