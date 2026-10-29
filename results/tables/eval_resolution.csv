@@ -1,0 +1,9 @@
+arm,n_seeds,steps_to_threshold_eval1,steps_to_threshold_eval1_lo,steps_to_threshold_eval1_hi,steps_to_threshold_eval25,steps_to_threshold_eval25_lo,steps_to_threshold_eval25_hi,rounding_gap,rounding_gap_lo,rounding_gap_hi,consistent_with_rounding,same_final_exploitability
+connectome,20,216.55,214,219.1,226.25,225,228.75,9.7,7.35,12.25,True,True
+connectome+sign,20,239.5,231.95,248.05,251.25,242.5,260,11.75,7.89875,15.65,True,True
+dense,20,327.35,324.5,330.25,341.25,336.25,346.25,13.9,10.65,17.1,True,True
+random_sparse,20,236.65,232.8,241.05,250,246.25,253.75,13.35,10.45,16.15,True,True
+random_sparse+sign,20,228.95,225.1,232.8,241.25,236.25,246.25,12.3,8.95,15.6,True,True
+rewired,20,231.6,229.45,233.85,245,240,248.75,13.4,10.05,16.5,True,True
+rewired+sign,20,227.35,222.6,232.05,236.25,231.25,241.25,8.9,6.3,11.75,True,True
+tabular,20,629,629,629,650,650,650,21,21,21,True,True

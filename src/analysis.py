@@ -70,6 +70,8 @@ EXPERIMENTS = (
     "ppo_game_b_sampled",
     "ppo_game_b_sampled_flygm",
     "ppo_game_a_sampled_asym",
+    "robust_ppo_game_a_sampled_shared_lr",
+    "robust_ppo_game_b_sampled_shared_lr",
     "robust_flygm_game_a_sampled_shared_lr",
     "robust_flygm_game_b_exact_shared_lr",
     "robust_flygm_game_b_sampled_shared_lr",

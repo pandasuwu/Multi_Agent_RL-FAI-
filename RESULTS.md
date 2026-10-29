@@ -177,7 +177,7 @@ quits and a heavy tail, with an exploitability floor. Mean over arms:
 | observed final exploitability (mean of 8 arms) | 0.048 | 0.102 | 0.130 | 0.146 |
 
 Every arm's final exploitability rises monotonically with ρ. Every increase over ρ = 1
-is distinguishable (Holm p ≤ 0.0024, g = 1.5–10). Observed values run about 0.015–0.04
+is distinguishable (Holm p ≤ 0.004, g = 1.5–10). Observed values run about 0.015–0.04
 above the prediction, which is roughly the symmetric sampling-noise floor. Asymmetry
 **hurts convergence in every architecture**. No wiring contrast at any ρ is
 distinguishable (`asym_pairwise.csv`). Speed cannot be compared at ρ ≥ 2 because almost
