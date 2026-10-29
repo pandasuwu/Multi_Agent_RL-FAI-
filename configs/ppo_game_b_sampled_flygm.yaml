@@ -1,3 +1,8 @@
+# NOT RUN. This cell was dropped (RESULTS.md sec. 10): no results/ppo_game_b_sampled_flygm/
+# exists and no reported number comes from it. Kept so the design is on record. The
+# driver step run-ppo-b-flygm still runs it, including in a full run of
+# scripts/reproduce_flygm_ppo.py.
+#
 # PPO x FlyGM x Game B sampled: the most expensive cell in the project, 3.8 h of CPU
 # per run (50 types x 8 agents x 258 neurons x 6 unroll steps x 4 PPO epochs, and the
 # step is already fully batched and within ~2x of single-core sgemm peak).

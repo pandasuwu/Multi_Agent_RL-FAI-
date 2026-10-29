@@ -101,3 +101,14 @@ def holm(p_values: list[float]) -> list[float]:
         running = max(running, min(1.0, (m - rank) * p[idx]))
         adjusted[idx] = running
     return adjusted.tolist()
+
+
+def benjamini_hochberg(p_values: list[float]) -> list[float]:
+    """Benjamini-Hochberg adjusted p-values (false discovery rate; same order as the input)."""
+    p = np.asarray(p_values, float)
+    m = len(p)
+    order = np.argsort(p)
+    scaled = p[order] * m / np.arange(1, m + 1)
+    adjusted = np.empty_like(p)
+    adjusted[order] = np.minimum(1.0, np.minimum.accumulate(scaled[::-1])[::-1])
+    return adjusted.tolist()

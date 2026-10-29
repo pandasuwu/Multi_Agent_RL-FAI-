@@ -1,0 +1,109 @@
+experiment,contrast,question,diff,diff_lo,diff_hi,hedges_g,p_perm,p_holm,p_holm_familywide,p_bh_familywide,distinguishable,distinguishable_familywide,duplicate
+game_b_sampled,connectome - rewired,specific wiring (unsigned),0.0588293,0.0355437,0.0774954,2.26945,0.00039996,0.00359964,0.0431957,0.0215978,True,True,False
+ppo_game_b_sampled,rewired+sign - random_sparse+sign,degree structure (signed),0.0347962,0.0166855,0.0566816,1.37477,0.00039996,0.00319968,0.0431957,0.0215978,True,True,False
+ppo_game_b_sampled,connectome - random_sparse,wiring + degrees (unsigned),0.0417207,0.0218313,0.06105,1.6817,0.00129987,0.00909909,0.137786,0.0345565,True,False,False
+robust_ppo_game_b_sampled_shared_lr,connectome - random_sparse,wiring + degrees (unsigned),0.0417207,0.021827,0.0612446,1.6817,0.00129987,0.00779922,0.137786,0.0345565,True,False,True
+ppo_game_a_sampled,connectome+sign - rewired+sign,specific wiring (signed),0.0159232,0.00805769,0.0232895,1.65977,0.00159984,0.0207979,0.166383,0.0345565,True,False,False
+game_b_sampled,rewired - random_sparse,degree structure (unsigned),-0.0477323,-0.0777732,-0.0207612,-1.3079,0.00259974,0.0181982,0.267773,0.0431957,True,False,False
+robust_ppo_game_a_sampled_shared_lr,rewired+sign - random_sparse+sign,degree structure (signed),-0.016828,-0.0266716,-0.00760617,-1.39149,0.00279972,0.0363964,0.285571,0.0431957,True,False,False
+ppo_game_b_sampled,connectome+sign - rewired+sign,specific wiring (signed),-0.0294338,-0.0516981,-0.010678,-1.1308,0.00649935,0.0389961,0.656434,0.0877412,True,False,False
+game_a_sampled,connectome - rewired,specific wiring (unsigned),-0.0113942,-0.0196721,-0.00374853,-1.12556,0.0117988,0.106189,1,0.128507,False,False,False
+ppo_game_a_sampled,rewired+sign - random_sparse+sign,degree structure (signed),-0.0137209,-0.0240002,-0.0046402,-1.12145,0.0118988,0.142786,1,0.128507,False,False,False
+robust_ppo_game_a_sampled_shared_lr,connectome+sign - rewired+sign,specific wiring (signed),0.0139155,0.00437696,0.0234774,1.16542,0.0170983,0.205179,1,0.164684,False,False,False
+game_b_exact,rewired - random_sparse,degree structure (unsigned),-0.056045,-0.13966,-0.00190669,-0.462382,0.0182982,0.109789,1,0.164684,False,False,False
+game_a_exact_eval1,rewired - random_sparse,degree structure (unsigned),-3.25694e-05,-6.26317e-05,-6.40671e-06,-0.68265,0.0249975,0.224978,1,0.207672,False,False,False
+game_a_exact,rewired - random_sparse,degree structure (unsigned),-3.26148e-05,-6.30329e-05,-6.51355e-06,-0.683252,0.0275972,0.248375,1,0.212893,False,False,False
+flygm_game_b_sampled,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.0253355,0.00476846,0.0453441,0.998738,0.0324968,0.0974903,1,0.226777,False,False,False
+game_b_sampled,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.0152237,0.00283118,0.0278558,0.975283,0.0337966,0.168983,1,0.226777,False,False,False
+robust_game_b_sampled_shared_lr,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.0152237,0.00279611,0.0276006,0.975283,0.0371963,0.223178,1,0.226777,False,False,True
+robust_ppo_game_b_sampled_shared_lr,connectome - rewired,specific wiring (unsigned),0.0249281,0.00343337,0.0453387,0.95401,0.040496,0.20248,1,0.226777,False,False,True
+ppo_game_b_sampled,connectome - rewired,specific wiring (unsigned),0.0249281,0.00302108,0.0454705,0.95401,0.0425957,0.212979,1,0.226777,False,False,False
+flygm_game_b_exact,flygm - flygm_rewired,specific wiring (FlyGM),0.00212268,6.70489e-05,0.00587515,0.366549,0.0438956,0.131687,1,0.226777,False,False,False
+game_b_exact,connectome - random_sparse,wiring + degrees (unsigned),-0.0556523,-0.140336,-0.00155302,-0.459105,0.0440956,0.220478,1,0.226777,False,False,False
+robust_game_b_exact_shared_lr,connectome - rewired,specific wiring (unsigned),0.115126,0.00499741,0.265034,0.525675,0.0731927,0.439156,1,0.35931,False,False,False
+ppo_game_a_sampled,connectome - rewired,specific wiring (unsigned),0.0132445,-0.000145588,0.026381,0.789271,0.0816918,0.89861,1,0.383596,False,False,False
+robust_ppo_game_b_sampled_shared_lr,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.00676163,-0.000288135,0.0143408,0.744197,0.10359,0.414359,1,0.466153,False,False,False
+flygm_game_a_sampled,flygm - flygm_rewired,specific wiring (FlyGM),0.00467644,-0.000679958,0.00977564,0.714923,0.115688,0.347065,1,0.499774,False,False,False
+robust_game_b_sampled_shared_lr,rewired - random_sparse,degree structure (unsigned),0.0383025,-0.0081719,0.0830125,0.676408,0.125287,0.626437,1,0.520425,False,False,False
+game_a_sampled,rewired - random_sparse,degree structure (unsigned),0.0082609,-0.00157443,0.018108,0.674082,0.132587,0.928107,1,0.530347,False,False,False
+ppo_game_a_sampled,connectome - random_sparse,wiring + degrees (unsigned),0.010914,-0.00239581,0.0239389,0.655533,0.139486,1,1,0.538018,False,False,False
+robust_ppo_game_b_sampled_shared_lr,rewired - random_sparse,degree structure (unsigned),0.0167925,-0.00353097,0.0376632,0.640216,0.149885,0.449655,1,0.558192,False,False,True
+ppo_game_b_sampled,rewired - random_sparse,degree structure (unsigned),0.0167925,-0.00351353,0.0381286,0.640216,0.155784,0.467353,1,0.560824,False,False,False
+flygm_game_b_exact,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.00486237,-2.82708e-05,0.0141274,0.340667,0.178082,0.356164,1,0.620415,False,False,False
+robust_game_b_exact_shared_lr,connectome+sign - rewired+sign,specific wiring (signed),0.000747299,-0.000214918,0.00187307,0.427505,0.184482,0.922408,1,0.622625,False,False,True
+game_b_exact,connectome+sign - rewired+sign,specific wiring (signed),0.000747299,-0.000206658,0.00185122,0.427505,0.190581,0.762324,1,0.623719,False,False,False
+robust_game_b_exact_shared_lr,connectome - random_sparse,wiring + degrees (unsigned),0.101352,-0.0352675,0.258894,0.414102,0.205379,0.922408,1,0.648519,False,False,False
+flygm_game_a_sampled,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),-0.00433307,-0.0105619,0.00199983,-0.554583,0.215278,0.430557,1,0.648519,False,False,False
+game_a_exact_eval1,rewired+sign - random_sparse+sign,degree structure (signed),-7.13976e-05,-0.000204046,1.04914e-05,-0.3625,0.219578,1,1,0.648519,False,False,False
+game_a_exact,rewired+sign - random_sparse+sign,degree structure (signed),-7.14089e-05,-0.000205539,9.79508e-06,-0.362349,0.222178,1,1,0.648519,False,False,False
+robust_game_b_sampled_shared_lr,connectome - rewired,specific wiring (unsigned),-0.0272054,-0.0686695,0.0121612,-0.539109,0.229577,0.918308,1,0.652482,False,False,False
+flygm_game_b_sampled,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.0209971,-0.00862005,0.0543282,0.532828,0.238976,0.477952,1,0.66178,False,False,False
+ppo_game_b_sampled,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.00536239,-0.00333121,0.014689,0.479846,0.270773,0.467353,1,0.71905,False,False,False
+game_a_sampled@ratio=4,connectome - random_sparse,wiring + degrees (unsigned),-0.0124205,-0.0325841,0.00786893,-0.483337,0.272973,1,1,0.71905,False,False,False
+game_a_exact_eval1,connectome+sign - rewired+sign,specific wiring (signed),1.88384e-05,-1.81006e-05,5.5465e-05,0.300353,0.341266,1,1,0.864918,False,False,False
+game_a_exact,connectome+sign - rewired+sign,specific wiring (signed),1.88169e-05,-1.70844e-05,5.64282e-05,0.299777,0.344366,1,1,0.864918,False,False,False
+robust_ppo_game_b_sampled_shared_lr,connectome+sign - rewired+sign,specific wiring (signed),0.00490473,-0.00469459,0.0144094,0.404983,0.355064,0.710129,1,0.871522,False,False,False
+game_b_exact,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.000530256,-0.000670183,0.00176897,0.261988,0.411159,1,1,0.974016,False,False,False
+robust_game_b_exact_shared_lr,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.000530256,-0.000634693,0.00173803,0.261988,0.414859,1,1,0.974016,False,False,True
+robust_game_a_sampled_shared_lr,rewired - random_sparse,degree structure (unsigned),-0.00354978,-0.0119569,0.00385246,-0.35755,0.439456,1,1,0.994885,False,False,False
+game_a_sampled@ratio=2,connectome+sign - rewired+sign,specific wiring (signed),0.00860371,-0.0132561,0.0300154,0.311902,0.474153,1,1,0.994885,False,False,False
+robust_game_a_sampled_shared_lr,connectome - random_sparse,wiring + degrees (unsigned),-0.00313328,-0.0109002,0.00384327,-0.333351,0.484352,1,1,0.994885,False,False,True
+game_a_sampled,connectome - random_sparse,wiring + degrees (unsigned),-0.00313328,-0.0111008,0.00406673,-0.333351,0.485851,1,1,0.994885,False,False,False
+game_a_sampled@ratio=4,rewired - random_sparse,degree structure (unsigned),-0.00969781,-0.0355183,0.0150724,-0.308876,0.490151,1,1,0.994885,False,False,False
+game_a_sampled,rewired+sign - random_sparse+sign,degree structure (signed),0.00243662,-0.00394375,0.00914902,0.292773,0.494151,1,1,0.994885,False,False,False
+robust_game_a_sampled_shared_lr,rewired+sign - random_sparse+sign,degree structure (signed),0.00243662,-0.00412324,0.00922994,0.292773,0.49565,1,1,0.994885,False,False,True
+game_a_sampled@ratio=2,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.00734319,-0.0135475,0.0284831,0.277408,0.513349,1,1,0.994885,False,False,False
+robust_game_b_sampled_shared_lr,connectome - random_sparse,wiring + degrees (unsigned),0.011097,-0.0248664,0.0440955,0.257049,0.560844,1,1,0.994885,False,False,True
+game_b_sampled,connectome - random_sparse,wiring + degrees (unsigned),0.011097,-0.024254,0.0438973,0.257049,0.561544,1,1,0.994885,False,False,False
+robust_game_b_sampled_shared_lr,rewired+sign - random_sparse+sign,degree structure (signed),0.0114265,-0.0127883,0.044248,0.317168,0.59624,1,1,0.994885,False,False,True
+game_b_sampled,rewired+sign - random_sparse+sign,degree structure (signed),0.0114265,-0.0129519,0.042954,0.317168,0.60364,1,1,0.994885,False,False,False
+game_a_sampled@ratio=8,rewired+sign - random_sparse+sign,degree structure (signed),0.00265741,-0.00743432,0.012662,0.211595,0.620838,1,1,0.994885,False,False,False
+robust_ppo_game_a_sampled_shared_lr,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.00424582,-0.011789,0.0181897,0.224356,0.624638,1,1,0.994885,False,False,True
+ppo_game_a_sampled,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.00424582,-0.0120015,0.017943,0.224356,0.632837,1,1,0.994885,False,False,False
+robust_game_b_exact_shared_lr,rewired+sign - random_sparse+sign,degree structure (signed),-0.000217043,-0.00105832,0.000468808,-0.16741,0.653735,1,1,0.994885,False,False,True
+game_b_exact,rewired+sign - random_sparse+sign,degree structure (signed),-0.000217043,-0.00104347,0.000470302,-0.16741,0.654635,1,1,0.994885,False,False,False
+robust_ppo_game_a_sampled_shared_lr,connectome+sign - random_sparse+sign,wiring + degrees (signed),-0.00291246,-0.015223,0.00914747,-0.191281,0.661534,1,1,0.994885,False,False,False
+game_a_exact,connectome+sign - random_sparse+sign,wiring + degrees (signed),-5.2592e-05,-0.000183855,2.76204e-05,-0.267936,0.666133,1,1,0.994885,False,False,False
+game_a_sampled@ratio=8,rewired - random_sparse,degree structure (unsigned),-0.00636593,-0.0340211,0.0213987,-0.181719,0.667133,1,1,0.994885,False,False,False
+game_a_exact_eval1,connectome+sign - random_sparse+sign,wiring + degrees (signed),-5.25592e-05,-0.00018714,2.80393e-05,-0.267919,0.668633,1,1,0.994885,False,False,False
+robust_ppo_game_a_sampled_shared_lr,connectome - random_sparse,wiring + degrees (unsigned),-0.00252981,-0.0138344,0.00773755,-0.18786,0.675732,1,1,0.994885,False,False,False
+game_a_sampled@ratio=8,connectome - random_sparse,wiring + degrees (unsigned),-0.00406029,-0.0222726,0.0126212,-0.184969,0.680532,1,1,0.994885,False,False,False
+game_a_sampled,connectome+sign - rewired+sign,specific wiring (signed),-0.00145318,-0.00843325,0.00504228,-0.174431,0.685931,1,1,0.994885,False,False,False
+robust_game_a_sampled_shared_lr,connectome+sign - rewired+sign,specific wiring (signed),-0.00145318,-0.00823434,0.00495061,-0.174431,0.688231,1,1,0.994885,False,False,True
+game_a_sampled@ratio=8,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.00273771,-0.00812289,0.0152557,0.189137,0.694331,1,1,0.994885,False,False,False
+ppo_game_a_sampled,flygm - flygm_rewired,specific wiring (FlyGM),0.0022128,-0.00855221,0.0130277,0.161794,0.707529,1,1,0.994885,False,False,False
+robust_ppo_game_a_sampled_shared_lr,flygm - flygm_rewired,specific wiring (FlyGM),0.0022128,-0.00844927,0.0134107,0.161794,0.708829,1,1,0.994885,False,False,True
+ppo_game_a_sampled,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.00220224,-0.00901315,0.0124549,0.162025,0.712329,1,1,0.994885,False,False,False
+flygm_game_b_exact,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.00273969,-0.00459371,0.0133899,0.177866,0.713229,0.713229,1,0.994885,False,False,False
+robust_ppo_game_a_sampled_shared_lr,rewired - random_sparse,degree structure (unsigned),-0.00233055,-0.0139601,0.00893505,-0.15756,0.713829,1,1,0.994885,False,False,True
+ppo_game_a_sampled,rewired - random_sparse,degree structure (unsigned),-0.00233055,-0.0144425,0.00905938,-0.15756,0.718528,1,1,0.994885,False,False,False
+robust_ppo_game_b_sampled_shared_lr,rewired+sign - random_sparse+sign,degree structure (signed),0.00185689,-0.0076683,0.0119477,0.150558,0.732027,0.732027,1,1,False,False,False
+game_a_sampled,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.000983437,-0.00516553,0.00681845,0.130624,0.755024,1,1,1,False,False,False
+robust_game_a_sampled_shared_lr,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.000983437,-0.0051975,0.00688515,0.130624,0.765323,1,1,1,False,False,True
+flygm_game_a_exact,flygm - flygm_random_sparse,wiring + degrees (FlyGM),6.66712e-06,-4.11405e-05,5.55633e-05,0.0799662,0.79762,1,1,1,False,False,False
+flygm_game_b_sampled,flygm - flygm_rewired,specific wiring (FlyGM),0.00433844,-0.0284229,0.0336956,0.112687,0.79822,0.79822,1,1,False,False,False
+game_a_sampled@ratio=2,connectome - random_sparse,wiring + degrees (unsigned),-0.00227786,-0.019684,0.0134413,-0.110196,0.813119,1,1,1,False,False,False
+robust_game_b_exact_shared_lr,rewired - random_sparse,degree structure (unsigned),-0.0137747,-0.101048,0.052889,-0.104293,0.818418,1,1,1,False,False,False
+robust_ppo_game_a_sampled_shared_lr,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.00203301,-0.0126216,0.0138268,0.118863,0.824918,1,1,1,False,False,True
+ppo_game_a_sampled,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.00203301,-0.0129282,0.0139674,0.118863,0.825617,1,1,1,False,False,False
+game_b_exact,connectome - rewired,specific wiring (unsigned),0.000392635,-0.000201111,0.00145586,0.25093,0.832017,1,1,1,False,False,False
+game_a_sampled@ratio=4,connectome - rewired,specific wiring (unsigned),-0.00272271,-0.0277533,0.0217448,-0.0864803,0.841416,1,1,1,False,False,False
+flygm_game_a_exact,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),4.30407e-06,-4.45585e-05,5.30936e-05,0.0515709,0.867413,1,1,1,False,False,False
+game_a_sampled@ratio=8,connectome - rewired,specific wiring (unsigned),0.00230564,-0.0280407,0.0316544,0.061254,0.885211,1,1,1,False,False,False
+robust_game_a_sampled_shared_lr,connectome - rewired,specific wiring (unsigned),0.000416502,-0.00536309,0.00605613,0.0584034,0.894711,1,1,1,False,False,False
+game_a_sampled@ratio=2,rewired - random_sparse,degree structure (unsigned),-0.00155073,-0.0258503,0.0211021,-0.0523159,0.90001,1,1,1,False,False,False
+robust_game_b_sampled_shared_lr,connectome+sign - rewired+sign,specific wiring (signed),0.00379714,-0.0270633,0.0258767,0.110204,0.90131,1,1,1,False,False,True
+game_b_sampled,connectome+sign - rewired+sign,specific wiring (signed),0.00379714,-0.0280459,0.0257357,0.110204,0.90381,1,1,1,False,False,False
+game_a_sampled@ratio=2,rewired+sign - random_sparse+sign,degree structure (signed),-0.00126052,-0.0226351,0.0194559,-0.0475222,0.913709,1,1,1,False,False,False
+flygm_game_a_exact,flygm - flygm_rewired,specific wiring (FlyGM),2.36305e-06,-4.61242e-05,5.15827e-05,0.0286555,0.925907,1,1,1,False,False,False
+flygm_game_a_sampled,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.000343372,-0.00642976,0.00694235,0.0405917,0.930207,0.930207,1,1,False,False,False
+game_a_sampled@ratio=4,connectome+sign - random_sparse+sign,wiring + degrees (signed),-0.000928718,-0.0239999,0.0191366,-0.0344732,0.941406,1,1,1,False,False,False
+game_a_sampled@ratio=2,connectome - rewired,specific wiring (unsigned),-0.000727134,-0.0205093,0.0204909,-0.0281728,0.945305,1,1,1,False,False,False
+game_a_sampled@ratio=4,rewired+sign - random_sparse+sign,degree structure (signed),-0.000683228,-0.0248577,0.0204751,-0.024199,0.956904,1,1,1,False,False,False
+robust_ppo_game_a_sampled_shared_lr,connectome - rewired,specific wiring (unsigned),-0.000199261,-0.0109973,0.0106245,-0.0146204,0.975002,1,1,1,False,False,False
+game_a_exact_eval1,connectome - random_sparse,wiring + degrees (unsigned),-3.035e-05,-0.000136187,0.000148835,-0.11339,0.980602,1,1,1,False,False,False
+game_a_exact,connectome - random_sparse,wiring + degrees (unsigned),-3.04349e-05,-0.000134917,0.000148775,-0.113727,0.982802,1,1,1,False,False,False
+game_a_sampled@ratio=4,connectome+sign - rewired+sign,specific wiring (signed),-0.00024549,-0.0195613,0.0188647,-0.00997489,0.983402,1,1,1,False,False,False
+game_a_sampled@ratio=8,connectome+sign - rewired+sign,specific wiring (signed),8.03025e-05,-0.0117657,0.0132094,0.00506886,0.990501,1,1,1,False,False,False
+game_a_exact,connectome - rewired,specific wiring (unsigned),2.17984e-06,-9.43711e-05,0.000175855,0.00823885,1,1,1,1,False,False,False
+game_a_exact_eval1,connectome - rewired,specific wiring (unsigned),2.2194e-06,-9.40147e-05,0.000174033,0.00838686,1,1,1,1,False,False,False

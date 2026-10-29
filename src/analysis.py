@@ -25,7 +25,7 @@ import pandas as pd
 from .config import REPO_ROOT, load_config
 from .games import GameA, TimeGrid, asymmetric_fixed_point, game_a_analytic_policy
 from .metrics.exploitability import exploitability_a, total_variation
-from .metrics.stats import bootstrap_mean_ci, compare, holm
+from .metrics.stats import benjamini_hochberg, bootstrap_mean_ci, compare, holm
 
 RESULTS = REPO_ROOT / "results"
 
@@ -408,6 +408,40 @@ def game_b_deciles(rng: np.random.Generator, n_boot: int) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+WIRING_QUESTIONS = tuple(
+    f"{q} ({kind})"
+    for q in ("specific wiring", "wiring + degrees", "degree structure")
+    for kind in ("unsigned", "signed", "FlyGM")
+)
+
+
+def wiring_familywide(pairwise: pd.DataFrame, asym_pairwise: pd.DataFrame | None) -> pd.DataFrame:
+    """Every wiring contrast (connectome vs its controls, and control vs control) on final
+    exploitability, in every experiment, corrected as one family by Holm and by BH.
+
+    The per-experiment ``p_holm`` corrects within one experiment x metric. This asks how
+    the same contrasts fare when the whole project is one family. The asymmetric-update
+    contrasts at ratio 1 are the ``game_a_sampled`` rows themselves, so only ratios > 1
+    are added. Final exploitability only: the permutation p-values bottom out at
+    1 / n_perm, so Holm over every metric (hundreds of tests) cannot reach 0.05 at all.
+    Shared-rate grids that reuse an arm pair whose tuned rates already matched produce
+    the same runs twice; ``duplicate`` marks the second copy, which is kept in the family
+    (the conservative choice)."""
+    frames = [pairwise]
+    if asym_pairwise is not None and not asym_pairwise.empty:
+        frames.append(asym_pairwise[asym_pairwise["loss_win_ratio"] != 1].drop(columns="loss_win_ratio"))
+    t = pd.concat(frames, ignore_index=True)
+    t = t[t["question"].isin(WIRING_QUESTIONS) & (t["metric"] == "final_exploitability")].copy()
+    key = t["contrast"] + "|" + t["mean_a"].round(10).astype(str) + "|" + t["mean_b"].round(10).astype(str)
+    t["duplicate"] = key.duplicated()
+    t["p_holm_familywide"] = holm(t["p_perm"].tolist())
+    t["p_bh_familywide"] = benjamini_hochberg(t["p_perm"].tolist())
+    t["distinguishable_familywide"] = t["ci_excludes_0"] & (t["p_holm_familywide"] < 0.05)
+    cols = ["experiment", "contrast", "question", "diff", "diff_lo", "diff_hi", "hedges_g", "p_perm", "p_holm",
+            "p_holm_familywide", "p_bh_familywide", "distinguishable", "distinguishable_familywide", "duplicate"]
+    return t[cols].sort_values("p_perm", kind="stable").reset_index(drop=True)
+
+
 def run_all(n_boot: int, seed: int = 20260918) -> dict[str, pd.DataFrame]:
     rng = np.random.default_rng(seed)
     out: dict[str, pd.DataFrame] = {}
@@ -437,6 +471,7 @@ def run_all(n_boot: int, seed: int = 20260918) -> dict[str, pd.DataFrame]:
     out["cross_experiment"] = cross_experiment_table(rng, n_boot)
     out["flygm_diagnostics"] = flygm_diagnostics(rng, n_boot)
     out["eval_resolution"] = eval_resolution(rng, n_boot)
+    out["wiring_familywide"] = wiring_familywide(out["pairwise"], out.get("asym_pairwise"))
     return out
 
 
