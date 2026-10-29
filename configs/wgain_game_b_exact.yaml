@@ -1,0 +1,30 @@
+# Gain fix, Game B exact (RESULTS.md sec. 12). FlyGM keeps the 5-neuron readout but gets
+# one trainable scalar g on its frozen matrix, m = g * W h + drive (g starts at 1; W
+# itself stays frozen). This tests whether a stronger input-to-output path is enough.
+#
+# Matched to the same budget as readout_game_b_exact.yaml (the connectome arm with the
+# rank-4 all-neuron readout, 6,578), so the two fixes are compared at one size: the
+# update network f_psi is widened to make up the difference. The runner asserts this
+# against that budget and against the dense arm matched to it, within 0.5%.
+base: flygm_ppo_base.yaml
+experiment: wgain_game_b_exact
+game:
+  name: B
+  t_max: 12.0
+network:
+  readout: output
+  budget_readout: all
+  readout_rank: 4
+  param_tolerance: 0.005
+  flygm:
+    w_gain: true
+arms:
+  - {name: oracle}
+  - {name: flygm}
+  - {name: flygm_rewired}
+  - {name: flygm_random_sparse}
+training:
+  mode: exact
+  steps: 4000
+  eval_every: 50
+lr_from: {file: tuned_lr.yaml, experiment: wgain_game_b_exact}

@@ -1,0 +1,62 @@
+=== 2026-10-21 12:49:11 steps: tune-flygm-fast, run-flygm-fast, eval1, tune-ppo-a, run-ppo-a ===
+=== 2026-10-21 13:02:26 steps: tune-flygm-fast, run-flygm-fast, eval1, tune-ppo-a, run-ppo-a, tune-flygm-b-sampled, run-flygm-b-sampled, tune-ppo-b, run-ppo-b, run-ppo-b-flygm, robust ===
+=== 2026-10-21 14:49:50 steps: tune-flygm-fast, run-flygm-fast, eval1, tune-ppo-a, run-ppo-a, tune-flygm-b-sampled, run-flygm-b-sampled, tune-ppo-b, run-ppo-b, run-ppo-b-flygm, robust ===
+eval1: 306 s wall (8 workers, alongside tune-flygm-fast)
+=== 2026-10-21 15:29:04 steps: tune-flygm-fast, run-flygm-fast, eval1, tune-ppo-a, run-ppo-a, tune-flygm-b-sampled, run-flygm-b-sampled, tune-ppo-b, run-ppo-b, run-ppo-b-flygm, robust ===
+=== 2026-10-21 15:39:07 steps: tune-flygm-fast, run-flygm-fast, eval1, tune-ppo-a, run-ppo-a, tune-flygm-b-sampled, run-flygm-b-sampled, tune-ppo-b, run-ppo-b, run-ppo-b-flygm, robust ===
+tune-flygm-fast: 1518 s wall (14 workers)
+run-flygm-fast: 8483 s wall (14 workers)
+eval1: 10 s wall (14 workers)
+=== 2026-10-21 18:31:08 steps: tune-flygm-fast, run-flygm-fast, eval1, tune-ppo-a, run-ppo-a, tune-flygm-b-sampled, run-flygm-b-sampled, tune-ppo-b, run-ppo-b, run-ppo-b-flygm, robust ===
+tune-flygm-fast: 8 s wall (14 workers)
+run-flygm-fast: 4 s wall (14 workers)
+eval1: 8 s wall (14 workers)
+tune-ppo-a: 6906 s wall (14 workers)
+run-ppo-a: 2841 s wall (14 workers)
+tune-flygm-b-sampled: capped at 6 workers (measured: more than that cuts throughput here)
+tune-flygm-b-sampled: 10555 s wall (6 workers)
+run-flygm-b-sampled: capped at 6 workers (measured: more than that cuts throughput here)
+=== 2026-10-22 11:08:47 steps: tune-ppo-b, run-ppo-b, robust-ppo-a, robust-ppo-b ===
+
+# --- laptop (AMD Ryzen AI 7 350, 8 physical cores) ---
+tune-ppo-b: 3135 s wall (6 workers)
+run-ppo-b: 7366 s wall (6 workers)
+robust-ppo-a: 3862 s wall (6 workers)
+robust-ppo-b: 5777 s wall (6 workers)
+=== total 335.7 min wall ===
+=== 2026-10-22 17:00:04 steps: tune-ppo-b, run-ppo-b, robust-ppo-a, robust-ppo-b ===
+tune-ppo-b: 5 s wall (6 workers)
+run-ppo-b: 4 s wall (6 workers)
+robust-ppo-a: 4 s wall (6 workers)
+robust-ppo-b: 4 s wall (6 workers)
+=== total 0.3 min wall ===
+=== 2026-10-22 17:20:05 steps: tune-ppo-b, run-ppo-b, robust-ppo-a, robust-ppo-b ===
+tune-ppo-b: 6 s wall (6 workers)
+run-ppo-b: 5 s wall (6 workers)
+robust-ppo-a: 4 s wall (6 workers)
+robust-ppo-b: 3 s wall (6 workers)
+=== total 0.3 min wall ===
+=== 2026-10-22 17:40:04 steps: tune-ppo-b, run-ppo-b, robust-ppo-a, robust-ppo-b ===
+tune-ppo-b: 3 s wall (6 workers)
+run-ppo-b: 2 s wall (6 workers)
+robust-ppo-a: 2 s wall (6 workers)
+robust-ppo-b: 2 s wall (6 workers)
+=== total 0.2 min wall ===
+
+# --- cloud session (Intel Xeon 2.10 GHz, 4 physical cores) ---
+=== 2026-10-22 08:35:23 steps: run-flygm-b-sampled, run-ppo-b-flygm ===
+run-flygm-b-sampled: capped at 4 workers (measured: more than that cuts throughput here)
+=== 2026-10-23 11:30:27 steps: run-flygm-b-sampled ===
+run-flygm-b-sampled: 8200 s wall (6 workers)
+=== total 136.7 min wall ===
+=== 2026-10-29 14:58:01 steps: tune-readout-b, run-readout-b ===
+tune-readout-b: 6066 s wall (6 workers)
+run-readout-b: 11106 s wall (6 workers)
+=== total 286.2 min wall ===
+=== 2026-10-29 19:44:36 steps: tune-readout-a, run-readout-a ===
+tune-readout-a: 164 s wall (6 workers)
+run-readout-a: 243 s wall (6 workers)
+=== total 6.8 min wall ===
+=== 2026-10-29 19:51:54 steps: analyze ===
+analyze: 24 s wall (6 workers)
+=== total 0.4 min wall ===

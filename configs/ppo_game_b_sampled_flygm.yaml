@@ -1,0 +1,33 @@
+# NOT RUN. This cell was dropped (RESULTS.md sec. 10): no results/ppo_game_b_sampled_flygm/
+# exists and no reported number comes from it. Kept so the design is on record. The
+# driver step run-ppo-b-flygm still runs it, including in a full run of
+# scripts/reproduce_flygm_ppo.py.
+#
+# PPO x FlyGM x Game B sampled: the most expensive cell in the project, 3.8 h of CPU
+# per run (50 types x 8 agents x 258 neurons x 6 unroll steps x 4 PPO epochs, and the
+# step is already fully batched and within ~2x of single-core sgemm peak).
+#
+# COMPUTE REDUCTIONS (recorded in RESULTS.md sec. 10), both of which make this cell
+# weaker evidence than the rest of the grid:
+#   * 3 evaluation seeds, not 10;
+#   * no learning-rate grid of its own. It reuses the rate tuned for the same arms
+#     under REINFORCE in the same game and mode (flygm_game_b_sampled), so PPO is not
+#     given a step size of its own here. A PPO-favouring rate may well exist.
+base: flygm_ppo_base.yaml
+experiment: ppo_game_b_sampled_flygm
+game:
+  name: B
+  t_max: 12.0
+arms:
+  - {name: flygm}
+  - {name: flygm_rewired}
+  - {name: flygm_random_sparse}
+seeds: {start: 0, count: 3}
+training:
+  mode: sampled
+  sampled_algorithm: ppo
+  steps: 3000
+  eval_every: 50
+metrics:
+  threshold: 0.05
+lr_from: {file: tuned_lr.yaml, experiment: flygm_game_b_sampled}

@@ -1,0 +1,9 @@
+# Game A exact at full time resolution: the committed game_a_exact grid (same 9 arms,
+# 20 seeds, same tuned learning rates) evaluated after *every* episode instead of
+# every 25. RESULTS.md sec. 4 reports a 19-24 episode speed-up of the connectome over
+# its controls, which is under one evaluation interval; with eval_every 1 every
+# crossing time is exact. New results directory, nothing else changes.
+base: game_a_exact.yaml
+experiment: game_a_exact_eval1
+training:
+  eval_every: 1

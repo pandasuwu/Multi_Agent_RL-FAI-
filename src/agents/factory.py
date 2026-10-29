@@ -9,12 +9,31 @@ import numpy as np
 import torch
 
 from ..games.war_of_attrition import Game, GameA
-from .policies import DenseMLP, Policy, SparseCircuitPolicy, TabularPolicy, dense_param_count, match_dense_width
+from .flygm import FlyGMPolicy, flygm_param_count, match_flygm_width
+from .policies import (
+    DenseMLP,
+    Policy,
+    SparseCircuitPolicy,
+    TabularPolicy,
+    dense_param_count,
+    match_dense_width,
+    readout_param_count,
+)
 
-NETWORK_ARMS = ("dense", "connectome", "rewired", "random_sparse")
 CIRCUIT_ARMS = ("connectome", "rewired", "random_sparse")
+# FlyGM arms: same three graphs, but the synapses are frozen and the neurons train
+# (src/agents/flygm.py). Each one maps to the graph its weights come from.
+FLYGM_GRAPH = {"flygm": "connectome", "flygm_rewired": "rewired", "flygm_random_sparse": "random_sparse"}
+FLYGM_ARMS = tuple(FLYGM_GRAPH)
+GRAPH_ARMS = (*CIRCUIT_ARMS, *FLYGM_ARMS)  # arms that need a CircuitSpec
+NETWORK_ARMS = ("dense", *CIRCUIT_ARMS, *FLYGM_ARMS)
 ALL_ARMS = ("oracle", "tabular", *NETWORK_ARMS)
 D_IN = 1  # context feature: V/c in Game A, the private value v in Game B
+
+
+def graph_name(arm_name: str) -> str:
+    """The graph an arm is built on: FlyGM arms reuse the three existing graphs."""
+    return FLYGM_GRAPH.get(arm_name, arm_name)
 
 
 def arm_label(arm: dict[str, Any]) -> str:
@@ -35,21 +54,54 @@ class CircuitSpec:
     output_nodes: np.ndarray
     node_sign: np.ndarray  # +1 excitatory, -1 inhibitory, 0 unknown/modulatory (Dale's law)
     graph_id: str  # checksum of the edge set actually used
+    # Synapse count per edge, used only by the FlyGM arm (whose weights are frozen
+    # synapse counts). The trained-edge arms 3-5 ignore it: their weights are learned.
+    synapses: np.ndarray | None = None
 
     @property
     def edge_sign(self) -> np.ndarray:
         return self.node_sign[self.edges[:, 0]]
 
 
-def circuit_param_count(spec: CircuitSpec, n_bins: int) -> int:
+def readout_settings(net_cfg: dict[str, Any], key: str = "readout") -> tuple[str, int]:
+    """``(nodes, rank)`` of the graph arms' readout. ``network.readout`` is ``output``
+    (the default: the 5 AVLP727m neurons) or ``all`` (every neuron, through a rank
+    ``network.readout_rank`` map). ``key = "budget_readout"`` gives the readout the
+    parameter budget is computed with, which defaults to the arms' own."""
+    nodes = net_cfg.get(key, net_cfg.get("readout", "output"))
+    return str(nodes), int(net_cfg.get("readout_rank", 0)) if nodes == "all" else 0
+
+
+def circuit_param_count(spec: CircuitSpec, n_bins: int, readout_nodes: str = "output", readout_rank: int = 0) -> int:
     """Trainable parameters of one :class:`SparseCircuitPolicy` agent."""
     return (
         D_IN * len(spec.input_nodes)
         + len(spec.edges)
         + spec.n_neurons
-        + len(spec.output_nodes) * n_bins
-        + n_bins
+        + readout_param_count(spec.n_neurons, len(spec.output_nodes), n_bins, readout_nodes, readout_rank)
     )
+
+
+def flygm_hidden_width(net_cfg: dict[str, Any], target_params: int | None, n_bins: int, spec: CircuitSpec) -> int:
+    """Width of ``f_psi``: explicit, or solved to match ``target_params``."""
+    fly = net_cfg["flygm"]
+    width = fly["hidden_width"]
+    if width == "matched":
+        if target_params is None:
+            raise ValueError("flygm hidden_width 'matched' needs the circuit parameter budget")
+        width = match_flygm_width(
+            target_params,
+            spec.n_neurons,
+            D_IN,
+            len(spec.input_nodes),
+            len(spec.output_nodes),
+            n_bins,
+            int(fly["descriptor_dim"]),
+            int(fly["hidden_layers"]),
+            *readout_settings(net_cfg),
+            bool(fly.get("w_gain", False)),
+        )
+    return int(width)
 
 
 def dense_hidden_sizes(net_cfg: dict[str, Any], target_params: int | None, n_bins: int) -> list[int]:
@@ -81,6 +133,34 @@ def build_policy(
     if name == "dense":
         hidden = dense_hidden_sizes(net_cfg, budget, n_bins)
         return DenseMLP(n_agents, D_IN, hidden, n_bins, net_cfg["activation"], gen)
+    if name in FLYGM_ARMS:
+        if circuit is None:
+            raise ValueError(f"arm {name!r} needs a circuit")
+        if circuit.synapses is None:
+            raise ValueError(f"arm {name!r} needs the synapse counts of its graph")
+        fly = net_cfg["flygm"]
+        return FlyGMPolicy(
+            n_agents=n_agents,
+            d_in=D_IN,
+            n_neurons=circuit.n_neurons,
+            edges=circuit.edges,
+            synapses=circuit.synapses,
+            node_sign=circuit.node_sign,
+            input_nodes=circuit.input_nodes,
+            output_nodes=circuit.output_nodes,
+            n_bins=n_bins,
+            unroll_steps=int(net_cfg["unroll_steps"]),
+            activation=net_cfg["activation"],
+            descriptor_dim=int(fly["descriptor_dim"]),
+            hidden_width=flygm_hidden_width(net_cfg, budget, n_bins, circuit),
+            hidden_layers=int(fly["hidden_layers"]),
+            unsigned_sign=float(fly["unsigned_sign"]),
+            eta_init_std=float(fly["eta_init_std"]),
+            generator=gen,
+            readout_nodes=readout_settings(net_cfg)[0],
+            readout_rank=readout_settings(net_cfg)[1],
+            w_gain=bool(fly.get("w_gain", False)),
+        )
     if name in CIRCUIT_ARMS:
         if circuit is None:
             raise ValueError(f"arm {name!r} needs a circuit")
@@ -99,6 +179,8 @@ def build_policy(
             edge_sign=circuit.edge_sign,
             sign_constrained=bool(arm.get("sign_constrained", False)),
             sparse_max_batch=int(net_cfg["sparse_max_batch"]),
+            readout_nodes=readout_settings(net_cfg)[0],
+            readout_rank=readout_settings(net_cfg)[1],
         )
     raise ValueError(f"unknown arm {name!r}")
 
@@ -119,6 +201,8 @@ def assert_matched(counts: dict[str, int], tolerance: float) -> None:
 __all__ = [
     "ALL_ARMS",
     "CIRCUIT_ARMS",
+    "FLYGM_ARMS",
+    "GRAPH_ARMS",
     "CircuitSpec",
     "NETWORK_ARMS",
     "arm_label",
@@ -127,4 +211,8 @@ __all__ = [
     "circuit_param_count",
     "dense_hidden_sizes",
     "dense_param_count",
+    "flygm_hidden_width",
+    "flygm_param_count",
+    "graph_name",
+    "readout_settings",
 ]

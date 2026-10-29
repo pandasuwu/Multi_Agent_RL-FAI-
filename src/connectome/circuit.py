@@ -11,6 +11,14 @@
 All three share the node set and node roles (input = PPL1, output = AVLP727m) and
 node signs (Dale's law: an edge's sign is its presynaptic neuron's), so arms 3-5
 have *identical* trainable parameter counts.
+
+Every spec also carries a synapse count per edge. The trained-edge arms 3-5 ignore
+it (they learn a weight per edge); the FlyGM arm uses it as its frozen weight. The
+real graph uses its real counts. A control's edges do not exist in the connectome
+and so have no count of their own, so each control gets a seeded random permutation
+of the *real* count multiset: the control then matches the real graph in sparsity
+(both), degree sequence (rewired) and weight distribution (both), and differs only
+in which pair of neurons each synapse count sits on.
 """
 
 from __future__ import annotations
@@ -88,14 +96,17 @@ def circuit_spec_for_arm(conn_cfg: dict[str, Any], arm: str, seed: int) -> Circu
     data = load_circuit(conn_cfg)
     n = len(data["node_ids"])
     edges = data["edges"]
+    synapses = data["synapses"]
     if arm == "connectome":
         new = edges
     elif arm == "rewired":
         rng = np.random.default_rng([int(seed), 0xC0FFEE])
         new, _ = degree_preserving_rewire(edges, int(conn_cfg["rewire_swaps_per_edge"]), rng)
+        synapses = np.random.default_rng([int(seed), 0x5717A95]).permutation(synapses)
     elif arm == "random_sparse":
         rng = np.random.default_rng([int(seed), 0xBEEF])
         new = random_sparse(n, len(edges), rng)
+        synapses = np.random.default_rng([int(seed), 0x5717A96]).permutation(synapses)
     else:
         raise ValueError(f"not a circuit arm: {arm!r}")
     role = data["role"]
@@ -106,4 +117,5 @@ def circuit_spec_for_arm(conn_cfg: dict[str, Any], arm: str, seed: int) -> Circu
         output_nodes=np.flatnonzero(role == "output"),
         node_sign=data["node_sign"],
         graph_id=graph_checksum(data["node_ids"], new)[:16],
+        synapses=synapses,
     )

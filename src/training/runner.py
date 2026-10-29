@@ -27,12 +27,15 @@ import torch
 import yaml
 
 from ..agents.factory import (
-    CIRCUIT_ARMS,
+    FLYGM_ARMS,
+    GRAPH_ARMS,
     NETWORK_ARMS,
     arm_label,
     assert_matched,
     build_policy,
     circuit_param_count,
+    graph_name,
+    readout_settings,
 )
 from ..config import REPO_ROOT, config_hash, deep_merge
 from ..games.equilibrium import game_a_analytic_policy, game_b_analytic_policy
@@ -98,15 +101,25 @@ def n_agents_for(cfg: dict[str, Any]) -> int:
 def circuit_for(cfg: dict[str, Any], arm: dict[str, Any], seed: int):
     from ..connectome.circuit import circuit_spec_for_arm  # heavy import only when needed
 
-    return circuit_spec_for_arm(cfg["connectome"], arm["name"], seed)
+    return circuit_spec_for_arm(cfg["connectome"], graph_name(arm["name"]), seed)
+
+
+def needs_budget(cfg: dict[str, Any], arm_name: str) -> bool:
+    """Whether this arm's size is solved from the connectome arm's parameter count."""
+    net = cfg["network"]
+    if arm_name == "dense":
+        return net["dense_width"] == "matched"
+    if arm_name in FLYGM_ARMS:
+        return net.get("flygm", {}).get("hidden_width") == "matched"
+    return False
 
 
 def parameter_budget(cfg: dict[str, Any]) -> int | None:
-    """Trainable parameters of the connectome arm; the budget the dense arm matches."""
-    if cfg["network"]["dense_width"] != "matched" or not any(a["name"] == "dense" for a in cfg["arms"]):
+    """Trainable parameters of the connectome arm; the budget other arms match."""
+    if not any(needs_budget(cfg, a["name"]) for a in cfg["arms"]):
         return None
     spec = circuit_for(cfg, {"name": "connectome"}, 0)
-    return circuit_param_count(spec, int(cfg["game"]["n_bins"]))
+    return circuit_param_count(spec, int(cfg["game"]["n_bins"]), *readout_settings(cfg["network"], "budget_readout"))
 
 
 def check_parameter_matching(cfg: dict[str, Any]) -> dict[str, int]:
@@ -117,15 +130,29 @@ def check_parameter_matching(cfg: dict[str, Any]) -> dict[str, int]:
     for arm in cfg["arms"]:
         if arm["name"] not in NETWORK_ARMS:
             continue
-        circuit = circuit_for(cfg, arm, 0) if arm["name"] in CIRCUIT_ARMS else None
+        circuit = circuit_for(cfg, arm, 0) if arm["name"] in GRAPH_ARMS else None
         policy = build_policy(arm, game, 1, cfg["network"], 0, circuit, budget)
         counts[arm_label(arm)] = policy.trainable_parameters_per_agent()
+    if counts:
+        # Every network arm is sized against the connectome arm's count, so that count
+        # joins the comparison even when no connectome arm runs in this experiment
+        # (the FlyGM-only configs) and even when a width was set by hand.
+        counts["connectome(budget)"] = budget if budget is not None else circuit_param_count(
+            circuit_for(cfg, {"name": "connectome"}, 0), int(cfg["game"]["n_bins"]), *readout_settings(cfg["network"])
+        )
+        # Likewise the dense arm at the same budget, so an experiment without one (a
+        # FlyGM-only grid) is still checked against the dense MLP it is compared with.
+        if budget is not None and "dense" not in counts and cfg["network"]["dense_width"] == "matched":
+            dense = build_policy({"name": "dense"}, game, 1, cfg["network"], 0, None, budget)
+            counts["dense(budget)"] = dense.trainable_parameters_per_agent()
     if len(counts) > 1:
         assert_matched(counts, float(cfg["network"]["param_tolerance"]))
     return counts
 
 
 def run_job(job: dict[str, Any]) -> dict[str, Any]:
+    # one thread per worker: the pool is the parallelism, so BLAS must not also
+    # thread (a fresh process defaults to one thread per physical core)
     torch.set_num_threads(1)
     cfg, arm, seed = job["cfg"], job["arm"], job["seed"]
     game = build_game(cfg["game"])
@@ -153,8 +180,8 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             final_policy=probs[0].tolist(),
         )
     else:
-        circuit = circuit_for(cfg, arm, seed) if arm["name"] in CIRCUIT_ARMS else None
-        budget = parameter_budget(cfg) if arm["name"] == "dense" else None
+        circuit = circuit_for(cfg, arm, seed) if arm["name"] in GRAPH_ARMS else None
+        budget = parameter_budget(cfg) if needs_budget(cfg, arm["name"]) else None
         torch.manual_seed(seed)
         policy = build_policy(arm, game, n_agents_for(cfg), cfg["network"], seed, circuit, budget)
         out = train_run(game, policy, cfg["training"], cfg["metrics"], learning_rate(cfg, arm), seed)
@@ -165,12 +192,21 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             summary=out.summary,
             winner_loser=out.winner_loser,
             final_policy=out.final_policy,
+            # arm-specific diagnostics (FlyGM: unsigned_sign used, spectral radius
+            # before scaling, input-to-output gain of the frozen W)
+            diagnostics=dict(getattr(policy, "diagnostics", {}) or {}),
         )
     record["summary"]["wall_seconds"] = time.perf_counter() - started
     out_dir = Path(job["out_dir"]) / "runs"
     out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_dir / f"{job['run_id']}.json", "w", encoding="utf-8") as fh:
+    # Write through a temporary file and rename: a run's JSON is what `resume` uses to
+    # decide the run is done, so a process killed mid-write must not leave a truncated
+    # file behind. os.replace is atomic on the same filesystem.
+    final = out_dir / f"{job['run_id']}.json"
+    tmp = final.with_suffix(".json.partial")
+    with open(tmp, "w", encoding="utf-8") as fh:
         json.dump(record, fh, default=_json_default)
+    os.replace(tmp, final)
     return {"run_id": job["run_id"], "wall": record["summary"]["wall_seconds"]}
 
 
@@ -197,6 +233,7 @@ def collect(out_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
                 "config_hash": rec["config_hash"],
                 **rec["summary"],
                 **{f"wl_{k}": v for k, v in rec["winner_loser"].items()},
+                **{f"diag_{k}": v for k, v in rec.get("diagnostics", {}).items()},
             }
         )
         for row in rec["curve"]:
@@ -222,6 +259,8 @@ def run_experiment(
     for job in jobs:
         job["out_dir"] = str(out_dir)
     if resume:
+        # one JSON per finished run, so an interrupted experiment loses only the runs
+        # that were in flight; `*.json.partial` leftovers are ignored and overwritten
         done = {p.stem for p in (out_dir / "runs").glob("*.json")} if (out_dir / "runs").exists() else set()
         jobs = [j for j in jobs if j["run_id"] not in done]
     print(f"[{cfg['experiment']}] {len(jobs)} runs to do on {workers} workers")

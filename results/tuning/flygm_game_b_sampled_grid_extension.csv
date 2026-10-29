@@ -1,0 +1,7 @@
+experiment,arm,lr,criterion,final_exploitability,n,chosen
+flygm_game_b_sampled,flygm,0.1,-0.487531,0.289641,2,False
+flygm_game_b_sampled,flygm,0.3,-0.456869,0.34172,2,False
+flygm_game_b_sampled,flygm_random_sparse,0.1,-0.525172,0.268989,2,False
+flygm_game_b_sampled,flygm_random_sparse,0.3,-0.430903,0.333235,2,False
+flygm_game_b_sampled,flygm_rewired,0.1,-0.52752,0.234541,2,False
+flygm_game_b_sampled,flygm_rewired,0.3,-0.445043,0.331161,2,False

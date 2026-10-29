@@ -5,3 +5,13 @@ __pycache__/
 .pytest_cache/
 results/_scratch/
 *.egg-info/
+# game_a_exact_eval1 evaluates after every episode, so its per-run curves are 3,001
+# points instead of 121: 168 MB of JSON and a 60 MB curves.csv for a result that is
+# entirely in summary.csv (the crossing times). Rerun it with
+#   python scripts/run_experiment.py configs/game_a_exact_eval1.yaml
+results/game_a_exact_eval1/runs/
+results/game_a_exact_eval1/curves.csv
+
+# the user's own working files, untracked at the start of this work
+report/
+Claude outputs/
