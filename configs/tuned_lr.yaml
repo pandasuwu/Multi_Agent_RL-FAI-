@@ -72,3 +72,33 @@ ppo_game_b_sampled:
   rewired: 0.01
   rewired+sign: 0.03
   tabular: 0.03
+readout_game_a_exact:
+  connectome: 0.003
+  connectome+sign: 0.003
+  dense: 0.003
+  flygm: 0.003
+  flygm_random_sparse: 0.003
+  flygm_rewired: 0.003
+  random_sparse: 0.003
+  random_sparse+sign: 0.003
+  rewired: 0.003
+  rewired+sign: 0.003
+readout_game_b_exact:
+  connectome: 0.003
+  connectome+sign: 0.003
+  dense: 0.01
+  flygm: 0.003
+  flygm_random_sparse: 0.003
+  flygm_rewired: 0.003
+  random_sparse: 0.003
+  random_sparse+sign: 0.003
+  rewired: 0.003
+  rewired+sign: 0.003
+wgain_game_a_exact:
+  flygm: 0.03
+  flygm_random_sparse: 0.03
+  flygm_rewired: 0.03
+wgain_game_b_exact:
+  flygm: 0.01
+  flygm_random_sparse: 0.01
+  flygm_rewired: 0.01

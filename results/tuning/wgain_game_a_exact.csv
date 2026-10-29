@@ -1,0 +1,16 @@
+arm,lr,criterion,final_exploitability,n,experiment,chosen
+flygm,0.001,-1.3855537963085207,0.02400369237116505,2,wgain_game_a_exact,False
+flygm,0.003,-1.663045005984796,0.01413089440325805,2,wgain_game_a_exact,False
+flygm,0.01,-2.0798495672432944,0.004469385831559701,2,wgain_game_a_exact,False
+flygm,0.03,-2.5699139882607716,0.0013255671199094,2,wgain_game_a_exact,True
+flygm,0.1,-0.6087079200738198,0.20375454333998383,2,wgain_game_a_exact,False
+flygm_random_sparse,0.001,-1.3851440521984517,0.024005531601645202,2,wgain_game_a_exact,False
+flygm_random_sparse,0.003,-1.662591069215374,0.0141559366964304,2,wgain_game_a_exact,False
+flygm_random_sparse,0.01,-2.079154060164824,0.004476894352061301,2,wgain_game_a_exact,False
+flygm_random_sparse,0.03,-2.566033930394471,0.00134470237868795,2,wgain_game_a_exact,True
+flygm_random_sparse,0.1,0.22419814725375561,2.865078337063171,2,wgain_game_a_exact,False
+flygm_rewired,0.001,-1.3852144225463983,0.024005168569643402,2,wgain_game_a_exact,False
+flygm_rewired,0.003,-1.6637961573558941,0.0141212374182242,2,wgain_game_a_exact,False
+flygm_rewired,0.01,-2.076283967246164,0.00449659657771565,2,wgain_game_a_exact,False
+flygm_rewired,0.03,-2.5522869139901845,0.00140265541968185,2,wgain_game_a_exact,True
+flygm_rewired,0.1,0.09831560496605424,1.373833361558347,2,wgain_game_a_exact,False

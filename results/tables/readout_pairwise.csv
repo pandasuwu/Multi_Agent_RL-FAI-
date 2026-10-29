@@ -1,0 +1,241 @@
+experiment,metric,contrast,question,mean_a,mean_b,diff,diff_lo,diff_hi,hedges_g,p_perm,n_a,n_b,ci_excludes_0,p_holm,distinguishable
+readout_game_b_exact,final_exploitability,connectome - rewired,specific wiring (unsigned),0.00389951,0.00412905,-0.000229544,-0.00263623,0.00151487,-0.0640658,0.921808,20,20,False,1,False
+readout_game_b_exact,final_exploitability,connectome+sign - rewired+sign,specific wiring (signed),0.00306894,0.003011,5.79404e-05,-0.000426736,0.000561186,0.0681397,0.832117,20,20,False,1,False
+readout_game_b_exact,final_exploitability,connectome - random_sparse,wiring + degrees (unsigned),0.00389951,0.00314085,0.000758657,-0.00019922,0.00179268,0.446401,0.158384,20,20,False,1,False
+readout_game_b_exact,final_exploitability,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.00306894,0.00290315,0.000165783,-0.00031924,0.000698747,0.191708,0.553945,20,20,False,1,False
+readout_game_b_exact,final_exploitability,rewired - random_sparse,degree structure (unsigned),0.00412905,0.00314085,0.0009882,-0.000504938,0.00330808,0.293303,0.489451,20,20,False,1,False
+readout_game_b_exact,final_exploitability,rewired+sign - random_sparse+sign,degree structure (signed),0.003011,0.00290315,0.000107843,-0.000266137,0.000489436,0.169124,0.593341,20,20,False,1,False
+readout_game_b_exact,final_exploitability,connectome - dense,connectome vs conventional (unsigned),0.00389951,0.00241789,0.00148163,0.000674791,0.0024342,0.993402,0.0009999,20,20,True,0.0149985,True
+readout_game_b_exact,final_exploitability,connectome+sign - dense,connectome vs conventional (signed),0.00306894,0.00241789,0.000651052,0.000239777,0.00113457,0.862668,0.00349965,20,20,True,0.0489951,True
+readout_game_b_exact,final_exploitability,random_sparse - dense,sparse circuit vs conventional,0.00314085,0.00241789,0.000722968,0.000238273,0.00125125,0.841185,0.00919908,20,20,True,0.119588,False
+readout_game_b_exact,final_exploitability,connectome+sign - connectome,sign constraint (connectome),0.00306894,0.00389951,-0.000830573,-0.00183017,9.88488e-05,-0.503686,0.112489,20,20,False,1,False
+readout_game_b_exact,final_exploitability,rewired+sign - rewired,sign constraint (rewired),0.003011,0.00412905,-0.00111806,-0.00342004,0.000260041,-0.339566,0.346765,20,20,False,1,False
+readout_game_b_exact,final_exploitability,random_sparse+sign - random_sparse,sign constraint (random),0.00290315,0.00314085,-0.000237699,-0.000811684,0.000309656,-0.248232,0.428257,20,20,False,1,False
+readout_game_b_exact,final_exploitability,flygm - flygm_rewired,specific wiring (FlyGM),0.0114468,0.0189028,-0.00745606,-0.0184883,9.2037e-05,-0.470071,0.119488,20,20,False,1,False
+readout_game_b_exact,final_exploitability,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.0114468,0.0182709,-0.00682414,-0.0193244,0.000364738,-0.357918,0.165183,20,20,False,1,False
+readout_game_b_exact,final_exploitability,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.0189028,0.0182709,0.000631913,-0.0151495,0.0147178,0.0255283,0.928607,20,20,False,1,False
+readout_game_b_exact,final_exploitability,flygm - connectome,frozen vs trained synapses,0.0114468,0.00389951,0.00754728,0.00643083,0.00860901,4.1083,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_exploitability,flygm - dense,FlyGM vs conventional,0.0114468,0.00241789,0.00902891,0.00841395,0.00972351,8.15679,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,steps_to_threshold_c,connectome - rewired,specific wiring (unsigned),375,350,25,7.5,42.5,0.837867,0.0214979,20,20,True,0.214979,False
+readout_game_b_exact,steps_to_threshold_c,connectome+sign - rewired+sign,specific wiring (signed),352.5,360,-7.5,-22.5,5,-0.31746,0.49585,20,20,False,1,False
+readout_game_b_exact,steps_to_threshold_c,connectome - random_sparse,wiring + degrees (unsigned),375,350,25,7.5,42.5,0.837867,0.0193981,20,20,True,0.213379,False
+readout_game_b_exact,steps_to_threshold_c,connectome+sign - random_sparse+sign,wiring + degrees (signed),352.5,355,-2.5,-17.5,12.5,-0.102127,1,20,20,False,1,False
+readout_game_b_exact,steps_to_threshold_c,rewired - random_sparse,degree structure (unsigned),350,350,0,-20,20,0,1,20,20,False,1,False
+readout_game_b_exact,steps_to_threshold_c,rewired+sign - random_sparse+sign,degree structure (signed),360,355,5,-7.5,17.5,0.228364,0.712829,20,20,False,1,False
+readout_game_b_exact,steps_to_threshold_c,connectome - dense,connectome vs conventional (unsigned),375,220,155,140,170,5.98309,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,steps_to_threshold_c,connectome+sign - dense,connectome vs conventional (signed),352.5,220,132.5,117.5,147.5,5.12767,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,steps_to_threshold_c,random_sparse - dense,sparse circuit vs conventional,350,220,130,112.5,147.5,4.39081,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,steps_to_threshold_c,connectome+sign - connectome,sign constraint (connectome),352.5,375,-22.5,-37.5,-7.5,-0.861941,0.0170983,20,20,True,0.205179,False
+readout_game_b_exact,steps_to_threshold_c,rewired+sign - rewired,sign constraint (rewired),360,350,10,-5,27.5,0.361075,0.391661,20,20,False,1,False
+readout_game_b_exact,steps_to_threshold_c,random_sparse+sign - random_sparse,sign constraint (random),355,350,5,-12.5,22.5,0.175888,0.781322,20,20,False,1,False
+readout_game_b_exact,steps_to_threshold_c,flygm - flygm_rewired,specific wiring (FlyGM),3862.5,3525,337.5,-45,772.5,0.487704,0.132587,20,20,False,1,False
+readout_game_b_exact,steps_to_threshold_c,flygm - flygm_random_sparse,wiring + degrees (FlyGM),3862.5,3507.5,355,-30,792.562,0.506672,0.117088,20,20,False,1,False
+readout_game_b_exact,steps_to_threshold_c,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),3525,3507.5,17.5,-522.5,557.5,0.0192678,0.959704,20,20,False,1,False
+readout_game_b_exact,steps_to_threshold_c,flygm - connectome,frozen vs trained synapses,3862.5,375,3487.5,3307.5,3622.5,12.9272,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,steps_to_threshold_c,flygm - dense,FlyGM vs conventional,3862.5,220,3642.5,3467.5,3777.5,13.503,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_tv,connectome - rewired,specific wiring (unsigned),0.155016,0.160974,-0.00595781,-0.0289993,0.0149035,-0.159879,0.636336,20,20,False,1,False
+readout_game_b_exact,final_tv,connectome+sign - rewired+sign,specific wiring (signed),0.162639,0.146658,0.0159813,-0.00108733,0.0330296,0.556124,0.0812919,20,20,False,1,False
+readout_game_b_exact,final_tv,connectome - random_sparse,wiring + degrees (unsigned),0.155016,0.149977,0.00503874,-0.0138027,0.0242264,0.158378,0.613039,20,20,False,1,False
+readout_game_b_exact,final_tv,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.162639,0.162714,-7.49659e-05,-0.0157798,0.0167241,-0.00275264,0.991901,20,20,False,1,False
+readout_game_b_exact,final_tv,rewired - random_sparse,degree structure (unsigned),0.160974,0.149977,0.0109966,-0.00858416,0.032997,0.312642,0.347265,20,20,False,1,False
+readout_game_b_exact,final_tv,rewired+sign - random_sparse+sign,degree structure (signed),0.146658,0.162714,-0.0160563,-0.0294907,-0.00140861,-0.682592,0.0350965,20,20,True,0.526447,False
+readout_game_b_exact,final_tv,connectome - dense,connectome vs conventional (unsigned),0.155016,0.148654,0.00636192,-0.00965755,0.0231898,0.226145,0.472853,20,20,False,1,False
+readout_game_b_exact,final_tv,connectome+sign - dense,connectome vs conventional (signed),0.162639,0.148654,0.013985,-0.00109911,0.0307226,0.522401,0.10119,20,20,False,1,False
+readout_game_b_exact,final_tv,random_sparse - dense,sparse circuit vs conventional,0.149977,0.148654,0.00132318,-0.0133017,0.0170344,0.0523074,0.865413,20,20,False,1,False
+readout_game_b_exact,final_tv,connectome+sign - connectome,sign constraint (connectome),0.162639,0.155016,0.00762312,-0.0116413,0.0275855,0.231009,0.464354,20,20,False,1,False
+readout_game_b_exact,final_tv,rewired+sign - rewired,sign constraint (rewired),0.146658,0.160974,-0.014316,-0.0354037,0.00392917,-0.426723,0.180882,20,20,False,1,False
+readout_game_b_exact,final_tv,random_sparse+sign - random_sparse,sign constraint (random),0.162714,0.149977,0.0127368,-0.00273383,0.0279036,0.493939,0.122388,20,20,False,1,False
+readout_game_b_exact,final_tv,flygm - flygm_rewired,specific wiring (FlyGM),0.203192,0.217191,-0.0139987,-0.0378534,0.00717955,-0.365722,0.259674,20,20,False,1,False
+readout_game_b_exact,final_tv,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.203192,0.220274,-0.0170825,-0.0360782,0.00219183,-0.528126,0.0910909,20,20,False,1,False
+readout_game_b_exact,final_tv,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.217191,0.220274,-0.00308377,-0.0253504,0.0221051,-0.0759096,0.822718,20,20,False,1,False
+readout_game_b_exact,final_tv,flygm - connectome,frozen vs trained synapses,0.203192,0.155016,0.048176,0.0294742,0.0666856,1.51413,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_tv,flygm - dense,FlyGM vs conventional,0.203192,0.148654,0.0545379,0.0394913,0.0694391,2.15567,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_w1,connectome - rewired,specific wiring (unsigned),0.0860034,0.0879993,-0.00199586,-0.0152407,0.00946367,-0.0971484,0.712729,20,20,False,1,False
+readout_game_b_exact,final_w1,connectome+sign - rewired+sign,specific wiring (signed),0.0842063,0.0829824,0.0012239,-0.00193906,0.00452248,0.224372,0.476952,20,20,False,1,False
+readout_game_b_exact,final_w1,connectome - random_sparse,wiring + degrees (unsigned),0.0860034,0.081496,0.00450744,-0.00185965,0.013171,0.34364,0.318768,20,20,False,1,False
+readout_game_b_exact,final_w1,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.0842063,0.0839129,0.000293438,-0.00285575,0.00376308,0.0520665,0.872913,20,20,False,1,False
+readout_game_b_exact,final_w1,rewired - random_sparse,degree structure (unsigned),0.0879993,0.081496,0.0065033,-0.00145968,0.0185711,0.375364,0.252675,20,20,False,1,False
+readout_game_b_exact,final_w1,rewired+sign - random_sparse+sign,degree structure (signed),0.0829824,0.0839129,-0.000930462,-0.00377612,0.00206708,-0.191174,0.548045,20,20,False,1,False
+readout_game_b_exact,final_w1,connectome - dense,connectome vs conventional (unsigned),0.0860034,0.0799142,0.00608916,0.000648481,0.0144442,0.496483,0.0442956,20,20,True,0.620138,False
+readout_game_b_exact,final_w1,connectome+sign - dense,connectome vs conventional (signed),0.0842063,0.0799142,0.00429205,0.00175862,0.00726452,0.907745,0.00189981,20,20,True,0.0284972,True
+readout_game_b_exact,final_w1,random_sparse - dense,sparse circuit vs conventional,0.081496,0.0799142,0.00158172,-0.00148356,0.00490669,0.296221,0.344266,20,20,False,1,False
+readout_game_b_exact,final_w1,connectome+sign - connectome,sign constraint (connectome),0.0842063,0.0860034,-0.00179711,-0.0103526,0.00439561,-0.139528,0.816718,20,20,False,1,False
+readout_game_b_exact,final_w1,rewired+sign - rewired,sign constraint (rewired),0.0829824,0.0879993,-0.00501687,-0.01694,0.0025018,-0.296687,0.470653,20,20,False,1,False
+readout_game_b_exact,final_w1,random_sparse+sign - random_sparse,sign constraint (random),0.0839129,0.081496,0.00241689,-0.00129516,0.00608567,0.392493,0.206179,20,20,False,1,False
+readout_game_b_exact,final_w1,flygm - flygm_rewired,specific wiring (FlyGM),0.153784,0.170793,-0.0170085,-0.0533971,0.00743801,-0.3159,0.40026,20,20,False,1,False
+readout_game_b_exact,final_w1,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.153784,0.157333,-0.00354907,-0.018242,0.010788,-0.143218,0.650635,20,20,False,1,False
+readout_game_b_exact,final_w1,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.170793,0.157333,0.0134594,-0.0150793,0.0530801,0.232412,0.586241,20,20,False,1,False
+readout_game_b_exact,final_w1,flygm - connectome,frozen vs trained synapses,0.153784,0.0860034,0.0677807,0.0581049,0.0755726,4.50297,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_w1,flygm - dense,FlyGM vs conventional,0.153784,0.0799142,0.0738699,0.0686067,0.0793913,8.10634,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,late_policy_variance,connectome - rewired,specific wiring (unsigned),0.000107071,9.46096e-05,1.24609e-05,6.07495e-06,1.83333e-05,1.20269,0.00049995,20,20,True,0.00549945,True
+readout_game_b_exact,late_policy_variance,connectome+sign - rewired+sign,specific wiring (signed),0.000116322,0.00011361,2.71158e-06,-5.16114e-06,1.10367e-05,0.197278,0.536646,20,20,False,1,False
+readout_game_b_exact,late_policy_variance,connectome - random_sparse,wiring + degrees (unsigned),0.000107071,9.17148e-05,1.53557e-05,9.293e-06,2.10516e-05,1.55978,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,late_policy_variance,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.000116322,0.000113595,2.72718e-06,-6.87972e-06,1.27238e-05,0.165749,0.60494,20,20,False,1,False
+readout_game_b_exact,late_policy_variance,rewired - random_sparse,degree structure (unsigned),9.46096e-05,9.17148e-05,2.89478e-06,-3.71044e-06,9.77731e-06,0.253187,0.418858,20,20,False,1,False
+readout_game_b_exact,late_policy_variance,rewired+sign - random_sparse+sign,degree structure (signed),0.00011361,0.000113595,1.56017e-08,-9.14339e-06,8.72857e-06,0.00103096,0.9972,20,20,False,1,False
+readout_game_b_exact,late_policy_variance,connectome - dense,connectome vs conventional (unsigned),0.000107071,0.000126048,-1.89779e-05,-5.78876e-05,3.31002e-06,-0.322603,0.369263,20,20,False,1,False
+readout_game_b_exact,late_policy_variance,connectome+sign - dense,connectome vs conventional (signed),0.000116322,0.000126048,-9.72656e-06,-5.00025e-05,1.41622e-05,-0.163496,0.977702,20,20,False,1,False
+readout_game_b_exact,late_policy_variance,random_sparse - dense,sparse circuit vs conventional,9.17148e-05,0.000126048,-3.43336e-05,-7.3923e-05,-1.15803e-05,-0.581673,0.00019998,20,20,True,0.00239976,True
+readout_game_b_exact,late_policy_variance,connectome+sign - connectome,sign constraint (connectome),0.000116322,0.000107071,9.25132e-06,2.24553e-06,1.70137e-05,0.750159,0.0153985,20,20,True,0.153985,False
+readout_game_b_exact,late_policy_variance,rewired+sign - rewired,sign constraint (rewired),0.00011361,9.46096e-05,1.90007e-05,1.17299e-05,2.5779e-05,1.58239,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,late_policy_variance,random_sparse+sign - random_sparse,sign constraint (random),0.000113595,9.17148e-05,2.18799e-05,1.32803e-05,3.06549e-05,1.49028,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,late_policy_variance,flygm - flygm_rewired,specific wiring (FlyGM),0.00817885,0.00180666,0.0063722,-0.000116225,0.0141668,0.521428,0.130287,20,20,False,1,False
+readout_game_b_exact,late_policy_variance,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.00817885,0.0119992,-0.00382035,-0.0200478,0.00919428,-0.155601,0.671933,20,20,False,1,False
+readout_game_b_exact,late_policy_variance,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.00180666,0.0119992,-0.0101925,-0.0250032,-6.77583e-05,-0.470577,0.110989,20,20,True,0.9989,False
+readout_game_b_exact,late_policy_variance,flygm - connectome,frozen vs trained synapses,0.00817885,0.000107071,0.00807178,0.00158385,0.0155424,0.678551,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,late_policy_variance,flygm - dense,FlyGM vs conventional,0.00817885,0.000126048,0.00805281,0.00147571,0.0158482,0.676947,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_l2,connectome - rewired,specific wiring (unsigned),0.0876509,0.0774079,0.010243,-0.0450569,0.0830357,0.0977814,0.9999,20,20,False,1,False
+readout_game_b_exact,final_l2,connectome+sign - rewired+sign,specific wiring (signed),0.0587748,0.0632306,-0.00445574,-0.00944547,0.000268508,-0.547503,0.0878912,20,20,False,0.966803,False
+readout_game_b_exact,final_l2,connectome - random_sparse,wiring + degrees (unsigned),0.0876509,0.0647451,0.0229058,-0.00845867,0.0833555,0.240592,1,20,20,False,1,False
+readout_game_b_exact,final_l2,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.0587748,0.0638905,-0.00511565,-0.00971328,-0.000764868,-0.676013,0.0357964,20,20,True,0.429557,False
+readout_game_b_exact,final_l2,rewired - random_sparse,degree structure (unsigned),0.0774079,0.0647451,0.0126628,-0.00312193,0.0415891,0.288101,0.69933,20,20,False,1,False
+readout_game_b_exact,final_l2,rewired+sign - random_sparse+sign,degree structure (signed),0.0632306,0.0638905,-0.000659912,-0.00634174,0.00494642,-0.0692205,0.826317,20,20,False,1,False
+readout_game_b_exact,final_l2,connectome - dense,connectome vs conventional (unsigned),0.0876509,0.0497646,0.0378863,0.0067227,0.0980624,0.398055,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_l2,connectome+sign - dense,connectome vs conventional (signed),0.0587748,0.0497646,0.0090102,0.00616328,0.0117655,1.90395,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_l2,random_sparse - dense,sparse circuit vs conventional,0.0647451,0.0497646,0.0149805,0.0123637,0.0173386,3.58907,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_l2,connectome+sign - connectome,sign constraint (connectome),0.0587748,0.0876509,-0.0288761,-0.0891635,0.00270904,-0.303218,0.653435,20,20,False,1,False
+readout_game_b_exact,final_l2,rewired+sign - rewired,sign constraint (rewired),0.0632306,0.0774079,-0.0141774,-0.0436496,0.00288439,-0.319385,0.393161,20,20,False,1,False
+readout_game_b_exact,final_l2,random_sparse+sign - random_sparse,sign constraint (random),0.0638905,0.0647451,-0.000854618,-0.00502699,0.00362243,-0.118183,0.70343,20,20,False,1,False
+readout_game_b_exact,final_l2,flygm - flygm_rewired,specific wiring (FlyGM),0.668488,0.69203,-0.023542,-0.135523,0.0717698,-0.134608,0.715628,20,20,False,1,False
+readout_game_b_exact,final_l2,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.668488,0.680958,-0.0124695,-0.094305,0.0695967,-0.0899011,0.773823,20,20,False,1,False
+readout_game_b_exact,final_l2,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.69203,0.680958,0.0110725,-0.109524,0.144884,0.0526449,0.871113,20,20,False,1,False
+readout_game_b_exact,final_l2,flygm - connectome,frozen vs trained synapses,0.668488,0.0876509,0.580837,0.505499,0.63298,5.3363,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_l2,flygm - dense,FlyGM vs conventional,0.668488,0.0497646,0.618724,0.586844,0.650447,11.6911,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_relative_utility_loss,connectome - rewired,specific wiring (unsigned),-0.00628925,-0.00568279,-0.000606464,-0.00110361,-7.25313e-05,-0.695687,0.0322968,20,20,True,0.387561,False
+readout_game_b_exact,final_relative_utility_loss,connectome+sign - rewired+sign,specific wiring (signed),-0.00592654,-0.00595836,3.18179e-05,-0.000204027,0.000251612,0.081376,0.79752,20,20,False,1,False
+readout_game_b_exact,final_relative_utility_loss,connectome - random_sparse,wiring + degrees (unsigned),-0.00628925,-0.00557633,-0.000712929,-0.00115496,-0.000221548,-0.889129,0.00719928,20,20,True,0.0935906,False
+readout_game_b_exact,final_relative_utility_loss,connectome+sign - random_sparse+sign,wiring + degrees (signed),-0.00592654,-0.00590755,-1.89919e-05,-0.000322258,0.000262938,-0.0388135,0.89981,20,20,False,1,False
+readout_game_b_exact,final_relative_utility_loss,rewired - random_sparse,degree structure (unsigned),-0.00568279,-0.00557633,-0.000106464,-0.000465851,0.000236211,-0.179081,0.577642,20,20,False,1,False
+readout_game_b_exact,final_relative_utility_loss,rewired+sign - random_sparse+sign,degree structure (signed),-0.00595836,-0.00590755,-5.08098e-05,-0.000333723,0.000206605,-0.111249,0.723928,20,20,False,1,False
+readout_game_b_exact,final_relative_utility_loss,connectome - dense,connectome vs conventional (unsigned),-0.00628925,-0.00640116,0.00011191,-0.000314914,0.000589936,0.144272,0.670533,20,20,False,1,False
+readout_game_b_exact,final_relative_utility_loss,connectome+sign - dense,connectome vs conventional (signed),-0.00592654,-0.00640116,0.000474622,0.000234525,0.000720301,1.15512,0.00029997,20,20,True,0.00419958,True
+readout_game_b_exact,final_relative_utility_loss,random_sparse - dense,sparse circuit vs conventional,-0.00557633,-0.00640116,0.000824838,0.000558397,0.00107841,1.86703,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_relative_utility_loss,connectome+sign - connectome,sign constraint (connectome),-0.00592654,-0.00628925,0.000362712,-0.00014091,0.000789439,0.461922,0.148085,20,20,False,1,False
+readout_game_b_exact,final_relative_utility_loss,rewired+sign - rewired,sign constraint (rewired),-0.00595836,-0.00568279,-0.00027557,-0.000591974,4.62049e-05,-0.506294,0.109689,20,20,False,1,False
+readout_game_b_exact,final_relative_utility_loss,random_sparse+sign - random_sparse,sign constraint (random),-0.00590755,-0.00557633,-0.000331225,-0.000619392,-9.39438e-06,-0.642483,0.0469953,20,20,True,0.516948,False
+readout_game_b_exact,final_relative_utility_loss,flygm - flygm_rewired,specific wiring (FlyGM),0.000623744,0.00661743,-0.00599369,-0.0167576,0.00112428,-0.385581,0.278372,20,20,False,1,False
+readout_game_b_exact,final_relative_utility_loss,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.000623744,0.00900608,-0.00838234,-0.0275568,0.00244581,-0.293771,0.586741,20,20,False,1,False
+readout_game_b_exact,final_relative_utility_loss,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.00661743,0.00900608,-0.00238865,-0.0240855,0.0137984,-0.0739986,0.883512,20,20,False,1,False
+readout_game_b_exact,final_relative_utility_loss,flygm - connectome,frozen vs trained synapses,0.000623744,-0.00628925,0.006913,0.00531314,0.00854592,2.53533,9.999e-05,20,20,True,0.00169983,True
+readout_game_b_exact,final_relative_utility_loss,flygm - dense,FlyGM vs conventional,0.000623744,-0.00640116,0.00702491,0.00549415,0.00860823,2.65765,9.999e-05,20,20,True,0.00169983,True
+wgain_game_b_exact,final_exploitability,flygm - flygm_rewired,specific wiring (FlyGM),0.331123,0.322244,0.00887982,-0.000314538,0.0270046,0.305882,0.79742,20,20,False,1,False
+wgain_game_b_exact,final_exploitability,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.331123,0.3293,0.00182366,-0.00013683,0.00549375,0.317415,0.39656,20,20,False,1,False
+wgain_game_b_exact,final_exploitability,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.322244,0.3293,-0.00705616,-0.0268835,0.00527932,-0.238437,0.892011,20,20,False,1,False
+wgain_game_b_exact,steps_to_threshold_c,flygm - flygm_rewired,specific wiring (FlyGM),4000,4000,0,0,0,0,1,20,20,False,1,False
+wgain_game_b_exact,steps_to_threshold_c,flygm - flygm_random_sparse,wiring + degrees (FlyGM),4000,4000,0,0,0,0,1,20,20,False,1,False
+wgain_game_b_exact,steps_to_threshold_c,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),4000,4000,0,0,0,0,1,20,20,False,1,False
+wgain_game_b_exact,final_tv,flygm - flygm_rewired,specific wiring (FlyGM),0.293607,0.293598,8.19096e-06,-0.00252303,0.00175413,0.00220003,0.9979,20,20,False,0.9979,False
+wgain_game_b_exact,final_tv,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.293607,0.290779,0.00282722,0.00102037,0.00494798,0.831904,0.00079992,20,20,True,0.00239976,True
+wgain_game_b_exact,final_tv,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.293598,0.290779,0.00281902,0.000155869,0.00608452,0.559441,0.0719928,20,20,True,0.143986,False
+wgain_game_b_exact,final_w1,flygm - flygm_rewired,specific wiring (FlyGM),0.421515,0.421315,0.000199726,-0.0013327,0.00188231,0.0728713,0.841516,20,20,False,0.841516,False
+wgain_game_b_exact,final_w1,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.421515,0.419842,0.00167282,0.000145866,0.00362169,0.566123,0.0614939,20,20,True,0.184482,False
+wgain_game_b_exact,final_w1,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.421315,0.419842,0.00147309,-0.000837099,0.00391696,0.365608,0.259874,20,20,False,0.519748,False
+wgain_game_b_exact,late_policy_variance,flygm - flygm_rewired,specific wiring (FlyGM),4.98379e-05,9.809e-05,-4.82522e-05,-0.000119161,-3.97637e-06,-0.464202,0.0453955,20,20,True,0.136186,False
+wgain_game_b_exact,late_policy_variance,flygm - flygm_random_sparse,wiring + degrees (FlyGM),4.98379e-05,6.17971e-05,-1.19592e-05,-2.80375e-05,7.5912e-07,-0.493801,0.115188,20,20,False,0.230377,False
+wgain_game_b_exact,late_policy_variance,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),9.809e-05,6.17971e-05,3.6293e-05,-1.27434e-05,0.000110233,0.340282,0.333967,20,20,False,0.333967,False
+wgain_game_b_exact,final_l2,flygm - flygm_rewired,specific wiring (FlyGM),1.84716,1.82639,0.020769,-1.80535e-06,0.062282,0.310232,0.136686,20,20,False,0.273373,False
+wgain_game_b_exact,final_l2,flygm - flygm_random_sparse,wiring + degrees (FlyGM),1.84716,1.84086,0.00629813,1.03157e-05,0.0188466,0.311477,0.0165983,20,20,True,0.049795,True
+wgain_game_b_exact,final_l2,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),1.82639,1.84086,-0.0144708,-0.0622433,0.0187771,-0.206923,0.841516,20,20,False,0.841516,False
+wgain_game_b_exact,final_relative_utility_loss,flygm - flygm_rewired,specific wiring (FlyGM),0.416242,0.403046,0.0131959,-4.04485e-05,0.0395644,0.310686,0.281072,20,20,False,0.783522,False
+wgain_game_b_exact,final_relative_utility_loss,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.416242,0.413955,0.00228651,-3.30831e-05,0.00683162,0.314524,0.261174,20,20,False,0.783522,False
+wgain_game_b_exact,final_relative_utility_loss,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.403046,0.413955,-0.0109094,-0.0394998,0.00670096,-0.25317,0.745025,20,20,False,0.783522,False
+readout_game_a_exact,final_exploitability,connectome - rewired,specific wiring (unsigned),0.000928926,0.000951104,-2.21776e-05,-3.66057e-05,-7.9599e-06,-0.916781,0.00439956,20,20,True,0.039596,True
+readout_game_a_exact,final_exploitability,connectome+sign - rewired+sign,specific wiring (signed),0.00104899,0.00106358,-1.45863e-05,-2.44018e-05,-4.81958e-06,-0.885099,0.00569943,20,20,True,0.0455954,True
+readout_game_a_exact,final_exploitability,connectome - random_sparse,wiring + degrees (unsigned),0.000928926,0.000935323,-6.39634e-06,-2.15284e-05,9.01553e-06,-0.253257,0.424958,20,20,False,1,False
+readout_game_a_exact,final_exploitability,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.00104899,0.00106714,-1.81527e-05,-2.75193e-05,-9.17399e-06,-1.15724,0.00089991,20,20,True,0.0089991,True
+readout_game_a_exact,final_exploitability,rewired - random_sparse,degree structure (unsigned),0.000951104,0.000935323,1.57813e-05,2.91501e-06,2.85738e-05,0.728876,0.0246975,20,20,True,0.172883,False
+readout_game_a_exact,final_exploitability,rewired+sign - random_sparse+sign,degree structure (signed),0.00106358,0.00106714,-3.56635e-06,-1.44756e-05,7.55628e-06,-0.190699,0.547045,20,20,False,1,False
+readout_game_a_exact,final_exploitability,connectome - dense,connectome vs conventional (unsigned),0.000928926,0.00137593,-0.000447002,-0.000472688,-0.000422652,-10.7277,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_exploitability,connectome+sign - dense,connectome vs conventional (signed),0.00104899,0.00137593,-0.000326936,-0.000350062,-0.000304994,-8.60644,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_exploitability,random_sparse - dense,sparse circuit vs conventional,0.000935323,0.00137593,-0.000440605,-0.000465176,-0.000417355,-10.9475,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_exploitability,connectome+sign - connectome,sign constraint (connectome),0.00104899,0.000928926,0.000120065,0.000107453,0.000132783,5.59143,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_exploitability,rewired+sign - rewired,sign constraint (rewired),0.00106358,0.000951104,0.000112474,0.000100585,0.000124231,5.65426,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_exploitability,random_sparse+sign - random_sparse,sign constraint (random),0.00106714,0.000935323,0.000131821,0.000119825,0.000144336,6.41056,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_exploitability,flygm - flygm_rewired,specific wiring (FlyGM),0.000995293,0.000941339,5.39544e-05,-1.21342e-05,0.000172087,0.298659,0.583442,20,20,False,1,False
+readout_game_a_exact,final_exploitability,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.000995293,0.000945708,4.95856e-05,-1.62897e-05,0.000165993,0.274571,0.80282,20,20,False,1,False
+readout_game_a_exact,final_exploitability,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.000941339,0.000945708,-4.36877e-06,-1.72788e-05,7.9655e-06,-0.205119,0.50485,20,20,False,1,False
+readout_game_a_exact,final_exploitability,flygm - connectome,frozen vs trained synapses,0.000995293,0.000928926,6.6367e-05,-6.37213e-07,0.000185379,0.366588,0.0952905,20,20,False,0.571743,False
+readout_game_a_exact,final_exploitability,flygm - dense,FlyGM vs conventional,0.000995293,0.00137593,-0.000380635,-0.000455014,-0.000258402,-2.07169,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,steps_to_threshold_c,connectome - rewired,specific wiring (unsigned),197.5,205,-7.5,-13.75,-2.5,-0.810612,0.0315968,20,20,True,0.315968,False
+readout_game_a_exact,steps_to_threshold_c,connectome+sign - rewired+sign,specific wiring (signed),250,251.25,-1.25,-3.75,0,-0.309945,1,20,20,False,1,False
+readout_game_a_exact,steps_to_threshold_c,connectome - random_sparse,wiring + degrees (unsigned),197.5,201.25,-3.75,-8.75,0,-0.546514,0.261174,20,20,False,1,False
+readout_game_a_exact,steps_to_threshold_c,connectome+sign - random_sparse+sign,wiring + degrees (signed),250,255,-5,-10,-1.25,-0.67551,0.10479,20,20,True,0.943106,False
+readout_game_a_exact,steps_to_threshold_c,rewired - random_sparse,degree structure (unsigned),205,201.25,3.75,-1.25,8.75,0.444881,0.341066,20,20,False,1,False
+readout_game_a_exact,steps_to_threshold_c,rewired+sign - random_sparse+sign,degree structure (signed),251.25,255,-3.75,-8.75,1.25,-0.444881,0.338366,20,20,False,1,False
+readout_game_a_exact,steps_to_threshold_c,connectome - dense,connectome vs conventional (unsigned),197.5,301.25,-103.75,-107.5,-100,-15.1202,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,steps_to_threshold_c,connectome+sign - dense,connectome vs conventional (signed),250,301.25,-51.25,-53.75,-50,-12.7077,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,steps_to_threshold_c,random_sparse - dense,sparse circuit vs conventional,201.25,301.25,-100,-103.75,-96.25,-17.5331,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,steps_to_threshold_c,connectome+sign - connectome,sign constraint (connectome),250,197.5,52.5,50,56.25,9.45714,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,steps_to_threshold_c,rewired+sign - rewired,sign constraint (rewired),251.25,205,46.25,41.25,51.25,5.48686,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,steps_to_threshold_c,random_sparse+sign - random_sparse,sign constraint (random),255,201.25,53.75,48.75,58.75,6.37663,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,steps_to_threshold_c,flygm - flygm_rewired,specific wiring (FlyGM),198.75,200,-1.25,-3.75,0,-0.309945,1,20,20,False,1,False
+readout_game_a_exact,steps_to_threshold_c,flygm - flygm_random_sparse,wiring + degrees (FlyGM),198.75,200,-1.25,-3.75,0,-0.309945,1,20,20,False,1,False
+readout_game_a_exact,steps_to_threshold_c,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),200,200,0,0,0,0,1,20,20,False,1,False
+readout_game_a_exact,steps_to_threshold_c,flygm - connectome,frozen vs trained synapses,198.75,197.5,1.25,-2.5,5,0.182171,1,20,20,False,1,False
+readout_game_a_exact,steps_to_threshold_c,flygm - dense,FlyGM vs conventional,198.75,301.25,-102.5,-106.25,-100,-17.9715,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_tv,connectome - rewired,specific wiring (unsigned),0.00709639,0.00760562,-0.000509237,-0.000731295,-0.00027987,-1.31709,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_tv,connectome+sign - rewired+sign,specific wiring (signed),0.00819177,0.00829137,-9.96021e-05,-0.000174645,-2.48942e-05,-0.79463,0.0141986,20,20,True,0.0851915,False
+readout_game_a_exact,final_tv,connectome - random_sparse,wiring + degrees (unsigned),0.00709639,0.00759846,-0.00050207,-0.000787003,-0.000216366,-1.0272,0.00179982,20,20,True,0.0125987,True
+readout_game_a_exact,final_tv,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.00819177,0.00834485,-0.000153083,-0.000232009,-7.51038e-05,-1.15653,0.00079992,20,20,True,0.00639936,True
+readout_game_a_exact,final_tv,rewired - random_sparse,degree structure (unsigned),0.00760562,0.00759846,7.16716e-06,-0.00027896,0.000281421,0.0153001,0.963104,20,20,False,1,False
+readout_game_a_exact,final_tv,rewired+sign - random_sparse+sign,degree structure (signed),0.00829137,0.00834485,-5.34807e-05,-0.000133679,2.73422e-05,-0.392032,0.211079,20,20,False,1,False
+readout_game_a_exact,final_tv,connectome - dense,connectome vs conventional (unsigned),0.00709639,0.0125052,-0.00540884,-0.0058181,-0.00499541,-7.89156,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_tv,connectome+sign - dense,connectome vs conventional (signed),0.00819177,0.0125052,-0.00431346,-0.00468528,-0.00394742,-6.88415,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_tv,random_sparse - dense,sparse circuit vs conventional,0.00759846,0.0125052,-0.00490677,-0.00533773,-0.00446759,-6.67904,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_tv,connectome+sign - connectome,sign constraint (connectome),0.00819177,0.00709639,0.00109539,0.000906728,0.00126659,3.61552,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_tv,rewired+sign - rewired,sign constraint (rewired),0.00829137,0.00760562,0.000685751,0.000525008,0.000846554,2.53098,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_tv,random_sparse+sign - random_sparse,sign constraint (random),0.00834485,0.00759846,0.000746399,0.00049621,0.000979369,1.83955,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_tv,flygm - flygm_rewired,specific wiring (FlyGM),0.00818514,0.00769842,0.000486719,-0.000250534,0.00158184,0.299751,0.458354,20,20,False,1,False
+readout_game_a_exact,final_tv,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.00818514,0.00773748,0.000447652,-0.000251768,0.00152988,0.281283,0.550145,20,20,False,1,False
+readout_game_a_exact,final_tv,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.00769842,0.00773748,-3.90669e-05,-0.000369621,0.00030018,-0.0686289,0.827417,20,20,False,1,False
+readout_game_a_exact,final_tv,flygm - connectome,frozen vs trained synapses,0.00818514,0.00709639,0.00108875,0.00039919,0.00214684,0.68761,0.00019998,20,20,True,0.00179982,True
+readout_game_a_exact,final_tv,flygm - dense,FlyGM vs conventional,0.00818514,0.0125052,-0.00432009,-0.0051115,-0.00316105,-2.5781,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_w1,connectome - rewired,specific wiring (unsigned),0.00428601,0.00432817,-4.21653e-05,-5.5991e-05,-2.94553e-05,-1.87644,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_w1,connectome+sign - rewired+sign,specific wiring (signed),0.0045817,0.00461044,-2.8745e-05,-5.04352e-05,-5.84951e-06,-0.765065,0.0189981,20,20,True,0.113989,False
+readout_game_a_exact,final_w1,connectome - random_sparse,wiring + degrees (unsigned),0.00428601,0.00432541,-3.94026e-05,-5.59163e-05,-2.41836e-05,-1.48544,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_w1,connectome+sign - random_sparse+sign,wiring + degrees (signed),0.0045817,0.00462012,-3.84262e-05,-6.02724e-05,-1.62061e-05,-1.051,0.00169983,20,20,True,0.0118988,True
+readout_game_a_exact,final_w1,rewired - random_sparse,degree structure (unsigned),0.00432817,0.00432541,2.7627e-06,-1.06766e-05,1.54799e-05,0.127073,0.682632,20,20,False,1,False
+readout_game_a_exact,final_w1,rewired+sign - random_sparse+sign,degree structure (signed),0.00461044,0.00462012,-9.68125e-06,-3.34844e-05,1.33913e-05,-0.245902,0.431357,20,20,False,1,False
+readout_game_a_exact,final_w1,connectome - dense,connectome vs conventional (unsigned),0.00428601,0.00573918,-0.00145317,-0.00148597,-0.00142558,-28.8234,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_w1,connectome+sign - dense,connectome vs conventional (signed),0.0045817,0.00573918,-0.00115748,-0.00119043,-0.00112825,-21.9804,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_w1,random_sparse - dense,sparse circuit vs conventional,0.00432541,0.00573918,-0.00141377,-0.00144557,-0.00138598,-28.2216,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_w1,connectome+sign - connectome,sign constraint (connectome),0.0045817,0.00428601,0.000295689,0.000277654,0.00031397,9.50803,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_w1,rewired+sign - rewired,sign constraint (rewired),0.00461044,0.00432817,0.000282268,0.000263678,0.000299949,9.16062,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_w1,random_sparse+sign - random_sparse,sign constraint (random),0.00462012,0.00432541,0.000294712,0.000274996,0.00031396,8.99598,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,final_w1,flygm - flygm_rewired,specific wiring (FlyGM),0.00443911,0.00432059,0.000118527,-1.73962e-05,0.000368677,0.304522,0.550245,20,20,False,1,False
+readout_game_a_exact,final_w1,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.00443911,0.00432372,0.000115397,-1.98575e-05,0.000366583,0.296656,0.675132,20,20,False,1,False
+readout_game_a_exact,final_w1,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.00432059,0.00432372,-3.12952e-06,-2.4718e-05,1.78794e-05,-0.0879551,0.778422,20,20,False,1,False
+readout_game_a_exact,final_w1,flygm - connectome,frozen vs trained synapses,0.00443911,0.00428601,0.000153105,1.95956e-05,0.00040245,0.393821,0.00049995,20,20,True,0.0039996,True
+readout_game_a_exact,final_w1,flygm - dense,FlyGM vs conventional,0.00443911,0.00573918,-0.00130006,-0.00144372,-0.0010441,-3.32427,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,late_policy_variance,connectome - rewired,specific wiring (unsigned),3.69009e-08,4.17995e-08,-4.89856e-09,-8.42695e-09,-1.46345e-09,-0.835488,0.0132987,20,20,True,0.116988,False
+readout_game_a_exact,late_policy_variance,connectome+sign - rewired+sign,specific wiring (signed),4.83691e-08,5.05483e-08,-2.1792e-09,-4.02545e-09,-4.11629e-10,-0.711797,0.0244976,20,20,True,0.171483,False
+readout_game_a_exact,late_policy_variance,connectome - random_sparse,wiring + degrees (unsigned),3.69009e-08,4.74366e-08,-1.05357e-08,-1.59427e-08,-5.27028e-09,-1.14326,0.00049995,20,20,True,0.0059994,True
+readout_game_a_exact,late_policy_variance,connectome+sign - random_sparse+sign,wiring + degrees (signed),4.83691e-08,5.20949e-08,-3.72575e-09,-6.83372e-09,-1.07787e-09,-0.768766,0.0129987,20,20,True,0.116988,False
+readout_game_a_exact,late_policy_variance,rewired - random_sparse,degree structure (unsigned),4.17995e-08,4.74366e-08,-5.63711e-09,-1.14945e-08,1.23497e-10,-0.569075,0.0785921,20,20,False,0.471553,False
+readout_game_a_exact,late_policy_variance,rewired+sign - random_sparse+sign,degree structure (signed),5.05483e-08,5.20949e-08,-1.54655e-09,-4.23304e-09,8.22388e-10,-0.357287,0.273173,20,20,False,1,False
+readout_game_a_exact,late_policy_variance,connectome - dense,connectome vs conventional (unsigned),3.69009e-08,1.74517e-07,-1.37616e-07,-1.44804e-07,-1.2984e-07,-10.8973,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,late_policy_variance,connectome+sign - dense,connectome vs conventional (signed),4.83691e-08,1.74517e-07,-1.26148e-07,-1.33132e-07,-1.18199e-07,-10.1015,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,late_policy_variance,random_sparse - dense,sparse circuit vs conventional,4.74366e-08,1.74517e-07,-1.2708e-07,-1.35666e-07,-1.17725e-07,-8.50565,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,late_policy_variance,connectome+sign - connectome,sign constraint (connectome),4.83691e-08,3.69009e-08,1.14682e-08,8.97165e-09,1.39147e-08,2.72969,9.999e-05,20,20,True,0.00169983,True
+readout_game_a_exact,late_policy_variance,rewired+sign - rewired,sign constraint (rewired),5.05483e-08,4.17995e-08,8.74883e-09,5.61421e-09,1.16186e-08,1.71255,0.00019998,20,20,True,0.00259974,True
+readout_game_a_exact,late_policy_variance,random_sparse+sign - random_sparse,sign constraint (random),5.20949e-08,4.74366e-08,4.65827e-09,-1.10633e-09,1.00787e-08,0.488959,0.126387,20,20,False,0.631937,False
+readout_game_a_exact,late_policy_variance,flygm - flygm_rewired,specific wiring (FlyGM),7.45801e-08,4.21589e-08,3.24212e-08,-3.42528e-09,9.89322e-08,0.310945,0.472153,20,20,False,1,False
+readout_game_a_exact,late_policy_variance,flygm - flygm_random_sparse,wiring + degrees (FlyGM),7.45801e-08,4.13904e-08,3.31897e-08,-1.50316e-09,9.93447e-08,0.318764,0.307269,20,20,False,1,False
+readout_game_a_exact,late_policy_variance,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),4.21589e-08,4.13904e-08,7.68472e-10,-3.47723e-09,5.64669e-09,0.100639,0.756524,20,20,False,1,False
+readout_game_a_exact,late_policy_variance,flygm - connectome,frozen vs trained synapses,7.45801e-08,3.69009e-08,3.76792e-08,3.04497e-09,1.0391e-07,0.361937,0.0009999,20,20,True,0.009999,True
+readout_game_a_exact,late_policy_variance,flygm - dense,FlyGM vs conventional,7.45801e-08,1.74517e-07,-9.99367e-08,-1.37593e-07,-3.10992e-08,-0.953902,0.00049995,20,20,True,0.0059994,True
+wgain_game_a_exact,final_exploitability,flygm - flygm_rewired,specific wiring (FlyGM),0.00137544,0.00136357,1.1876e-05,-3.76731e-05,6.22064e-05,0.142894,0.650735,20,20,False,1,False
+wgain_game_a_exact,final_exploitability,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.00137544,0.00136746,7.98226e-06,-4.23033e-05,5.95447e-05,0.0937295,0.760624,20,20,False,1,False
+wgain_game_a_exact,final_exploitability,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.00136357,0.00136746,-3.89375e-06,-5.03454e-05,4.25489e-05,-0.0500659,0.872413,20,20,False,1,False
+wgain_game_a_exact,steps_to_threshold_c,flygm - flygm_rewired,specific wiring (FlyGM),260,257.5,2.5,-8.75,13.75,0.131846,0.832217,20,20,False,1,False
+wgain_game_a_exact,steps_to_threshold_c,flygm - flygm_random_sparse,wiring + degrees (FlyGM),260,258.75,1.25,-10,12.5,0.0625177,1,20,20,False,1,False
+wgain_game_a_exact,steps_to_threshold_c,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),257.5,258.75,-1.25,-12.5,8.75,-0.0697663,1,20,20,False,1,False
+wgain_game_a_exact,final_tv,flygm - flygm_rewired,specific wiring (FlyGM),0.0128297,0.0127577,7.20053e-05,-0.000473154,0.000632614,0.0783085,0.80122,20,20,False,1,False
+wgain_game_a_exact,final_tv,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.0128297,0.0128035,2.61942e-05,-0.000542085,0.000602071,0.0272754,0.928907,20,20,False,1,False
+wgain_game_a_exact,final_tv,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.0127577,0.0128035,-4.58111e-05,-0.000585604,0.000495319,-0.0502277,0.875312,20,20,False,1,False
+wgain_game_a_exact,final_w1,flygm - flygm_rewired,specific wiring (FlyGM),0.0057315,0.00569329,3.82181e-05,-7.65585e-05,0.000159085,0.192728,0.559544,20,20,False,1,False
+wgain_game_a_exact,final_w1,flygm - flygm_random_sparse,wiring + degrees (FlyGM),0.0057315,0.00570876,2.27398e-05,-8.89969e-05,0.000140305,0.1159,0.730527,20,20,False,1,False
+wgain_game_a_exact,final_w1,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),0.00569329,0.00570876,-1.54784e-05,-0.000115719,8.54051e-05,-0.0919563,0.778522,20,20,False,1,False
+wgain_game_a_exact,late_policy_variance,flygm - flygm_rewired,specific wiring (FlyGM),1.65813e-07,1.65821e-07,-7.85351e-12,-6.3175e-09,6.83283e-09,-0.000703595,0.9982,20,20,False,1,False
+wgain_game_a_exact,late_policy_variance,flygm - flygm_random_sparse,wiring + degrees (FlyGM),1.65813e-07,1.64449e-07,1.36384e-09,-4.7446e-09,7.52399e-09,0.131935,0.682632,20,20,False,1,False
+wgain_game_a_exact,late_policy_variance,flygm_rewired - flygm_random_sparse,degree structure (FlyGM),1.65821e-07,1.64449e-07,1.37169e-09,-5.83369e-09,8.08858e-09,0.116294,0.714329,20,20,False,1,False
