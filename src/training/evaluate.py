@@ -14,10 +14,10 @@ from ..metrics import exploitability as mx
 
 
 def context_tensors(game: Game, n_agents: int) -> tuple[torch.Tensor, torch.Tensor]:
-    """Features and type indices for *all* contexts, for every agent.
+    """Features and type indices for all contexts, for every agent.
 
     Game A has one context whose feature is ``V / c``. Game B has one context per
-    type whose feature is the *standardised* value ``(v - E v) / sd(v) = rate * v - 1``
+    type whose feature is the standardised value ``(v - E v) / sd(v) = rate * v - 1``
     for ``v ~ Exp(rate)``. Standard input scaling for every network arm: with raw
     values up to 4.6 the tanh units saturate and every network stalls (a dense pilot
     stalled at utility loss 0.06 raw vs 0.003 standardised).

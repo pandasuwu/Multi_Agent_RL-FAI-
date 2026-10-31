@@ -3,18 +3,18 @@
 Definition (all parameters in the ``connectome`` config section; rationale in
 docs/circuit.md):
 
-1. **Core cell types**, resolved by exact type name / regex against the MaleCNS
+1. Core cell types, resolved by exact type name / regex against the MaleCNS
    ``type`` annotation: PPL1 dopaminergic neurons, the V2 MBONs MBON18/MBON19 and
    AVLP727m (the MaleCNS type of Tk-GAL4^FruM neurons, per Ventimiglia et al. 2026).
-2. **Connecting neurons**: every neuron on a directed path of at most
+2. Connecting neurons: every neuron on a directed path of at most
    ``path.max_synapses`` synapses from the ``path.source`` population to the
    ``path.target`` population, every edge having at least ``min_synapses``
-   synapses (the paper's threshold). Together with 1 this is the *exact circuit*.
-3. **One-hop expansion** (only if the exact circuit has fewer than
+   synapses (the paper's threshold). Together with 1 this is the exact circuit.
+3. One-hop expansion (only if the exact circuit has fewer than
    ``expansion.target_range[0]`` neurons): add every neuron that exchanges at
    least ``expansion.min_exchanged_synapses`` synapses (in + out, over edges of at
    least ``min_synapses``) with the exact circuit.
-4. The **subgraph** is the induced graph on the selected neurons, keeping edges with
+4. The subgraph is the induced graph on the selected neurons, keeping edges with
    at least ``min_synapses`` synapses. Self-loops are dropped.
 """
 

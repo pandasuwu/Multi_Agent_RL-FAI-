@@ -10,13 +10,13 @@
 
 All three share the node set and node roles (input = PPL1, output = AVLP727m) and
 node signs (Dale's law: an edge's sign is its presynaptic neuron's), so arms 3-5
-have *identical* trainable parameter counts.
+have identical trainable parameter counts.
 
 Every spec also carries a synapse count per edge. The trained-edge arms 3-5 ignore
 it (they learn a weight per edge); the FlyGM arm uses it as its frozen weight. The
 real graph uses its real counts. A control's edges do not exist in the connectome
 and so have no count of their own, so each control gets a seeded random permutation
-of the *real* count multiset: the control then matches the real graph in sparsity
+of the real count multiset: the control then matches the real graph in sparsity
 (both), degree sequence (rewired) and weight distribution (both), and differs only
 in which pair of neurons each synapse count sits on.
 """

@@ -1,108 +1,93 @@
-# Fly give-up-circuit wiring vs. equilibrium learning in the war of attrition
+# Fly give-up circuit and the war of attrition
 
-**Question.** When two learning agents play a war of attrition, does constraining each
-agent's policy network to the wiring of the real *Drosophila* give-up circuit change
-how well or how fast they converge to the known equilibrium, compared to conventional
-networks of matched size? The circuit is PPL1 → V2 MBONs (MBON18/19) → Tk-GAL4^FruM
-(AVLP727m), from the MaleCNS v1.0 connectome, following Ventimiglia et al. 2026.
+Two agents play a war of attrition and learn by self-play. I wanted to know whether
+building their policy networks out of the real Drosophila give-up circuit changes how
+close (or how fast) they get to the equilibrium, compared with ordinary networks of the
+same size. The circuit is PPL1 → V2 MBONs (MBON18/19) → Tk-GAL4^FruM (AVLP727m), taken
+from the MaleCNS v1.0 connectome, following Ventimiglia et al. 2026.
 
-**Answer:** connectome wiring made no difference to how well the agents converged.
-That holds across every way we built and trained the networks, with one suggestive
-exception under PPO. The details, including small speed effects of inconsistent sign,
-are in [`RESULTS.md`](RESULTS.md), and the section numbers below refer to it.
+Short version: the wiring didn't matter. Full numbers are in [RESULTS.md](RESULTS.md);
+section numbers below point there.
 
-* **Trained edges.** The real circuit's final exploitability cannot be told apart from
-  a degree-preserving rewire or a random sparse graph of matched size, in either game,
-  with exact or sampled self-play (§3–§4).
-* **Frozen synapses (FlyGM).** Keeping the real synapse counts as fixed weights, and
-  training the neurons instead, works in Game A with no wiring effect (§9). In Game B it
-  collapses on all three graphs to one bid for every value. The cause is the 5-neuron
-  readout, not weak synapses: a trainable gain on the synapses changes nothing, while a
-  readout from all 258 neurons fixes the collapse. Final exploitability falls from 0.33
-  to 0.011, and all 60 seeds bid by value. Even then no wiring contrast survives, and
-  FlyGM stays behind the arms that train their edges (§12).
-* **PPO instead of REINFORCE.** PPO reaches the threshold up to 4 times sooner in
-  Game A. On final accuracy it depends on the game. In Game B it helps dense and the
-  signed circuits. In Game A it hurts the connectome arms. One Game B
-  sampled contrast, the real circuit ending worse than random wiring, passes Holm
-  within its own experiment. It does not survive a correction across the whole
-  project's 108 wiring tests, so we read it as suggestive only (§10).
-* **The readout matters more than the wiring.** Reading the policy out from every
-  neuron, rather than 5, improves every circuit arm in Game B. It also removes two
-  earlier findings: most of the circuit arms' gap to the dense MLP, and the advantage
-  of sign constraints (§12).
+- With trained edges, the real circuit ends up at the same exploitability as a
+  degree-preserving rewire or a random sparse graph, in both games and both training
+  modes (§3–§4).
+- With frozen synapse counts as weights (FlyGM), Game A works and shows no wiring effect
+  (§9). Game B collapses to a single bid on all three graphs. That turned out to be the
+  5-neuron readout, not weak synapses: a trainable gain on W does nothing, but reading
+  out from all 258 neurons fixes it (0.33 → 0.011, all 60 seeds bid by value). Still no
+  wiring effect after that, and FlyGM stays behind the trained-edge arms (§12).
+- PPO gets to the threshold up to 4x sooner in Game A. Final accuracy depends on the
+  game: it helps dense and the signed circuits in Game B and hurts the connectome arms
+  in Game A. One Game B contrast (real circuit worse than random) passes Holm within its
+  experiment but not across all 108 wiring tests in the project, so I don't count it (§10).
+- The readout matters more than the wiring. Reading out from every neuron improves every
+  circuit arm in Game B and removes most of the gap to the dense MLP, along with the
+  earlier sign-constraint advantage (§12).
 
-**Live demo:** [Give-Up Game Lab](https://claude.ai/artifact/7RDFGua3hKQyYSKt8W7RKN), or open [`demo/index.html`](demo/index.html) in any browser. Players learn both games in real time, with brains wired like the fly circuit (all 4,952 real connections) or its controls. Rebuild it with `python scripts/build_demo.py` (source: `scripts/demo_template.html`).
-**Theory:** [`docs/theory.md`](docs/theory.md).
-**Circuit extraction:** [`docs/circuit.md`](docs/circuit.md).
+Other docs: [docs/theory.md](docs/theory.md) (equilibria, exploitability),
+[docs/circuit.md](docs/circuit.md) (how the subgraph was extracted).
 
-## What is compared
+There's also a small browser demo in `demo/index.html` where you can watch agents learn
+both games with the fly wiring or its controls. Rebuild it with
+`python scripts/build_demo.py` (template in `scripts/demo_template.html`).
 
-| # | Arm | What it is |
+## Arms
+
+| # | Arm | Notes |
 |---|---|---|
-| 0 | Oracle | the analytic equilibrium floored onto the grid; yardstick and payoff-engine check |
-| 1 | Tabular | softmax logits per context; sanity baseline |
-| 2 | Dense MLP | 2 hidden layers of width 48 (5,584 parameters) |
-| 3 | Connectome | recurrent circuit on the real 258-neuron / 4,952-edge MaleCNS subgraph (5,610 parameters); only existing edges have weights |
-| 4 | Degree-preserving rewire | same neurons, same in- and out-degree of every neuron, wiring shuffled by double-edge swaps, redrawn per seed |
-| 5 | Random sparse | same neurons and edge count, uniformly random edges |
-| 6 | FlyGM, real circuit | the same graph with its **synapse counts frozen** as the weights (`W[post, pre] = sign(pre)·synapses`, rescaled to spectral radius 1, never trained). What trains is a 9-dimensional descriptor per neuron, one shared update MLP `f_ψ(h_i, m_i, η_i)` with `m = W h`, the encoder and gate on PPL1, and the readout (5,638 parameters) |
-| 7 | FlyGM, rewire | the same, on the degree-preserving rewire |
-| 8 | FlyGM, random sparse | the same, on the random sparse graph |
+| 0 | Oracle | analytic equilibrium floored onto the grid, used as a check |
+| 1 | Tabular | softmax logits per context |
+| 2 | Dense MLP | 2 hidden layers of 48 (5,584 params) |
+| 3 | Connectome | recurrent net on the 258-neuron / 4,952-edge MaleCNS subgraph, weights only on real edges (5,610 params) |
+| 4 | Rewire | same neurons and in/out degrees, edges shuffled by double-edge swaps, new draw per seed |
+| 5 | Random sparse | same neurons and edge count, edges uniform at random |
+| 6 | FlyGM, real | synapse counts frozen as weights, `W[post, pre] = sign(pre)·synapses`, scaled to spectral radius 1. Trained: 9-dim descriptor per neuron, a shared update MLP `f(h_i, m_i, η_i)` with `m = W h`, encoder and gate on PPL1, readout (5,638 params) |
+| 7 | FlyGM, rewire | same on the rewired graph |
+| 8 | FlyGM, random | same on the random graph |
 
-Arms 3–5 also run **sign-constrained** (Dale's law from MaleCNS transmitter predictions),
-giving 9 trained-edge arms, and 12 with the FlyGM arms. Arms 2–8 match in trainable
-parameters within 5% (5,584 / 5,610 / 5,638). The runner asserts this before any run
-starts, and it is tested (`tests/test_connectome.py`, `tests/test_flygm.py`).
-Arms 3–8 share node roles: context enters through the 16 PPL1 neurons, and the policy
-is read out from the 5 AVLP727m neurons. RESULTS.md §12 also runs arms 2–8 with a
-rank-4 readout from all 258 neurons (`network.readout: all`), matched within 0.5% at
-6,578 parameters.
+Arms 3–5 also have a sign-constrained version (Dale's law, using the MaleCNS
+transmitter predictions), so there are 9 trained-edge arms and 12 counting FlyGM.
+Arms 2–8 are within 5% of each other in trainable parameters; the runner checks this
+before starting and there's a test for it. In arms 3–8 the context goes in through the
+16 PPL1 neurons and the policy comes out of the 5 AVLP727m neurons. §12 also reruns
+arms 2–8 with a rank-4 readout from all 258 neurons (`network.readout: all`, 6,578
+params).
 
-Arms 3–5 ask whether the connectome's *sparsity* helps when every edge is free to
-learn its weight; arms 6–8 ask whether its *weights* help when they are kept exactly
-and the neurons learn instead (after Jin et al. 2026, arXiv:2602.17997). A control
-graph carries a seeded permutation of the real synapse-count multiset, so it matches
-the real circuit in sparsity, degree sequence (arm 7) and weight distribution, and
-differs only in which pair of neurons each count sits on.
+Arms 3–5 test whether the connectome's sparsity pattern helps when each edge learns its
+own weight. Arms 6–8 test whether its actual weights help when they're kept fixed and
+the neurons learn instead (the FlyGM setup from Jin et al. 2026, arXiv:2602.17997). The
+control graphs get a seeded permutation of the real synapse counts, so they match on
+sparsity, degree sequence (arm 7) and weight distribution and only differ in which
+neuron pair each count lands on.
 
-## Games and protocol
+## Games and training
 
-* **Game A** (primary): complete information, prize `V = 1`, cost `c = 1`. The
-  symmetric equilibrium is `T ~ Exp(c/V)`.
-* **Game B**: private values `v ~ Exp(1)`. The BNE is `b(v) = v²/2`.
+Game A: complete information, V = 1, c = 1, symmetric equilibrium T ~ Exp(c/V).
+Game B: private values v ~ Exp(1), BNE b(v) = v²/2.
 
-Quitting times lie on a 64-point grid, `T_max = 8` for Game A and `12` for Game B.
-Exploitability (ex-ante utility loss, Bichler et al. 2021) is computed **exactly** on
-the grid.
+Quit times are on a 64-point grid (T_max = 8 for A, 12 for B). Exploitability is the
+ex-ante utility loss from Bichler et al. 2021, computed exactly on the grid.
 
-* **Exact-gradient self-play:** one shared policy ascends its exact expected payoff
-  against a detached copy of itself. Noise-free.
-* **Sampled self-play:** a population of 8 independent agents, randomly re-matched
-  every round, 128 matches per agent per round. Agents learn only from their own
-  sampled quitting times and payoffs (REINFORCE with a running-mean baseline). Ties
-  are fair coin flips for the prize. Win/loss asymmetry scales the per-sample
-  gradient by `α_loss` or `α_win`, with the ratio swept over {1, 2, 4, 8}.
-* **PPO** (`training.sampled_algorithm: ppo`) is the alternative sampled learner:
-  4 clipped updates per round on the same batch, clip 0.2, no entropy bonus, the same
-  running-mean baseline as critic, and the same win/loss weights. It runs for every
-  arm, FlyGM included.
-* **Optimizer:** the same for every arm (Adam with β₁ = 0, cosine decay). Learning
-  rates are picked per arm from a fixed grid on tuning seeds 1000+, which are
-  disjoint from evaluation seeds 0–19 (`configs/tuned_lr.yaml`,
-  `results/tuning/*.csv`).
-* **Robustness:** the circuit arms are re-run at **one shared learning rate**
-  (`configs/robust_*_shared_lr.yaml`), so that the connectome and its controls differ
-  only in their mask. Per-arm tuning on 2 seeds had produced a learning-rate confound
-  that the controls exposed; see RESULTS.md §5.
-* **Seeds:** 20 per configuration in exact mode, 10 in sampled mode (compute budget;
-  see RESULTS.md). Every reported number is a mean with a 95% bootstrap CI. Every
-  arm-vs-arm contrast has a bootstrap CI on the difference, Hedges' g and a
-  Holm-adjusted permutation p-value.
+- Exact mode: one shared policy follows the exact gradient of its payoff against a
+  detached copy of itself.
+- Sampled mode: 8 agents, re-matched randomly each round, 128 matches per agent per
+  round, REINFORCE with a running-mean baseline. Ties are a coin flip. For the
+  asymmetry experiments the per-sample gradient is scaled by α_loss or α_win, ratio in
+  {1, 2, 4, 8}.
+- PPO (`training.sampled_algorithm: ppo`): 4 clipped updates per round on the same
+  batch, clip 0.2, no entropy bonus, same baseline and win/loss weights. Runs for every
+  arm including FlyGM.
+- Adam with β₁ = 0 and cosine decay for everything. Learning rates come from a fixed
+  grid, tuned on seeds 1000+ (eval seeds are 0–19). See `configs/tuned_lr.yaml`.
+- Per-arm tuning on 2 seeds gave a learning-rate confound (RESULTS §5), so the circuit
+  arms are also rerun at one shared learning rate (`configs/robust_*_shared_lr.yaml`).
+- 20 seeds in exact mode, 10 in sampled mode. Means come with 95% bootstrap CIs;
+  pairwise contrasts with a bootstrap CI, Hedges' g and a Holm-adjusted permutation p.
 
-## Reproduce
+## Running it
 
-CPU only. Requires Python ≥ 3.10.
+CPU only, Python 3.10+.
 
 ```bash
 python -m venv .venv
@@ -112,54 +97,46 @@ python -m venv .venv
 .venv/Scripts/python scripts/reproduce.py
 ```
 
-On Linux/macOS use `.venv/bin/`. `make reproduce` does the same where `make` exists.
+(`.venv/bin/` on Linux/macOS, or `make reproduce`.)
 
-`scripts/reproduce.py` runs the whole pipeline:
+`reproduce.py` downloads the three MaleCNS files (~566 MB, CC-BY) if they aren't there,
+rebuilds the subgraph and checks its checksum, tunes learning rates, runs the four
+experiments, and writes `results/tables/` and `figures/`. Use `--skip-connectome` and
+`--skip-tuning` to reuse the committed subgraph and learning rates.
 
-1. Downloads the three public MaleCNS files (about 566 MB, CC-BY) if absent,
-   rebuilds the subgraph, and checks it against the committed checksum.
-2. Tunes learning rates.
-3. Runs the four experiments.
-4. Writes every statistic to `results/tables/`.
-5. Redraws every figure in `figures/`.
-
-`--skip-connectome` and `--skip-tuning` reuse the committed subgraph and learning
-rates. The measured wall time is in RESULTS.md.
-
-The FlyGM and PPO experiments (RESULTS.md §9–§11) are a second, much longer grid:
+The FlyGM/PPO grid (§9–§11) is separate and much longer:
 
 ```bash
 .venv/Scripts/python scripts/reproduce_flygm_ppo.py --list
 .venv/Scripts/python scripts/reproduce_flygm_ppo.py --workers 14
 ```
 
-It runs in named steps, and appends each step's measured wall time to
-`results/flygm_ppo_log.txt`.
+Wall times get appended to `results/flygm_ppo_log.txt`.
 
 ## Layout
 
 ```
-src/games/        payoff engine, equilibria (analytic, grid, asymmetric-update rest point)
-src/agents/       tabular / dense / sparse-circuit policies, arm factory, parameter matching
-src/connectome/   MaleCNS download + extraction + provenance, rewired / random controls
-src/training/     exact & sampled self-play, runner, learning-rate tuning
-src/metrics/      exact exploitability & distances, bootstrap statistics
-src/analysis.py   every number in RESULTS.md
-configs/          one YAML per experiment (+ base.yaml, tuned_lr.yaml); no magic numbers in code
-scripts/          entry points (reproduce, build_connectome, tune_lr, run_experiment, analyze, make_figures)
-data/connectome/  the extracted subgraph, node/edge tables, provenance record (committed)
-results/          per-run JSON (with full config snapshot and seed), summary/curve CSVs, tables
+src/games/        payoffs, equilibria
+src/agents/       tabular, dense, circuit and FlyGM policies, arm factory
+src/connectome/   MaleCNS download and extraction, rewired/random controls
+src/training/     exact and sampled self-play, runner, LR tuning
+src/metrics/      exploitability, bootstrap stats
+src/analysis.py   numbers in RESULTS.md
+configs/          one YAML per experiment
+scripts/          entry points
+data/connectome/  extracted subgraph and provenance
+results/          per-run JSON, summary CSVs, tables
 figures/          PNG + PDF
-tests/            pytest (payoffs, oracle, tabular convergence, b(v) best response,
-                  parameter matching, degree preservation, no synthetic fallback, ...)
+tests/            pytest
 ```
 
-## Data and citations
+## References
 
-* MaleCNS v1.0: Berg, S. et al. *Sexual dimorphism in the complete Drosophila male
-  central nervous system connectome.* Cell 189 (2026). CC-BY 4.0.
-* Ventimiglia, D. et al. *Neural circuits regulating social dominance implement a
-  strategy predicted by evolutionary game theory.* bioRxiv 2026.02.20.706896.
-* Bichler, M., Fichtl, M., Heidekrüger, S., Kohring, N., Sutterer, P. *Learning
-  equilibria in symmetric auction games using artificial neural networks.* Nature
+- Berg, S. et al. Sexual dimorphism in the complete Drosophila male central nervous
+  system connectome. Cell 189 (2026). Data CC-BY 4.0.
+- Ventimiglia, D. et al. Neural circuits regulating social dominance implement a
+  strategy predicted by evolutionary game theory. bioRxiv 2026.02.20.706896.
+- Bichler, M., Fichtl, M., Heidekrüger, S., Kohring, N., Sutterer, P. Learning
+  equilibria in symmetric auction games using artificial neural networks. Nature
   Machine Intelligence 3, 687–695 (2021).
+- Jin et al. 2026, arXiv:2602.17997.

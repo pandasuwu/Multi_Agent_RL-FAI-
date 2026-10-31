@@ -1,6 +1,6 @@
 """Self-play training in two modes.
 
-``exact``   Every agent ascends its *exact* expected payoff against the current
+``exact``   Every agent ascends its exact expected payoff against the current
             (detached) opponent strategy, computed in closed form on the grid. With
             a population of one this is the shared-policy self-play of
             Bichler et al. (2021). Noise-free.
@@ -205,7 +205,7 @@ class SampledSelfPlay:
         return logp_all.gather(2, choice.unsqueeze(-1)).squeeze(-1)
 
     def _logp_recomputed(self, policy: Policy, types: torch.Tensor, choice: torch.Tensor) -> torch.Tensor:
-        """Log-probabilities of the stored actions under the *current* parameters."""
+        """Log-probabilities of the stored actions under the current parameters."""
         logp_ctx = torch.log_softmax(policy(self.ctx_features, self.ctx_types), dim=-1)
         logp_all = torch.gather(logp_ctx, 1, types.unsqueeze(-1).expand(-1, -1, logp_ctx.shape[-1]))
         return self._logp(logp_all, choice)
