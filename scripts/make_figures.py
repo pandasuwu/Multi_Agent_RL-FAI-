@@ -531,6 +531,66 @@ def fig_population_size() -> None:
     save(fig, str(FIG / "fig10_population_size"))
 
 
+def fig_lr_sweep() -> None:
+    """Final utility loss against a shared learning rate, every arm (exact mode)."""
+    path = RES / "tables" / "lr_sweep.csv"
+    if not path.exists():
+        return
+    t = pd.read_csv(path)
+    exps = [e for e in ("lrsweep_game_a_exact", "lrsweep_game_b_exact") if e in set(t["experiment"])]
+    fig, axes = plt.subplots(1, len(exps), figsize=(5.6 * len(exps), 4.3), squeeze=False)
+    for ax, exp in zip(axes[0], exps):
+        sub = t[t["experiment"] == exp]
+        arms = sort_arms(list(sub["arm"].unique()))
+        for k, arm in enumerate(arms):
+            a = sub[sub["arm"] == arm].sort_values("shared_lr")
+            st = arm_style(arm)
+            x = a["shared_lr"].to_numpy() * (1 + 0.04 * (k - len(arms) / 2))
+            err = [a["final_exploitability"] - a["final_exploitability_lo"], a["final_exploitability_hi"] - a["final_exploitability"]]
+            ax.errorbar(x, a["final_exploitability"], yerr=err, ls=st["linestyle"], marker="o", ms=4, capsize=2, lw=1.3,
+                        label=st["label"], **_marker(arm))
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set(title=f"Game {exp.split('_')[2].upper()}, exact", xlabel="learning rate (same for every arm)", ylabel="final utility loss")
+    axes[0][0].legend(fontsize=8)
+    fig.suptitle("Shared learning-rate sweep; mean and 95% bootstrap CI over 10 evaluation seeds", fontsize=10, color=INK_2)
+    fig.tight_layout()
+    save(fig, str(FIG / "fig12_lr_sweep"))
+
+
+def fig_population_nash() -> None:
+    """Individual vs population-mixture utility loss, by number of agents (Game A, sampled)."""
+    path = RES / "tables" / "population_nash.csv"
+    if not path.exists():
+        return
+    t = pd.read_csv(path)
+    t = t[t["experiment"] == "popsize_game_a_sampled"]
+    if t.empty:
+        return
+    arms = sort_arms(list(t["arm"].unique()))
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.3), sharey=True)
+    for k, arm in enumerate(arms):
+        sub = t[t["arm"] == arm].sort_values("population_size")
+        st = arm_style(arm)
+        x = sub["population_size"].to_numpy() * (1 + 0.035 * (k - len(arms) / 2))
+        for ax, metric in ((axes[0], "final_exploitability"), (axes[1], "final_mixture_exploitability")):
+            err = [sub[metric] - sub[f"{metric}_lo"], sub[f"{metric}_hi"] - sub[metric]]
+            ax.errorbar(x, sub[metric], yerr=err, ls=st["linestyle"], marker="o", ms=5, capsize=2, lw=1.3,
+                        label=st["label"], **_marker(arm))
+    sizes = sorted(t["population_size"].unique())
+    for ax in axes:
+        ax.set_xscale("log", base=2)
+        ax.set_xticks(sizes)
+        ax.set_xticklabels([f"{s:g}" for s in sizes])
+        ax.set_xlabel("number of agents in the population")
+    axes[0].set(title="Each agent vs the mixture of the others", ylabel="utility loss")
+    axes[1].set(title="Population mixture vs itself")
+    axes[0].legend(fontsize=8)
+    fig.suptitle("Game A, sampled REINFORCE; mean and 95% bootstrap CI over 10 seeds", fontsize=10, color=INK_2)
+    fig.tight_layout()
+    save(fig, str(FIG / "fig13_population_nash"))
+
+
 FIGURES = [
     fig_tabular_convergence,
     fig_convergence_all_arms,
@@ -542,6 +602,8 @@ FIGURES = [
     fig_reinforce_vs_ppo,
     fig_welfare,
     fig_population_size,
+    fig_lr_sweep,
+    fig_population_nash,
 ]
 
 

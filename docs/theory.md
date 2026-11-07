@@ -215,7 +215,12 @@ and a positive mean payoff. On the default grid, `asymmetric_fixed_point` gives:
 | 4 | 0.241 | 0.108 | 0.246 | 0.249 |
 | 8 | 0.270 | 0.130 | 0.295 | 0.285 |
 
-These are the floors the asymmetric arms should approach, if they converge at all. The
+These are the floors the asymmetric arms should approach, if they converge at all.
+`scripts/validate_asymmetric.py` checks them against the learning rule itself (expected
+dynamics and sampled matches, no use of the modified game) and against the continuous
+closed form; see RESULTS.md §15.2. The fixed point's tail beyond t ≈ 4–6 is a T_max = 8
+truncation artefact (an atom at t_max with empty bins before it), but b and the
+exploitability floor do not move when the grid is doubled in length. The
 experiment tests whether they do, and whether wiring changes how closely they do.
 
 ### 3.2 Ties are coin flips

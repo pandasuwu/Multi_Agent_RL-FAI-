@@ -86,6 +86,10 @@ def expand_jobs(cfg: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def learning_rate(cfg: dict[str, Any], arm: dict[str, Any]) -> float:
+    # learning-rate sweep experiments: every arm runs at the swept rate
+    shared = cfg["training"].get("shared_lr")
+    if shared is not None:
+        return float(shared)
     table = cfg["lr"]
     label = arm_label(arm)
     for key in (label, arm["name"], "default"):

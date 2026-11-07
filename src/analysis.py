@@ -545,6 +545,143 @@ def readout_analysis(rng: np.random.Generator, n_boot: int) -> dict[str, pd.Data
     }
 
 
+
+# ------------------------------------------------- population-level Nash (TA review)
+POPULATION_EXPERIMENTS = (
+    *[e for e in EXPERIMENTS if "sampled" in e],
+    "popsize_game_a_sampled",
+    "popnash_game_a_sampled",
+)
+WIRING_CONTRASTS = [c for c in CONTRASTS if c[2].startswith(("specific wiring", "wiring + degrees", "degree structure"))]
+
+
+def population_nash(rng: np.random.Generator, n_boot: int) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Individual vs population-mixture exploitability in every sampled experiment.
+
+    ``final_exploitability`` is each agent against the mixture of the *other* agents
+    (what it trains on). ``final_mixture_exploitability`` is the population's combined
+    strategy against itself, ``ell(pi_bar; pi_bar)``, the population-level Nash
+    criterion. A population can score low on the first and high on the second, e.g. a
+    fixed pair that splits into one early and one late quitter. ``agent_tv_mean`` (each
+    agent's own TV to the equilibrium) exists only in runs made after it was added.
+    Wiring contrasts on the mixture metric are Holm-adjusted within each experiment
+    (and population size).
+    """
+    per_arm, pairs = [], []
+    for exp in POPULATION_EXPERIMENTS:
+        if not (RESULTS / exp / "summary.csv").exists():
+            continue
+        df, _ = load_summary(exp)
+        df = df[df["arm"] != "oracle"]
+        if "loss_win_ratio" in df.columns:
+            df = df[df["loss_win_ratio"] == 1.0]
+        df = df.assign(mixture_minus_individual=df["final_mixture_exploitability"] - df["final_exploitability"])
+        metrics = ["final_exploitability", "final_mixture_exploitability", "mixture_minus_individual"]
+        metrics += [m for m in ("final_agent_mean_quit_sd", "final_agent_tv_mean", "final_agent_tv_max") if m in df.columns]
+        group = ["population_size", "arm"] if "population_size" in df.columns else ["arm"]
+        t = per_arm_table(df, metrics, group, rng, n_boot)
+        t.insert(0, "experiment", exp)
+        per_arm.append(t)
+        sizes = sorted(df["population_size"].unique()) if "population_size" in df.columns else [None]
+        for size in sizes:
+            sub = df if size is None else df[df["population_size"] == size]
+            arms = set(sub["arm"])
+            family = []
+            for a, b, question in WIRING_CONTRASTS:
+                if a not in arms or b not in arms:
+                    continue
+                x = sub.loc[sub["arm"] == a, "final_mixture_exploitability"].to_numpy(float)
+                y = sub.loc[sub["arm"] == b, "final_mixture_exploitability"].to_numpy(float)
+                d = compare(x, y, n_boot, 0.95, rng)
+                family.append(
+                    {
+                        "experiment": exp,
+                        "population_size": size,
+                        "contrast": f"{a} - {b}",
+                        "question": question,
+                        "mean_a": float(np.mean(x)),
+                        "mean_b": float(np.mean(y)),
+                        "diff": d.diff,
+                        "diff_lo": d.lo,
+                        "diff_hi": d.hi,
+                        "hedges_g": d.hedges_g,
+                        "p_perm": d.p_perm,
+                        "ci_excludes_0": d.distinguishable,
+                    }
+                )
+            if family:
+                for r, p in zip(family, holm([r["p_perm"] for r in family])):
+                    r["p_holm"] = p
+                    r["distinguishable"] = bool(r["ci_excludes_0"] and p < 0.05)
+                pairs.extend(family)
+    if not per_arm:
+        return pd.DataFrame(), pd.DataFrame()
+    return pd.concat(per_arm, ignore_index=True), pd.DataFrame(pairs)
+
+
+
+# ------------------------------------------------- shared learning-rate sweep (TA review)
+LR_SWEEP_EXPERIMENTS = ("lrsweep_game_a_exact", "lrsweep_game_b_exact")
+
+
+def lr_sweep_analysis(rng: np.random.Generator, n_boot: int) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Every arm at every rate of the grid, on evaluation seeds.
+
+    Per-arm tuning answers "how good is each architecture at its own best rate"; this
+    answers "at the same rate, does the wiring matter". The wiring contrasts are
+    computed at every rate and Holm-adjusted over all rates and contrasts of one
+    experiment and metric together. Unstable runs (non-finite loss) count as failures
+    at their last finite value, so a rate that blows up shows up as a high loss rather
+    than being dropped.
+    """
+    per_rate, pairs = [], []
+    for exp in LR_SWEEP_EXPERIMENTS:
+        if not (RESULTS / exp / "summary.csv").exists():
+            continue
+        df, cfg = load_summary(exp)
+        metrics = ["final_exploitability", "steps_to_threshold_c"]
+        if cfg["game"]["name"] == "B":
+            metrics.append("final_l2")
+        t = per_arm_table(df, metrics, ["shared_lr", "arm"], rng, n_boot)
+        t.insert(0, "experiment", exp)
+        per_rate.append(t)
+        for metric in metrics:
+            family = []
+            for lr, sub in df.groupby("shared_lr"):
+                arms = set(sub["arm"])
+                for a, b, question in WIRING_CONTRASTS + [c for c in CONTRASTS if c[1] == "dense" and c[0] != "flygm"]:
+                    if a not in arms or b not in arms:
+                        continue
+                    x = sub.loc[sub["arm"] == a, metric].to_numpy(float)
+                    y = sub.loc[sub["arm"] == b, metric].to_numpy(float)
+                    d = compare(x, y, n_boot, 0.95, rng)
+                    family.append(
+                        {
+                            "experiment": exp,
+                            "metric": metric,
+                            "shared_lr": lr,
+                            "contrast": f"{a} - {b}",
+                            "question": question,
+                            "mean_a": float(np.mean(x)),
+                            "mean_b": float(np.mean(y)),
+                            "diff": d.diff,
+                            "diff_lo": d.lo,
+                            "diff_hi": d.hi,
+                            "hedges_g": d.hedges_g,
+                            "p_perm": d.p_perm,
+                            "ci_excludes_0": d.distinguishable,
+                        }
+                    )
+            if family:
+                for r, p in zip(family, holm([r["p_perm"] for r in family])):
+                    r["p_holm"] = p
+                    r["distinguishable"] = bool(r["ci_excludes_0"] and p < 0.05)
+                pairs.extend(family)
+    if not per_rate:
+        return pd.DataFrame(), pd.DataFrame()
+    return pd.concat(per_rate, ignore_index=True), pd.DataFrame(pairs)
+
+
 def run_all(n_boot: int, seed: int = 20260918) -> dict[str, pd.DataFrame]:
     rng = np.random.default_rng(seed)
     out: dict[str, pd.DataFrame] = {}
@@ -577,6 +714,9 @@ def run_all(n_boot: int, seed: int = 20260918) -> dict[str, pd.DataFrame]:
     out["wiring_familywide"] = wiring_familywide(out["pairwise"], out.get("asym_pairwise"))
     out["game_b_value_dependence"] = value_dependence((*EXPERIMENTS, *READOUT_EXPERIMENTS))
     out.update(readout_analysis(np.random.default_rng(seed + 12), n_boot))
+    # own RNG streams, so adding these never moves an earlier table's bootstrap
+    out["population_nash"], out["population_nash_pairwise"] = population_nash(np.random.default_rng(seed + 13), n_boot)
+    out["lr_sweep"], out["lr_sweep_pairwise"] = lr_sweep_analysis(np.random.default_rng(seed + 14), n_boot)
     return out
 
 

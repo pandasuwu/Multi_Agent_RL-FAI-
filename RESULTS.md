@@ -51,6 +51,14 @@ Things that did matter:
   population converges on the symmetric equilibrium, and at 16 all arms tie (§14).
   Wiring makes no difference at any size.
 
+Checks added after the project review (§15): the population as a whole is further from
+Nash than each agent against the others (34–47% higher exploitability at 8 agents), but
+the wiring conclusions are unchanged on that metric; the loss-weighted rest point
+matches simulations of the learning rule; every rewired and random control keeps all
+PPL1 → AVLP727m paths (with shorter routes than the real circuit); and a full shared
+learning-rate sweep finds no wiring effect beyond the Game A speed-up, which holds at
+two shared rates and so is not a tuning effect.
+
 ---
 
 ## 1. Setup
@@ -1066,3 +1074,212 @@ welfare, 16 tests: none is distinguishable (on welfare every Holm p is 1.0; on
 exploitability every CI covers zero). The dense MLP beats the connectome at 8 agents
 (by 0.012 [0.007, 0.017], Holm p = 0.004 among the 12 exploitability tests), as in §3,
 and the gap closes at 16.
+
+---
+
+## 15. Checks after the project review
+
+The TA's review of the project idea raised four points. Each gets its own check here.
+New code: `src/games/asym_dynamics.py`, `scripts/validate_asymmetric.py`,
+`scripts/path_diagnostics.py`, the `population_nash` and `lr_sweep_analysis` functions in
+`src/analysis.py`, and `tests/test_review_checks.py`. The new runs were made on a
+2-core cloud machine with a newer torch than the earlier runs (see the note on
+reproduction under 15.1).
+
+### 15.1 Population-level Nash
+
+The point: an agent measured against the mixture of the *other* agents can look close to
+equilibrium even when the population as a whole is not. Two agents that split into
+"quit at once" and "never quit" each best-respond to the other, so each scores 0, but
+their mixture is far from the symmetric equilibrium (`test_split_population_...`).
+
+Every run already stored both numbers: `exploitability` is each agent against the
+mixture of the others (what it trains on), and `mixture_exploitability` is the
+population's combined strategy against itself, ℓ(π̄; π̄). I now report the second
+everywhere (`results/tables/population_nash.csv`). Runs also record each agent's own TV
+distance from the equilibrium (`agent_tv_mean`, `agent_tv_max`), which shows whether the
+agents agree on one strategy or differ and only average to it. To get that number for
+the main sampled comparison I reran Game A sampled at the shared learning rate, with
+tabular and dense added (`configs/popnash_game_a_sampled.yaml`, 10 seeds, 80 runs).
+
+Game A sampled, 8 agents, REINFORCE, mean [95% CI]:
+
+| arm | each agent vs the others | population mixture vs itself | each agent's TV to equilibrium |
+|---|---|---|---|
+| tabular | 0.068 [0.059, 0.080] | 0.097 [0.082, 0.112] | 0.84 [0.82, 0.86] |
+| dense | 0.033 [0.030, 0.036] | 0.045 [0.041, 0.048] | 0.42 [0.40, 0.44] |
+| connectome | 0.045 [0.042, 0.049] | 0.066 [0.062, 0.070] | 0.59 [0.57, 0.62] |
+| connectome, signed | 0.045 [0.041, 0.049] | 0.064 [0.058, 0.071] | 0.58 [0.55, 0.61] |
+| rewire | 0.044 [0.040, 0.049] | 0.059 [0.052, 0.066] | 0.56 [0.52, 0.59] |
+| rewire, signed | 0.046 [0.041, 0.052] | 0.067 [0.058, 0.075] | 0.58 [0.54, 0.62] |
+| random sparse | 0.049 [0.043, 0.056] | 0.066 [0.056, 0.077] | 0.57 [0.54, 0.60] |
+| random sparse, signed | 0.044 [0.040, 0.048] | 0.059 [0.052, 0.066] | 0.56 [0.52, 0.59] |
+
+What this shows:
+
+- The population is further from Nash than the per-agent number suggests: the mixture's
+  exploitability is 34–47% higher for every arm. The individual agents are far from the
+  equilibrium distribution (TV 0.56–0.59 for the circuits), while their mixture is much
+  closer (TV 0.26–0.28). So at 8 agents the population is a spread of different
+  strategies that only partly averages out to the exponential, which is the TA's point.
+- It does not change any wiring conclusion. On the mixture metric no wiring contrast is
+  distinguishable at the shared rate (6 tests, all Holm p ≥ 0.98; largest connectome −
+  rewire +0.007 [−0.002, +0.015]).
+- Across all sampled experiments the mixture metric flags 8 wiring contrasts
+  (`population_nash_pairwise.csv`), all in places already explained: the per-arm-tuned
+  runs where the rewired arm got a different rate from the others (§5; in Game A its
+  agents also spread out most, SD of mean quitting time 1.2 against 0.5), and PPO Game B
+  (§10). None appears at a shared rate outside PPO Game B. It drops the two PPO Game A
+  contrasts the per-agent metric flagged.
+- With population size (§14, `figures/fig13_population_nash.png`) the gap is largest for
+  a fixed pair: 0.04–0.08 per agent against 0.18–0.25 for the pair's mixture. It shrinks
+  as the population grows, and at 16 agents both measures agree within 0.003–0.013.
+  No wiring contrast is distinguishable at any size on the mixture metric either.
+
+Reproduction: the rerun matches `robust_game_a_sampled_shared_lr` seed for seed on the
+same graphs (identical graph checksums), up to floating-point drift from the different
+machine and torch version: largest difference in final exploitability 0.009 (one rewired
+seed), mean difference ≤ 0.001 for every arm.
+
+### 15.2 The shifted equilibrium under loss weighting
+
+The point: the rest point of loss-weighted REINFORCE (§6, docs/theory.md §3) was derived
+on paper and needs checking against simulations. `scripts/validate_asymmetric.py`
+compares, for ρ = 1, 2, 4, 8:
+
+- the continuous closed form (Lomax survival, hazard ρc / (V + (ρ−1)(ct + b))), floored
+  onto the grid;
+- the grid fixed point (the equilibrium of the modified game), which §6 uses as the
+  target;
+- the expected update of the learning rule itself, iterated with no sampling, both as
+  plain policy gradient and preconditioned by the softmax Fisher matrix (same rest
+  points, but unused quitting times die out exponentially instead of like 1/steps);
+- the rule run with sampled matches, coin-flip ties, per-sample weights and a running
+  baseline (tabular, 4 seeds, 30,000 steps of 4,096 matches).
+
+None of the simulations uses the modified game or the formula. Table
+`results/tables/asym_validation.csv`, figure `figures/fig11_asym_validation.png`.
+
+| ρ | 1 | 2 | 4 | 8 |
+|---|---|---|---|---|
+| baseline b: grid fixed point | 0.059 | 0.182 | 0.241 | 0.270 |
+| b: expected update (Fisher-preconditioned) | 0.059 | 0.182 | 0.241 | 0.270 |
+| b: sampled rule (mean of 4 seeds) | 0.058 | 0.188 | 0.231 | 0.286 |
+| b: closed form | 0 | 0.125 | 0.188 | 0.219 |
+| exploitability: grid fixed point | 0.000 | 0.066 | 0.108 | 0.130 |
+| exploitability: closed form on the grid | 0.001 | 0.067 | 0.106 | 0.127 |
+| exploitability: expected update (plain gradient) | 0.001 | 0.066 | 0.108 | 0.130 |
+| exploitability: sampled rule | 0.022 | 0.076 | 0.130 | 0.163 |
+| TV, expected update (Fisher) to fixed point | 3·10⁻⁴ | 5·10⁻⁷ | 2·10⁻¹³ | 4·10⁻⁶ |
+| W1, sampled rule to fixed point | 0.074 | 0.064 | 0.089 | 0.099 |
+| W1, sampled rule to the true equilibrium | 0.074 | 0.313 | 0.441 | 0.534 |
+| max hazard error, closed form vs grid, t ≤ 2 | 0.003 | 0.022 | 0.035 | 0.096 |
+
+What this shows:
+
+- The derivation holds. The expected dynamics of the rule converge to the grid fixed
+  point to machine precision, and the plain-gradient version reaches the same
+  exploitability to within 10⁻⁴ for ρ ≥ 2 (0.001 at ρ = 1). The sampled rule lands at the shifted point, not at the true
+  equilibrium: its W1 distance to the prediction is 0.06–0.10 at every ρ, against
+  0.31–0.53 to the equilibrium, and its baseline matches the predicted b to within 0.016.
+  Its exploitability sits 0.01–0.035 above the prediction, the same sampling-noise floor
+  it has at ρ = 1 (0.022), as in §6.
+- The closed form and the grid fixed point agree where the mass is. Up to t = 2 the
+  hazards agree to within 0.02–0.10 (on hazards of 0.5–3), probability of quitting at 0
+  agrees to within 0.006, and exploitability to within 3%. The baseline differs by a
+  constant 0.05–0.06 at every ρ, including ρ = 1 where the continuous value is exactly 0,
+  so that offset is the grid (coin-flip ties at spacing Δ = 0.127), not the formula.
+- Two grid artefacts, neither of which moves the target. After t ≈ 2 the grid fixed
+  point's hazard splits into two interleaved branches (alternate bins) whose average
+  follows the closed form. And the tail is cut off at T_max = 8: the grid puts about
+  twice the closed form's mass beyond 8 (0.027 / 0.045 / 0.053 against 0.015 / 0.024 /
+  0.028) into an atom at t = 8, leaving 18–28 empty bins before it. Re-solving on a
+  grid twice as long with the same spacing recovers the closed-form tail mass beyond 8
+  exactly (0.0153 / 0.0240 / 0.0277) and changes b by ≤ 0.0002 and exploitability by
+  < 10⁻⁴. So the exploitability floor §6 compares against is right; the shape of the
+  tail beyond t ≈ 4–6 on the default grid is not, and should not be read as a prediction.
+
+### 15.3 Do the rewired controls keep the input-output paths?
+
+The point: degree-preserving rewiring keeps every neuron's degree but does not guarantee
+that the control still connects PPL1 to AVLP727m. `scripts/path_diagnostics.py`
+rebuilds the exact graphs the runs used (real circuit, and the rewired and random graphs
+of seeds 0–19, matched to the runs by graph checksum). With 6 unrolled steps, a path
+carries the input only if it has at most 5 synapses.
+
+| | real circuit | rewire (20 graphs) | random (20 graphs) |
+|---|---|---|---|
+| AVLP727m neurons reachable from PPL1 within 5 synapses | 5 / 5 | 5 / 5 in every graph | 5 / 5 in every graph |
+| PPL1 → AVLP727m pairs connected within 5 synapses | 80 / 80 | 80 / 80 in every graph | 80 / 80 in every graph |
+| shortest path over all pairs | 2 | 1 | 1 |
+| median shortest path | 3 | 2 | 2 |
+| log10 number of walks, length 1–5 | 5.76 | 6.22–6.28 | 5.82–6.03 |
+| distinct neurons PPL1 synapses onto | 97 | 150–169 | 173–197 |
+
+Every control keeps every functional path, and the controls are better connected than
+the real circuit, not worse: shorter routes and more of them. Each PPL1 neuron keeps
+its out-degree, but in the real circuit the 16 PPL1 neurons converge on shared targets,
+and rewiring scatters them. This is the structural side of the FlyGM gain result (§9),
+where the real circuit passes 180–2,900× less signal from input to output than its
+controls.
+
+Within a control family, the number of walks varies from graph to graph, so I also
+checked whether runs on better-connected graphs did better (Spearman correlation with
+final exploitability, control arms of 8 Game B experiments, 30 tests,
+`path_vs_performance.csv`). None survives Holm (smallest Holm p = 0.28). Pairs and
+shortest paths don't vary across control graphs, so they can't be tested this way.
+
+So the "no wiring effect" results are not because the controls lost their input path.
+
+### 15.4 Shared learning rate vs per-arm tuning
+
+The point: per-arm tuning mixes tuning effects with topology effects. The project
+already ran the circuit arms at one shared rate (§5). That was one rate per experiment,
+the modal tuned value. The new experiment sweeps all of them: every network arm at every
+rate of the exact-mode grid (0.001 to 0.1), 10 evaluation seeds, Game A and B exact
+(`configs/lrsweep_game_*_exact.yaml`, 700 runs, `results/tables/lr_sweep*.csv`,
+`figures/fig12_lr_sweep.png`). Per-arm tuning (tuning seeds 1000+, eval seeds 0–19) stays
+the second, separate protocol. The wiring contrasts are Holm-adjusted over all rates and
+contrasts of one experiment and metric (45 tests per family).
+
+Final exploitability at a shared rate (unsigned arms; the signed arms are in the table):
+
+| Game | rate | connectome | rewire | random | dense |
+|---|---|---|---|---|---|
+| A exact | 0.001 | 0.0238 | 0.0239 | 0.0239 | 0.0047 |
+| A exact | 0.003 | 0.0135 | 0.0141 | 0.0141 | 0.0016 |
+| A exact | 0.01 | 0.0041 | 0.0044 | 0.0044 | 0.98 (diverges) |
+| A exact | 0.03 | 0.0013 | 0.0013 | 0.0013 | 0.74 (diverges) |
+| B exact | 0.001 | 0.053 | 0.051 | 0.050 | 0.0074 |
+| B exact | 0.003 | 0.016 | 0.017 | 0.016 | 0.0040 |
+| B exact | 0.01 | 0.0086 | 0.0078 | 0.0077 | 0.0028 |
+| B exact | 0.03 | 0.18 (4/10 reach threshold) | 0.071 | 0.018 | 0.027 |
+
+What this shows:
+
+- Wiring, read at one rate at a time. In every stable setting the three graphs end within
+  7% of each other in Game A and 12% in Game B. Exact-mode runs vary so little across
+  seeds that some of these tiny gaps pass Holm: in Game A the connectome is 0.4–7% better
+  at the three lower rates; in Game B at rate 0.001 it is 4–7% worse. They point in
+  opposite directions and none is larger than about 0.003 in exploitability.
+- The Game A exact speed-up of the unsigned connectome (§4, §11) is a topology effect,
+  not tuning. It shows at two shared rates: 57 episodes sooner than the rewire at 0.01
+  (750 vs 808, CI [−73, −43]) and 25 sooner at 0.03 (225 vs 250). Both Holm p = 0.011.
+  The signed connectome shows no speed-up at either rate, as before.
+- The Game B signed-connectome cost (§4, §5) has the same sign at a shared rate:
+  at 0.03 its bid L2 is +0.12 above the signed rewire [+0.01, +0.24] and it reaches the
+  threshold 50 episodes later [+5, +90]. With 10 seeds and 45 tests per family neither
+  passes Holm here, so this sweep supports the direction but doesn't confirm it.
+- Stability depends on wiring at high rates, and only for the unsigned arms. At 0.03 in
+  Game B the unsigned connectome reaches the threshold in 4 of 10 seeds, the rewire in 8,
+  random in 7, and every signed arm in 10. This is the instability noted in §7.
+- Dense against the circuits can only be compared with each architecture at its own
+  rate. Dense is best at 0.003 (A) and 0.01 (B). It diverges in Game A from 0.01 up and
+  is five times worse than the signed circuits in Game B at 0.03, where they do best. At any single shared rate the gap swings from dense far ahead
+  to dense far behind, so the dense-vs-circuit numbers in §3 and §7 come from per-arm
+  tuning by necessity, and the sweep shows that this is a tuning comparison, not a
+  topology one.
+
+Not done here: a shared-rate sweep for sampled mode and FlyGM. Sampled runs take 7–11×
+longer, and the FlyGM Game B runs about 30 minutes each, so they remain covered
+only by the single shared-rate reruns of §5, §9 and §10.

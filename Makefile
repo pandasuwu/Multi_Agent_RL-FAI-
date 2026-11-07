@@ -1,6 +1,6 @@
 PY ?= .venv/Scripts/python
 
-.PHONY: reproduce test connectome tune experiments analysis figures
+.PHONY: reproduce test connectome tune experiments analysis figures review
 
 reproduce:
 	$(PY) scripts/reproduce.py
@@ -22,3 +22,9 @@ analysis:
 
 figures:
 	$(PY) scripts/make_figures.py
+
+review:
+	$(PY) scripts/run_experiment.py configs/popnash_game_a_sampled.yaml configs/lrsweep_game_a_exact.yaml configs/lrsweep_game_b_exact.yaml
+	$(PY) scripts/validate_asymmetric.py
+	$(PY) scripts/path_diagnostics.py
+	$(PY) scripts/analyze.py

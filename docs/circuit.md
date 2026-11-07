@@ -130,6 +130,28 @@ any swap that would create a self-loop or a duplicate edge.
 `test_degree_preserving_rewire_preserves_degrees` checks that every neuron's in- and
 out-degree is unchanged.
 
+Degree-preserving rewiring does not by itself guarantee that the control still
+connects PPL1 to AVLP727m, so `scripts/path_diagnostics.py` checks it for the exact
+graphs the runs used (seeds 0–19, matched to the runs by graph checksum). A path only
+carries the input if it fits in the unrolled network: the context enters PPL1 on the
+first of the 6 updates and the policy is read after the last, so at most 5 synapses.
+
+| | connectome | rewire (20 graphs) | random (20 graphs) |
+|---|---|---|---|
+| AVLP727m neurons reachable from PPL1 within 5 synapses | 5 of 5 | 5 of 5 in every graph | 5 of 5 in every graph |
+| PPL1 → AVLP727m pairs connected within 5 synapses | 80 of 80 | 80 of 80 in every graph | 80 of 80 in every graph |
+| shortest path, any pair | 2 | 1 | 1 |
+| median shortest path over pairs | 3 | 2 | 2 |
+| log10 walks of length 1–5, PPL1 → AVLP727m | 5.76 | 6.22–6.28 | 5.82–6.03 |
+| neurons PPL1 synapses onto directly | 97 | 150–169 | 173–197 |
+
+No control loses a functional path. If anything the controls are better connected than
+the real circuit: shorter routes and more of them. Each PPL1 neuron keeps its out-degree,
+but in the real circuit the 16 PPL1 neurons converge on shared targets, and rewiring
+scatters them over more neurons. Tables: `results/tables/path_diagnostics.csv` (per graph),
+`path_summary.csv`, and `path_vs_performance.csv`, which checks whether runs on
+better-connected control graphs did better (no Spearman correlation survives Holm).
+
 So the rewired control destroys the circuit's specific wiring, including its strong
 reciprocity and clustering, but keeps sparsity and degree sequence. The random
 control also destroys the degree sequence. The contrasts are:
