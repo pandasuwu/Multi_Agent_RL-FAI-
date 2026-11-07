@@ -4,472 +4,147 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Source template for the demo site. scripts/build_demo.py fills in the data and writes site/index.html. -->
-<title>When should a fly give up? · Give-Up Game Lab</title>
-<meta name="description" content="Learning agents play the war of attrition with brains wired like the fruit-fly give-up circuit. Runs live in the browser.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;0,900;1,400;1,600&family=Libre+Franklin:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<title>Give-Up Game Lab</title>
 <style>
   :root {
-    --ground: #f3eee3;     /* bone paper */
-    --panel: #f3eee3;
-    --panel-2: #ebe4d5;
-    --ink: #111111;
-    --ink-2: #3d3a35;
-    --ink-3: #7c766b;
-    --rule: #111111;
-    --hair: #cfc6b3;
-    --grid: #ddd5c3;
-    --accent: #d1301f;     /* vermilion: the fly circuit and the learning population */
-    --accent-soft: rgba(209, 48, 31, 0.10);
-    --ideal: #111111;
-    --predict: #1f3c9e;    /* cobalt: theory */
-    --idle-node: #cbc2ae;
-    --rival: #1f3c9e;
-    --food: #e6b422;
-    --food-2: #a97c06;
-    --wing: rgba(160, 175, 190, 0.45);
-    --eye: #8f1b10;
-    --focus: #1f3c9e;
-    --c-table: #8c8578;
-    --c-dense: #d99a00;
-    --c-fly: #d1301f;
-    --c-shuf: #0d6e5f;
-    --c-rand: #7b2d8e;
-    --good: #0d6e5f;
-    --night: #111111;
-    --serif: "Playfair Display", Georgia, "Times New Roman", serif;
-    --sans: "Libre Franklin", "Franklin Gothic Medium", "Helvetica Neue", Arial, sans-serif;
-    --cond: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
-    --mono: "DM Mono", ui-monospace, Consolas, monospace;
+    --ground: #ffffff; --panel: #ffffff; --panel-2: #f4f4f4;
+    --ink: #111; --ink-2: #444; --ink-3: #888; --rule: #ccc; --grid: #e8e8e8;
+    --accent: #c0392b; --accent-soft: rgba(192, 57, 43, 0.08);
+    --ideal: #111; --predict: #2c5aa0; --idle-node: #d0d0d0; --rival: #2c5aa0;
+    --food: #e2b33c; --food-2: #b08620; --wing: rgba(160, 175, 190, 0.45); --eye: #7a1d14; --focus: #2c5aa0;
+    --c-table: #888; --c-dense: #d4a017; --c-fly: #c0392b; --c-shuf: #2a7f62; --c-rand: #6c3f99; --good: #2a7f62;
+    --sans: Helvetica, Arial, sans-serif; --cond: Helvetica, Arial, sans-serif; --mono: Menlo, Consolas, monospace;
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
-  html { background: var(--ground); }
-  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-  ::selection { background: var(--accent); color: var(--ground); }
-  a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-  a:hover { color: var(--accent); }
-
-  /* ---------- masthead */
-  .mast { background: var(--night); color: var(--ground); }
-  .mast-in { max-width: 1180px; margin: 0 auto; padding: 22px 24px 0; }
-  .mast-top { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: #b9b1a1; border-bottom: 1px solid #3a3731; padding-bottom: 12px; }
-  .mast-top a { color: var(--ground); }
-  .mast-body { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 40px; padding: 44px 0 48px; align-items: end; }
-  .kicker { font-family: var(--serif); font-style: italic; font-size: 19px; color: var(--accent); margin: 0 0 10px; }
-  h1 { font-family: var(--serif); font-weight: 900; font-size: clamp(44px, 7.4vw, 96px); line-height: 0.95; letter-spacing: -0.02em; margin: 0; }
-  h1 em { font-weight: 400; font-style: italic; color: var(--accent); }
-  .lede { font-family: var(--serif); font-size: 19px; line-height: 1.5; color: #d9d1c1; margin: 22px 0 0; max-width: 40ch; }
-  .facts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #3a3731; }
-  .facts li { padding: 16px 0 14px; border-bottom: 1px solid #3a3731; display: grid; }
-  .facts li:nth-child(odd) { padding-right: 18px; border-right: 1px solid #3a3731; }
-  .facts li:nth-child(even) { padding-left: 18px; }
-  .facts b { font-family: var(--serif); font-weight: 600; font-size: 46px; line-height: 1; font-variant-numeric: lining-nums; color: var(--ground); }
-  .facts span { font-size: 13px; color: #b9b1a1; margin-top: 6px; }
-
-  /* ---------- section index */
-  nav.tabs { position: sticky; top: 0; z-index: 5; background: var(--ground); border-bottom: 2px solid var(--ink); }
-  .tabs-in { max-width: 1180px; margin: 0 auto; padding: 0 24px; display: flex; overflow-x: auto; }
-  nav.tabs button { font: inherit; font-family: var(--serif); font-size: 19px; background: none; border: 0; border-right: 1px solid var(--hair); color: var(--ink-2); padding: 14px 22px 12px; cursor: pointer; white-space: nowrap; display: flex; align-items: baseline; gap: 10px; }
-  nav.tabs button:first-child { padding-left: 0; }
-  nav.tabs button::before { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
-  nav.tabs button:nth-child(1)::before { content: "01"; }
-  nav.tabs button:nth-child(2)::before { content: "02"; }
-  nav.tabs button:nth-child(3)::before { content: "03"; }
-  nav.tabs button:nth-child(4)::before { content: "04"; }
-  nav.tabs button[aria-selected="true"] { color: var(--ink); font-style: italic; font-weight: 600; box-shadow: inset 0 -5px 0 var(--accent); }
-  nav.tabs button[aria-selected="true"]::before { color: var(--accent); }
-  nav.tabs button:hover { color: var(--ink); }
-
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 34px 24px 64px; }
-  [role="tabpanel"] { display: grid; gap: 34px; }
-  h2 { font-family: var(--serif); font-weight: 600; font-size: 24px; line-height: 1.2; margin: 0; letter-spacing: -0.005em; }
-  h3 { font-family: var(--serif); font-weight: 800; font-size: 30px; margin: 0; line-height: 1.12; text-wrap: balance; letter-spacing: -0.01em; }
+  body { margin: 0; background: #fff; color: var(--ink); font: 15px/1.5 var(--sans); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 40px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 6px; }
   p { margin: 0; }
-
-  /* ---------- game chooser */
-  .games { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 2px solid var(--ink); }
-  .game-card { text-align: left; font: inherit; color: var(--ink); background: transparent; border: 0; padding: 22px 24px 24px; cursor: pointer; display: grid; gap: 6px; align-content: start; }
-  .game-card + .game-card { border-left: 2px solid var(--ink); }
-  .game-card .tag { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
-  .game-card .ttl { font-family: var(--serif); font-weight: 800; font-size: 28px; line-height: 1.1; }
-  .game-card .dsc { color: var(--ink-2); font-size: 14.5px; max-width: 52ch; }
-  .game-card:hover:not([aria-pressed="true"]) { background: var(--panel-2); }
-  .game-card[aria-pressed="true"] { background: var(--ink); color: var(--ground); }
-  .game-card[aria-pressed="true"] .tag { color: var(--accent); }
-  .game-card[aria-pressed="true"] .dsc { color: #d9d1c1; }
-
-  /* ---------- controls */
-  .controls { display: flex; flex-wrap: wrap; gap: 18px 30px; align-items: flex-end; padding: 0 0 22px; border-bottom: 1px solid var(--hair); }
-  .ctl { display: grid; gap: 8px; }
-  .ctl > span { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--ink-2); }
-  .seg { display: inline-flex; flex-wrap: wrap; padding: 0 0 1.5px 1.5px; }
-  .seg button { font: inherit; font-size: 13.5px; font-weight: 500; border: 1.5px solid var(--ink); margin: 0 0 -1.5px -1.5px; background: transparent; color: var(--ink); padding: 7px 13px; cursor: pointer; }
-  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--ground); }
-  .seg button:hover:not([aria-pressed="true"]) { background: var(--accent-soft); }
-  .actions { display: flex; gap: 10px; margin-left: auto; }
-  .btn { font: inherit; font-size: 14px; font-weight: 600; padding: 9px 20px; cursor: pointer; border: 1.5px solid var(--accent); background: var(--accent); color: #fff; }
-  .btn:hover { background: #a92415; border-color: #a92415; }
-  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
-  .btn.ghost:hover { background: var(--ink); color: var(--ground); }
-  button:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-  input[type=range] { accent-color: var(--accent); width: 150px; }
-
-  /* ---------- panels: ruled columns, no cards */
-  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 34px 40px; }
-  .panel { border-top: 2px solid var(--ink); padding-top: 14px; display: grid; gap: 14px; align-content: start; min-width: 0; }
-  .full { grid-column: 1 / -1; }
-  .stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  .stat { display: grid; gap: 2px; padding: 4px 18px 6px; border-left: 1px solid var(--hair); }
-  .stat:first-child { padding-left: 0; border-left: 0; }
-  .stat .k { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--ink-2); }
-  .stat .v { font-family: var(--serif); font-weight: 600; font-size: 40px; line-height: 1.05; font-variant-numeric: lining-nums tabular-nums; }
-  #sExpl { color: var(--accent); }
-  .stat .s { font-size: 12.5px; color: var(--ink-3); }
+  a { color: inherit; }
+  .sub { color: var(--ink-2); margin-bottom: 18px; }
+  section { margin-top: 28px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; padding: 10px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .ctl { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); }
+  .seg { display: inline-flex; flex-wrap: wrap; }
+  .seg button, .btn { font: inherit; font-size: 13px; background: #fff; color: var(--ink); border: 1px solid #999; padding: 3px 9px; margin-left: -1px; cursor: pointer; }
+  .seg button:first-child { margin-left: 0; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); position: relative; }
+  .btn { margin-left: 0; }
+  input[type=range] { accent-color: var(--accent); width: 110px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 4px 22px; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+  .stats b { font-family: var(--mono); font-weight: normal; color: var(--ink); font-size: 15px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
   canvas { width: 100%; display: block; }
-  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); }
-  .legend i { display: inline-block; width: 22px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 7px; }
-  .legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; margin-right: 7px; border: 2px solid; }
-  .note { font-size: 14px; color: var(--ink-2); max-width: 74ch; }
-  .verdict { font-family: var(--serif); font-size: 17px; color: var(--ink-2); min-height: 1.5em; }
-  .verdict b { color: var(--ink); }
-  .head { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; justify-content: space-between; }
-  .steps { font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
-
-  /* ---------- explainer pieces */
-  .rules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--hair); }
-  .rule { padding: 18px 22px 22px; display: grid; gap: 8px; align-content: start; border-left: 1px solid var(--hair); }
-  .rule:first-child { border-left: 0; padding-left: 0; }
-  .rule .n { font-family: var(--serif); font-weight: 900; font-size: 40px; line-height: 0.9; color: var(--accent); }
-  .rule h3 { font-size: 22px; }
-  .rule p { color: var(--ink-2); font-size: 14.5px; }
-  .prose { display: grid; gap: 12px; max-width: 70ch; }
-  .prose p { color: var(--ink-2); font-size: 16px; }
-  .prose p b { color: var(--ink); font-weight: 600; }
-  .prose > h3 + p::first-letter { font-family: var(--serif); font-weight: 900; float: left; font-size: 64px; line-height: 0.82; padding: 6px 10px 0 0; color: var(--accent); }
-  .relay { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--ink); color: var(--ground); }
-  .stage { padding: 20px 22px 22px; display: grid; gap: 6px; align-content: start; position: relative; border-left: 1px solid #3a3731; }
-  .stage:first-child { border-left: 0; }
-  .stage::after { content: "\2192"; position: absolute; right: 0; top: 22px; transform: translateX(50%); background: var(--ink); color: var(--accent); font-size: 18px; line-height: 1; padding: 2px 0; z-index: 1; }
-  .stage:last-child::after { content: none; }
-  .stage .cnt { font-family: var(--serif); font-weight: 900; font-size: 48px; line-height: 1; }
-  .stage .nm { font-weight: 700; font-size: 15px; }
-  .stage p { font-size: 13.5px; color: #c9c1b0; }
-  .stage .sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 7px; vertical-align: 1px; box-shadow: 0 0 0 1.5px var(--ground); }
-  .callout { background: var(--accent); color: #fff; padding: 34px 36px 36px; display: grid; gap: 12px; }
-  .callout .eyebrow { font-family: var(--serif); font-style: italic; font-size: 18px; color: #ffd9d2; }
-  .callout .big { font-family: var(--serif); font-weight: 900; font-size: clamp(30px, 4.4vw, 52px); line-height: 1.04; letter-spacing: -0.015em; max-width: 22ch; }
-  .callout p { color: #ffe9e5; max-width: 72ch; font-size: 16px; }
-  .table-wrap { overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
-  th { text-align: left; font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--ink-2); font-size: 14px; padding: 6px 12px 8px 0; border-bottom: 1.5px solid var(--ink); }
-  td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--hair); vertical-align: top; }
-  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  td.ids { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2); }
-  .pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border: 1.5px solid var(--ink-3); color: var(--ink-2); white-space: nowrap; }
-  .pill.ok { color: #fff; background: var(--good); border-color: var(--good); }
-  ul.clean { margin: 0; padding-left: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 40px; color: var(--ink-2); counter-reset: m; }
-  ul.clean li { counter-increment: m; position: relative; padding-left: 44px; }
-  ul.clean li::before { content: counter(m, upper-roman) "."; position: absolute; left: 0; top: -2px; font-family: var(--serif); font-weight: 800; font-size: 20px; color: var(--accent); }
-  ul.clean b { color: var(--ink); }
-  code { font-family: var(--mono); font-size: 0.92em; }
-
-  /* ---------- colophon */
-  .colophon { background: var(--night); color: #b9b1a1; }
-  .colophon-in { max-width: 1180px; margin: 0 auto; padding: 34px 24px 40px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 40px; font-size: 13px; line-height: 1.65; }
-  .colophon p { max-width: 86ch; }
-  .colophon .sig { font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--ground); text-align: right; }
-  .colophon .sig a { display: block; font-family: var(--sans); font-style: normal; font-size: 13px; color: #b9b1a1; margin-top: 4px; }
-  .colophon a:hover { color: var(--accent); }
-
-  @media (max-width: 860px) {
-    .mast-body { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 30px 0 34px; }
-    .grid, .rules, ul.clean { grid-template-columns: minmax(0, 1fr); }
-    .games { grid-template-columns: minmax(0, 1fr); }
-    .game-card + .game-card { border-left: 0; border-top: 2px solid var(--ink); }
-    .rule { border-left: 0; padding-left: 0; border-top: 1px solid var(--hair); }
-    .rule:first-child { border-top: 0; }
-    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 0; }
-    .stat { padding-left: 0; border-left: 0; }
-    .relay { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .stage::after { content: none; }
-    .actions { margin-left: 0; }
-    .callout { padding: 24px 22px 26px; }
-    .colophon-in { grid-template-columns: minmax(0, 1fr); }
-    .colophon .sig { text-align: left; }
-  }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+  .legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 5px; }
+  .legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; vertical-align: middle; margin-right: 5px; border: 2px solid; }
+  .verdict { font-size: 13px; color: var(--ink-2); min-height: 1.5em; }
+  .head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; }
+  .steps { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+  .cap { font-size: 13px; color: var(--ink-2); margin-top: 6px; }
+  footer { margin-top: 36px; padding-top: 10px; border-top: 1px solid var(--rule); font-size: 12px; color: var(--ink-3); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-
-<header class="mast">
-  <div class="mast-in">
-    <div class="mast-top"><span>Multi-agent reinforcement learning on the fruit-fly connectome</span><a href="https://github.com/pandasuwu/Multi_Agent_RL-FAI-">Source on GitHub &rarr;</a></div>
-    <div class="mast-body">
-      <div>
-        <p class="kicker">The Give-Up Game Lab</p>
-        <h1>When should a fly <em>give up?</em></h1>
-        <p class="lede">Two male fruit flies fighting over food have to decide when to give up, and Ventimiglia et al. (2026) found the circuit that makes that call. Here, learning agents play the same war of attrition with policy networks wired like that circuit, a shuffled copy, a random graph, or a plain MLP.</p>
-      </div>
-      <ul class="facts" aria-label="Circuit size">
-        <li><b id="fNeurons">258</b><span>neurons</span></li>
-        <li><b id="fEdges">4,952</b><span>connections</span></li>
-      </ul>
-    </div>
-  </div>
-</header>
-
-<nav class="tabs" role="tablist" aria-label="Sections">
-  <div class="tabs-in">
-    <button role="tab" id="t-lab" aria-controls="lab" aria-selected="true">Live lab</button>
-    <button role="tab" id="t-game" aria-controls="game" aria-selected="false">The game</button>
-    <button role="tab" id="t-circuit" aria-controls="circuit" aria-selected="false">The fly circuit</button>
-    <button role="tab" id="t-findings" aria-controls="findings" aria-selected="false">Findings</button>
-  </div>
-</nav>
-
 <div class="wrap">
+  <h1>Give-Up Game Lab</h1>
+  <p class="sub">Learning agents play the war of attrition with brains wired like the fruit-fly give-up circuit (<span id="fNeurons">258</span> neurons, <span id="fEdges">4,952</span> connections) or its controls. <a href="https://github.com/pandasuwu/Multi_Agent_RL-FAI-">Code and results</a>.</p>
 
-  <!-- ================================================================ LIVE LAB -->
-  <section role="tabpanel" id="lab" aria-labelledby="t-lab">
-    <div class="games" id="gameCards" role="group" aria-label="Choose a game">
-      <button class="game-card" data-v="A" aria-pressed="true">
-        <span class="tag">Game A</span><span class="ttl">Same prize for both</span>
-        <span class="dsc">The food is worth 1 to both flies. Best play: quit at a random moment, 1 second on average. This is the game real flies play.</span>
-      </button>
-      <button class="game-card" data-v="B" aria-pressed="false">
-        <span class="tag">Game B</span><span class="ttl">Secret values</span>
-        <span class="dsc">Each fly privately knows how much it wants the food (v). Best play: wait exactly v&sup2;/2 seconds. The brain must turn a value into a waiting time.</span>
-      </button>
-    </div>
-
-    <section class="controls" aria-label="Simulation controls">
-      <div class="ctl"><span>Brain</span>
-        <div class="seg" id="brain" role="group" aria-label="Brain type">
-          <button data-v="fly" aria-pressed="true">Fly circuit</button>
-          <button data-v="shuffled" aria-pressed="false">Shuffled fly</button>
-          <button data-v="random" aria-pressed="false">Random sparse</button>
-          <button data-v="dense" aria-pressed="false">Ordinary net</button>
-          <button data-v="table" aria-pressed="false">Look-up table</button>
-        </div>
+  <div class="controls">
+    <div class="ctl">Game
+      <div class="seg" id="gameCards" role="group" aria-label="Game">
+        <button class="game-card" data-v="A" aria-pressed="true" title="Prize worth 1 to both">A: same prize</button>
+        <button class="game-card" data-v="B" aria-pressed="false" title="Each player privately knows its value v">B: secret values</button>
       </div>
-      <div class="ctl"><span>Losses count</span>
-        <div class="seg" id="rho" role="group" aria-label="How much more players learn from a loss than a win">
-          <button data-v="1" aria-pressed="true">1&times;</button>
-          <button data-v="2" aria-pressed="false">2&times;</button>
-          <button data-v="4" aria-pressed="false">4&times;</button>
-          <button data-v="8" aria-pressed="false">8&times;</button>
-        </div>
+    </div>
+    <div class="ctl">Brain
+      <div class="seg" id="brain" role="group" aria-label="Brain type">
+        <button data-v="fly" aria-pressed="true">Fly circuit</button>
+        <button data-v="shuffled" aria-pressed="false">Shuffled</button>
+        <button data-v="random" aria-pressed="false">Random</button>
+        <button data-v="dense" aria-pressed="false">MLP</button>
+        <button data-v="table" aria-pressed="false">Table</button>
       </div>
-      <div class="ctl"><span>Players</span>
-        <div class="seg" id="players" role="group" aria-label="Number of players">
-          <button data-v="2" aria-pressed="false">2, fixed pair</button>
-          <button data-v="8" aria-pressed="true">8, shuffled</button>
-          <button data-v="16" aria-pressed="false">16, shuffled</button>
-        </div>
+    </div>
+    <div class="ctl">Loss weight
+      <div class="seg" id="rho" role="group" aria-label="Loss weight">
+        <button data-v="1" aria-pressed="true">1&times;</button>
+        <button data-v="2" aria-pressed="false">2&times;</button>
+        <button data-v="4" aria-pressed="false">4&times;</button>
+        <button data-v="8" aria-pressed="false">8&times;</button>
       </div>
-      <div class="ctl"><span>Speed</span>
-        <input id="speed" type="range" min="1" max="30" value="8" aria-label="Rounds per frame">
+    </div>
+    <div class="ctl">Players
+      <div class="seg" id="players" role="group" aria-label="Number of players">
+        <button data-v="2" aria-pressed="false">2</button>
+        <button data-v="8" aria-pressed="true">8</button>
+        <button data-v="16" aria-pressed="false">16</button>
       </div>
-      <div class="actions">
-        <button class="btn" id="play">Pause</button>
-        <button class="btn ghost" id="reset">Reset</button>
-      </div>
-    </section>
-
-    <div class="grid">
-      <section class="panel full" aria-label="Current state">
-        <div class="stats">
-          <div class="stat"><span class="k">Practice rounds</span><span class="v" id="sRound">0</span><span class="s" id="sMatches">0 fights</span></div>
-          <div class="stat"><span class="k">Learning speed</span><span class="v" id="sLr">100%</span><span class="s">cools to 5% by round 3,000</span></div>
-          <div class="stat"><span class="k">Exploitability</span><span class="v" id="sExpl">&ndash;</span><span class="s">0 = unbeatable</span></div>
-          <div class="stat"><span class="k" id="kMean">Mean quit time</span><span class="v" id="sMean">&ndash;</span><span class="s" id="sMeanSub">ideal: 1.00</span></div>
-          <div class="stat"><span class="k">Players differ by</span><span class="v" id="sSpread">&ndash;</span><span class="s">spread of their mean quit times</span></div>
-        </div>
-      </section>
-
-      <section class="panel full" aria-label="Arena">
-        <div class="head"><h2>Arena: one fight at a time</h2><span class="steps" id="arenaClock"></span></div>
-        <canvas id="cArena" height="270" role="img" aria-label="Two flies fighting over food; the loser walks away"></canvas>
-        <div class="verdict" id="verdict" aria-live="polite"></div>
-        <p class="note" id="arenaNote"></p>
-      </section>
-
-      <section class="panel" aria-label="Exploitability over time">
-        <h2>How beatable are the players?</h2>
-        <canvas id="cExpl" height="250" role="img" aria-label="Exploitability against practice rounds, log scale"></canvas>
-        <div class="legend">
-          <span><i style="border-color:var(--accent)"></i>average player</span>
-          <span><i style="border-color:var(--ink-3);border-top-style:dashed"></i>whole population, as one mixed strategy</span>
-          <span id="predExplLegend" hidden><i style="border-color:var(--predict);border-top-style:dotted"></i>where theory says learning settles</span>
-        </div>
-        <p class="note">Exploitability is how much a perfect opponent could win from you, computed exactly over all 64 possible quitting times. With luck-driven learning it levels off above 0. Independent learners also drift apart (some quit early, some late) while the group as a whole stays near the ideal. With a fixed pair of 2, one player usually ends up always giving in.</p>
-      </section>
-
-      <section class="panel" aria-label="Learned strategy">
-        <h2 id="chartTitle"></h2>
-        <canvas id="cStrat" height="250" role="img" aria-label="The learned strategy compared with the perfect one"></canvas>
-        <div class="legend" id="stratLegend"></div>
-        <p class="note" id="stratNote"></p>
-      </section>
-
-      <section class="panel full" aria-label="Brain activity">
-        <div class="head"><h2>Inside player 1's brain</h2><span class="steps" id="stepLbl"></span></div>
-        <canvas id="cCirc" height="250" role="img" aria-label="Activity of the 258 circuit neurons, grouped by role"></canvas>
-        <p class="note" id="circNote"></p>
-      </section>
     </div>
-  </section>
-
-  <!-- ================================================================ THE GAME -->
-  <section role="tabpanel" id="game" aria-labelledby="t-game" hidden>
-    <div class="prose">
-      <h3>A waiting contest where both sides pay</h3>
-      <p>In a war of attrition both players pay for every second the contest lasts, and whoever quits first loses the prize. Male fruit flies fighting over food are a textbook case.</p>
-    </div>
-    <div class="rules">
-      <div class="rule"><span class="n">Rule 1</span><h3>Both pay while it lasts</h3><p>Every second of fighting costs each player 1, no matter who ends up winning.</p></div>
-      <div class="rule"><span class="n">Rule 2</span><h3>First to quit loses</h3><p>The moment one player gives up, the other gets the prize (worth 1 in Game A).</p></div>
-      <div class="rule"><span class="n">Rule 3</span><h3>The winner still paid</h3><p>A long fight can cost more than the prize is worth, so holding on forever is a bad plan too.</p></div>
-    </div>
-
-    <div class="grid">
-      <section class="panel" aria-label="Can you beat the perfect strategy">
-        <h2>Can you beat the perfect strategy?</h2>
-        <div class="seg" id="oppPick" role="group" aria-label="Opponent">
-          <button data-v="ideal" aria-pressed="true">Perfect random quitter</button>
-          <button data-v="early" aria-pressed="false">Always quits at 0.5 s</button>
-          <button data-v="late" aria-pressed="false">Always quits at 2 s</button>
-          <button data-v="lab" aria-pressed="false">The lab's players now</button>
-        </div>
-        <canvas id="cBeat" height="240" role="img" aria-label="Your expected payoff for each quitting time against the chosen opponent"></canvas>
-        <p class="note" id="beatNote"></p>
-      </section>
-
-      <section class="panel" aria-label="Why random">
-        <h2>Why quitting at random is unbeatable</h2>
-        <div class="prose">
-          <p>If you always quit at the same time, the opponent waits one tick longer and wins. The equilibrium instead keeps a constant hazard of quitting, however long the fight has gone on.</p>
-          <p>That makes the opponent indifferent between all quitting times. With V = c = 1 the quit time is exponential, P(still fighting at t) = e<sup>&minus;t</sup>, mean 1. Against it the payoff curve on the left is flat.</p>
-          <p>Ventimiglia et al. (2026) report the same exponential shape in real fly fight durations.</p>
-        </div>
-      </section>
-
-      <section class="panel" aria-label="Game B">
-        <h2>Game B: when each player wants it differently</h2>
-        <canvas id="cBid" height="220" role="img" aria-label="The perfect waiting time v squared over 2 for each value v"></canvas>
-        <p class="note">Each player privately knows how much it values the prize, v. The equilibrium bid is b(v) = v&sup2;/2, so v = 0.5 quits at 0.125 and v = 3 holds on until 4.5.</p>
-      </section>
-
-      <section class="panel" aria-label="Losses hurt more">
-        <h2>What if losses teach more than wins?</h2>
-        <canvas id="cRho" height="220" role="img" aria-label="Predicted quit-time survival curves for different loss weightings"></canvas>
-        <div class="legend" id="rhoLegend"></div>
-        <p class="note">Flies seem to learn more from losses than wins. If the learners do too, they settle somewhere other than the equilibrium: more immediate quits and a heavier tail (docs/theory.md &sect;3).</p>
-      </section>
-    </div>
-  </section>
-
-  <!-- ================================================================ THE FLY CIRCUIT -->
-  <section role="tabpanel" id="circuit" aria-labelledby="t-circuit" hidden>
-    <div class="prose">
-      <h3>The fly's give-up relay</h3>
-      <p>A fly gives up when a short relay of neurons shuts down its aggression neurons. The subgraph below is cut out of the MaleCNS v1.0 connectome with every connection kept.</p>
-    </div>
-    <div class="relay" aria-label="The relay, stage by stage">
-      <div class="stage"><span class="cnt">16</span><span class="nm"><span class="sw" style="background:var(--c-fly)"></span>PPL1 cells</span><p>Send dopamine, a &ldquo;this is going badly&rdquo; signal. The players' context enters here.</p></div>
-      <div class="stage"><span class="cnt">6</span><span class="nm"><span class="sw" style="background:var(--rival)"></span>MBON18 &amp; 19</span><p>Output cells of the mushroom body, the fly's learning centre. They receive the dopamine signal.</p></div>
-      <div class="stage"><span class="cnt">54</span><span class="nm"><span class="sw" style="background:var(--ink-3)"></span>Path neurons</span><p>Every cell on a short (up to 3-step) path from the MBONs to the aggression cells.</p></div>
-      <div class="stage"><span class="cnt">5</span><span class="nm"><span class="sw" style="background:var(--eye)"></span>Tk / AVLP727m</span><p>The aggression cells that keep a fly fighting. The players' quitting strategy is read out here.</p></div>
-    </div>
-    <p class="note">That exact circuit has 81 cells, so I added the 177 cells most strongly connected to it (one step out), giving 258 cells. Kenyon cells, the mushroom body's main input, are left out because no single one is strongly connected.</p>
-
-    <section class="panel" aria-label="Wiring map">
-      <div class="head"><h2>All 4,952 connections</h2>
-        <div class="seg" id="wirePick" role="group" aria-label="Which wiring">
-          <button data-v="connectome" aria-pressed="true">Real fly wiring</button>
-          <button data-v="rewired" aria-pressed="false">Shuffled fly</button>
-          <button data-v="random_sparse" aria-pressed="false">Random sparse</button>
-        </div>
-      </div>
-      <canvas id="cWire" height="320" role="img" aria-label="Every connection of the circuit, drawn between groups of neurons"></canvas>
-      <p class="note" id="wireNote"></p>
-    </section>
-
-    <div class="grid">
-      <section class="panel" aria-label="How the controls differ">
-        <h2>The two fair copies</h2>
-        <div class="table-wrap"><table id="statTable"></table></div>
-        <p class="note">Same cells, same number of connections, same size of brain. The shuffled copy even keeps how many connections each cell has, and only changes <i>who</i> connects to <i>whom</i>. The real wiring is far more reciprocal (cells that talk back to each other) and clustered than either copy.</p>
-      </section>
-      <section class="panel" aria-label="Exact cell identities">
-        <h2>Exactly which cells</h2>
-        <div class="table-wrap"><table id="idTable"></table></div>
-        <p class="note" id="idNote"></p>
-      </section>
-    </div>
-  </section>
-
-  <!-- ================================================================ FINDINGS -->
-  <section role="tabpanel" id="findings" aria-labelledby="t-findings" hidden>
-    <div class="callout">
-      <span class="big">The wiring made no difference to final exploitability.</span>
-      <p>In both games and both training modes, the real circuit ended up where the shuffled and random graphs did. The loss-weighted learning rule mattered; the wiring did not. Full numbers in RESULTS.md.</p>
-    </div>
-
-    <section class="panel" aria-label="Final exploitability by brain">
-      <div class="head"><h2>How close each brain got to perfect</h2><span class="steps">mean and 95% range over repeated runs; lower is better</span></div>
-      <canvas id="cFind" height="380" role="img" aria-label="Final exploitability of each brain in four settings, with confidence intervals"></canvas>
-      <div class="legend">
-        <span><span class="dot" style="border-color:var(--c-fly);background:var(--c-fly)"></span>filled = unconstrained</span>
-        <span><span class="dot" style="border-color:var(--c-fly)"></span>hollow = &ldquo;go/stop&rdquo; signs kept (Dale's law)</span>
-        <span><i style="border-color:var(--ink);border-top-style:dotted"></i>perfect player on this grid</span>
-      </div>
-    </section>
-
-    <div class="grid">
-      <section class="panel" aria-label="Fly wiring versus its copies">
-        <h2>Fly wiring minus its fair copies</h2>
-        <div class="table-wrap"><table id="contrastTable"></table></div>
-        <p class="note">Difference in final exploitability with its 95% range. A range that includes 0 means no detectable difference. For the practice-by-playing settings, all circuit brains used the same learning speed, so wiring is the only thing that differs.</p>
-      </section>
-      <section class="panel" aria-label="Losses count more">
-        <h2>Losses count more: theory vs learners</h2>
-        <canvas id="cAsym" height="240" role="img" aria-label="Final exploitability against loss weighting, observed and predicted"></canvas>
-        <div class="legend">
-          <span><i style="border-color:var(--predict);border-top-style:dashed"></i>predicted before running</span>
-          <span><i style="border-color:var(--accent)"></i>learners, average of all brains (bar = range across brains)</span>
-        </div>
-        <p class="note">Every kind of brain moved away from the perfect strategy by about the amount the math predicted, plus the usual noise floor. It also produced a small loser effect: after losing, players quit a little earlier. Wiring changed neither.</p>
-      </section>
-    </div>
-
-    <section class="panel" aria-label="Method">
-      <h2>How the study worked</h2>
-      <ul class="clean">
-        <li><b>Agents:</b> learning players, each with its own brain, choosing when to quit. Two ways to practise: exact self-play (noise-free) and a population of 8 players who learn only from their own fights (multi-agent reinforcement learning, REINFORCE with a baseline).</li>
-        <li><b>Fair comparison:</b> every network brain has the same number of adjustable settings (5,584 to 5,610), and each is tested against a shuffled copy that keeps every cell's number of connections, and a random copy.</li>
-        <li><b>Score:</b> exploitability, how much a perfect opponent could win from you, computed exactly. 10 to 20 repeated runs per setting, reported with 95% ranges and corrected for many comparisons.</li>
-        <li><b>Limits:</b> practising by playing never gets exploitability all the way to 0 (luck); only one way of cutting out the circuit was tested; the go/stop signs are predictions from the brain images.</li>
-      </ul>
-    </section>
-  </section>
-
-</div>
-
-<footer class="colophon">
-  <div class="colophon-in">
-    <p>Wiring: 258 neurons and 4,952 connections from the MaleCNS v1.0 male fruit-fly connectome (Berg et al., Cell 2026, CC-BY 4.0), around the give-up circuit of Ventimiglia et al. 2026 (bioRxiv). Findings are from the project's full experiment grid (<a href="https://github.com/pandasuwu/Multi_Agent_RL-FAI-/tree/main/results/tables">results/tables</a>). The live lab uses a smaller setup (64 fights per round, 10 value levels in Game B) and runs entirely in your browser; nothing in it is pre-recorded.</p>
-    <p class="sig">Suhani &middot; IIT Gandhinagar<a href="https://github.com/pandasuwu/Multi_Agent_RL-FAI-/blob/main/RESULTS.md">Full write-up: RESULTS.md</a></p>
+    <div class="ctl">Speed <input id="speed" type="range" min="1" max="30" value="8" aria-label="Rounds per frame"></div>
+    <div class="ctl"><button class="btn" id="play">Pause</button><button class="btn" id="reset">Reset</button></div>
   </div>
-</footer>
+
+  <div class="stats">
+    <span>Round <b id="sRound">0</b></span>
+    <span>Exploitability <b id="sExpl">&ndash;</b></span>
+    <span><span id="kMean">Mean quit time</span> <b id="sMean">&ndash;</b> <span id="sMeanSub"></span></span>
+    <span>Spread <b id="sSpread">&ndash;</b></span>
+    <span>Learning rate <b id="sLr">100%</b></span>
+    <span hidden id="sMatches"></span>
+  </div>
+
+  <section>
+    <div class="head"><h2>One fight</h2><span class="steps" id="arenaClock"></span></div>
+    <canvas id="cArena" height="230" role="img" aria-label="Two flies fighting over food"></canvas>
+    <div class="verdict" id="verdict" aria-live="polite"></div>
+  </section>
+
+  <section class="grid">
+    <div>
+      <h2>Exploitability</h2>
+      <canvas id="cExpl" height="230" role="img" aria-label="Exploitability against rounds, log scale"></canvas>
+      <div class="legend">
+        <span><i style="border-color:var(--accent)"></i>average player</span>
+        <span><i style="border-color:var(--ink-3);border-top-style:dashed"></i>population</span>
+        <span id="predExplLegend" hidden><i style="border-color:var(--predict);border-top-style:dotted"></i>predicted</span>
+      </div>
+    </div>
+    <div>
+      <h2 id="chartTitle"></h2>
+      <canvas id="cStrat" height="230" role="img" aria-label="Learned strategy vs the equilibrium"></canvas>
+      <div class="legend" id="stratLegend"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Player 1's brain</h2><span class="steps" id="stepLbl"></span></div>
+    <canvas id="cCirc" height="230" role="img" aria-label="Activity of the circuit neurons"></canvas>
+  </section>
+
+  <section>
+    <h2>Results from the full runs</h2>
+    <canvas id="cFind" height="380" role="img" aria-label="Final exploitability of each brain in four settings"></canvas>
+    <div class="legend">
+      <span><span class="dot" style="border-color:var(--c-fly);background:var(--c-fly)"></span>unconstrained</span>
+      <span><span class="dot" style="border-color:var(--c-fly)"></span>signed (Dale's law)</span>
+      <span><i style="border-color:var(--ink);border-top-style:dotted"></i>best possible on this grid</span>
+    </div>
+    <p class="cap">Final exploitability, mean and 95% CI over seeds; lower is better. Details in <a href="https://github.com/pandasuwu/Multi_Agent_RL-FAI-/blob/main/RESULTS.md">RESULTS.md</a>.</p>
+  </section>
+
+  <footer>Wiring from the MaleCNS v1.0 connectome (Berg et al., Cell 2026), around the give-up circuit of Ventimiglia et al. 2026. The live part runs a small version in your browser. Suhani, IIT Gandhinagar.</footer>
+</div>
 
 <script>
 "use strict";
 const DATA = /*__DATA__*/null;
 if (!DATA) { // the unbuilt template: point to the real page instead of failing silently
-  document.querySelector(".wrap").innerHTML = '<div class="prose"><h3>Source template</h3><p>This file has no data yet. Build the site with <code>python scripts/build_demo.py</code>, or open the published demo.</p></div>';
+  document.querySelector(".wrap").innerHTML = '<h1>Source template</h1><p>No data yet: run <code>python scripts/build_demo.py</code>.</p>';
   throw new Error("template without data: run scripts/build_demo.py");
 }
 const NB = DATA.nBins, TMAX = DATA.tMax, DT = TMAX / (NB - 1);
@@ -712,17 +387,10 @@ function record() {
 function describeGame() {
   const A = S.game === "A";
   document.querySelectorAll("#gameCards .game-card").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === S.game)));
-  document.getElementById("chartTitle").textContent = A ? "Chance a player is still fighting at time t" : "How long players wait, by how much they want the food";
+  document.getElementById("chartTitle").textContent = A ? "Still fighting at time t" : "Waiting time vs value v";
   document.getElementById("stratLegend").innerHTML = A
     ? '<span><i style="border-color:var(--ideal);border-top-style:dotted"></i>perfect strategy, e<sup>&minus;t</sup></span><span><i style="border-color:var(--accent)"></i>population</span><span><i style="border-color:var(--accent);opacity:.35"></i>individual players</span>' + (S.rho > 1 ? '<span><i style="border-color:var(--predict);border-top-style:dashed"></i>predicted with lopsided learning</span>' : "")
     : '<span><i style="border-color:var(--ideal);border-top-style:dotted"></i>perfect strategy, v<sup>2</sup>/2</span><span><i style="border-color:var(--accent)"></i>population average</span><span><i style="border-color:var(--accent);opacity:.35"></i>individual players</span>';
-  document.getElementById("stratNote").textContent = A
-    ? "On this log scale the perfect strategy is a straight line. That is the same pattern Ventimiglia et al. found in real fly fights."
-    : "Each dot is one of the 10 value levels used here (the study used 50). The highest-value players learn slowest: they are rarely in fights that last that long, so they get little feedback. The study found the same.";
-  document.getElementById("arenaNote").textContent = (A
-    ? "Player 1 fights a random opponent from the population. "
-    : "Player 1 fights a random opponent. Each fly's secret value is shown only to you; the flies cannot see each other's. ")
-    + "Every tick (0.127 s of fighting) each fly decides “keep going or leave?” with the give-up chance shown. Deciding step by step is exactly the same game as picking a quitting time in advance, so the arena and the charts always agree. The pushing is only for show: nothing but time decides the winner.";
   document.getElementById("kMean").textContent = A ? "Mean quit time" : "Waiting-time error";
   document.getElementById("sMeanSub").textContent = A ? "ideal: 1.00" : "average gap from v²/2, ideal 0";
   document.getElementById("predExplLegend").hidden = !(A && S.rho > 1);
@@ -823,7 +491,7 @@ function bidChart(g, w, h, pad, withLearners, mixP) {
   g.restore();
 }
 
-// ---------- circuit layout (shared by the lab's brain view and the circuit tab)
+// ---------- circuit layout for the brain view
 const GROUPS = [
   { key: "ppl1", label: "PPL1 (16)", sub: "dopamine input", x: 0.07, color: "--c-fly" },
   { key: "mbon", label: "MBON18/19 (6)", sub: "mushroom body", x: 0.25, color: "--rival" },
@@ -848,29 +516,23 @@ function groupLabels(g, w) {
   g.textAlign = "center"; g.textBaseline = "top";
   for (const Gp of GROUPS) {
     const x = Math.min(Math.max(Gp.x * w, 50), w - 50);
-    g.fillStyle = css("--ink-2"); g.font = "600 11.5px " + css("--cond"); g.fillText(Gp.label, x, 2);
-    g.fillStyle = css("--ink-3"); g.font = "10.5px " + css("--sans"); g.fillText(Gp.sub, x, 16);
+    const short = w < 600; // narrow screens: names only, no counts or subtitles, so they don't collide
+    g.fillStyle = css("--ink-2"); g.font = "600 " + (short ? 10 : 11.5) + "px " + css("--cond");
+    g.fillText(short ? Gp.label.replace(/\s*\(\d+\)$/, "").replace(/^neighbours$/, "nbrs").replace(/^path neurons$/, "path").replace(/\/.*$/, "") : Gp.label, x, 2);
+    if (!short) { g.fillStyle = css("--ink-3"); g.font = "10.5px " + css("--sans"); g.fillText(Gp.sub, x, 16); }
   }
 }
 let nodePos = [], circStep = 1, circBase = null;
 function drawCircuitBase() {
   const c = document.getElementById("cCirc"), [g, w, h] = setupCanvas(c);
   nodePos = layoutNodes(w, h, 34);
-  const isCircuit = !["table", "dense"].includes(S.brain);
-  if (isCircuit) {
+  if (!["table", "dense"].includes(S.brain)) {
     g.strokeStyle = css("--ink-3"); g.globalAlpha = 0.05; g.lineWidth = 0.6; g.beginPath();
     for (const [a, b] of graphEdges) { g.moveTo(nodePos[a][0], nodePos[a][1]); g.lineTo(nodePos[b][0], nodePos[b][1]); }
     g.stroke(); g.globalAlpha = 1;
   }
   groupLabels(g, w);
   circBase = g.getImageData(0, 0, c.width, c.height);
-  document.getElementById("circNote").textContent = isCircuit
-    ? (S.brain === "fly"
-      ? "Real fly wiring. Faint lines are the 4,952 connections. Dots light up as the signal spreads from the dopamine neurons, one synaptic step at a time, before the Tk neurons set the quitting strategy." + (S.game === "B" ? " The input is player 1's value in the current fight." : "")
-      : S.brain === "shuffled"
-        ? "Same neurons, and every neuron keeps its number of connections, but who connects to whom is shuffled. This control tests whether the fly's exact wiring matters."
-        : "Same neurons and the same number of connections, placed at random. This control tests whether sparseness alone matters.")
-    : "This brain has no fly wiring (" + (S.brain === "dense" ? "a standard fully connected network of about the same size" : "just a list of 64 chances per value") + "). Pick a fly-style brain to see circuit activity.";
 }
 function drawCircuit() {
   const c = document.getElementById("cCirc"), g = c.getContext("2d");
@@ -1014,90 +676,7 @@ function drawArena(now) {
     R.phase === "enter" ? "fight starts soon" : "t = " + (R.phase === "leave" ? R.endT : R.t).toFixed(2) + " s";
 }
 
-// ================================================================ THE GAME tab
-let opp = "ideal";
-function pointMass(t) { const p = new Float64Array(NB); p[Math.round(t / DT)] = 1; return p; }
-function drawBeat() {
-  const [g, w, h] = setupCanvas(document.getElementById("cBeat"));
-  const pad = { l: 52, r: 12, t: 12, b: 40 };
-  const q = opp === "ideal" ? Float64Array.from(DATA.ideal) : opp === "early" ? pointMass(0.5) : opp === "late" ? pointMass(2) : marginal((lastMix || [Float64Array.from(DATA.ideal)]).slice(0, S.game === "A" ? 1 : undefined));
-  const f = payoffsVs(q, 1), xmax = 5;
-  const fx = t => pad.l + (t / xmax) * (w - pad.l - pad.r), fy = u => pad.t + (1 - (u + 1) / 2) * (h - pad.t - pad.b);
-  axes(g, w, h, pad, [0, 1, 2, 3, 4, 5].map(v => [v, String(v)]), [[-1, "-1"], [-0.5, "-0.5"], [0, "0"], [0.5, "0.5"], [1, "1"]], "your quitting time (s)", "your average payoff", fx, fy);
-  g.save(); clipTo(g, pad, w, h);
-  g.strokeStyle = css("--ink-3"); g.lineWidth = 1; g.beginPath(); g.moveTo(pad.l, fy(0)); g.lineTo(w - pad.r, fy(0)); g.stroke();
-  g.strokeStyle = css("--accent"); g.lineWidth = 2.4; g.beginPath();
-  for (let i = 0; i < NB && TIMES[i] <= xmax + DT; i++) { const x = fx(TIMES[i]), y = fy(Math.max(-1, Math.min(1, f[i]))); i ? g.lineTo(x, y) : g.moveTo(x, y); }
-  g.stroke();
-  let best = 0; for (let i = 0; i < NB; i++) if (f[i] > f[best]) best = i;
-  g.fillStyle = css("--accent"); g.beginPath(); g.arc(fx(TIMES[best]), fy(f[best]), 5, 0, 7); g.fill();
-  g.restore();
-  const spread = Math.max(...f.slice(0, 40)) - Math.min(...f.slice(0, 40));
-  document.getElementById("beatNote").innerHTML = opp === "ideal"
-    ? "Against the perfect random quitter the line is <b>flat</b> (it varies by only " + spread.toFixed(3) + "): whatever you do, you earn the same. There is nothing to exploit."
-    : opp === "early" ? "This opponent always quits at 0.5 s, so waiting just past it wins every time. Best reply: quit at " + TIMES[best].toFixed(2) + " s, earning " + f[best].toFixed(2) + " per fight."
-      : opp === "late" ? "This opponent always holds on until 2 s. Fighting it costs more than the prize, so the best reply is to give up at once (earning " + f[best].toFixed(2) + ")."
-        : "Against the lab's current players (if the food is worth 1 to you), the best reply is to quit at " + TIMES[best].toFixed(2) + " s, earning " + f[best].toFixed(3) + ". The flatter the line, the closer they are to perfect.";
-}
-function drawGameStatic() {
-  const [g1, w1, h1] = setupCanvas(document.getElementById("cBid"));
-  bidChart(g1, w1, h1, { l: 52, r: 16, t: 14, b: 40 }, false, null);
-  const [g2, w2, h2] = setupCanvas(document.getElementById("cRho"));
-  const cols = { 1: css("--ideal"), 2: css("--c-shuf"), 4: css("--predict"), 8: css("--c-rand") };
-  survivalChart(g2, w2, h2, { l: 52, r: 12, t: 10, b: 40 }, [1, 2, 4, 8].map(r => [DATA.predicted[r], cols[r], r === 1 ? 2.2 : 1.8, r === 1 ? [] : [6, 3], 1]));
-  document.getElementById("rhoLegend").innerHTML = [1, 2, 4, 8].map(r =>
-    '<span><i style="border-color:' + cols[r] + ';border-top-style:' + (r === 1 ? "solid" : "dashed") + '"></i>' + (r === 1 ? "balanced (perfect strategy)" : "losses count " + r + "×") + "</span>").join("");
-  drawBeat();
-}
-
-// ================================================================ THE FLY CIRCUIT tab
-let wire = "connectome";
-const WIRES = {};
-function wireEdges(kind) {
-  if (!WIRES[kind]) {
-    const keep = seed; seed = 777; // separate, fixed draws so this tab never disturbs the lab
-    WIRES[kind] = kind === "connectome" ? REAL : kind === "rewired" ? rewire(REAL) : randomSparse(REAL.length);
-    seed = keep;
-  }
-  return WIRES[kind];
-}
-function drawWire() {
-  const [g, w, h] = setupCanvas(document.getElementById("cWire"));
-  const pos = layoutNodes(w, h, 36), edges = wireEdges(wire);
-  const colorOf = {}; for (const Gp of GROUPS) colorOf[Gp.key] = css(Gp.color);
-  g.lineWidth = 0.7;
-  for (const [a, b] of edges) {
-    const core = DATA.group[a] !== "expansion" && DATA.group[b] !== "expansion";
-    g.globalAlpha = core ? 0.22 : 0.05; g.strokeStyle = core ? css("--accent") : css("--ink-3");
-    g.beginPath(); g.moveTo(pos[a][0], pos[a][1]); g.lineTo(pos[b][0], pos[b][1]); g.stroke();
-  }
-  g.globalAlpha = 1;
-  for (let i = 0; i < N; i++) {
-    const grp = DATA.group[i], big = grp === "ppl1" || grp === "mbon" || grp === "tk";
-    g.beginPath(); g.arc(pos[i][0], pos[i][1], big ? 4.6 : 2.8, 0, 7); g.fillStyle = colorOf[grp]; g.fill();
-  }
-  groupLabels(g, w);
-  const st = DATA.graphStats.find(s => s.label === { connectome: "Real fly wiring", rewired: "Shuffled fly", random_sparse: "Random sparse" }[wire]);
-  document.getElementById("wireNote").innerHTML = (wire === "connectome"
-    ? "The real wiring. Connections among the core relay and path cells are highlighted; the rest are faint."
-    : wire === "rewired" ? "The shuffled copy: every cell keeps its number of incoming and outgoing connections, but the partners are swapped."
-      : "The random copy: the same number of connections, placed anywhere.")
-    + " Reciprocity " + st.reciprocity.toFixed(2) + ", clustering " + st.clustering.toFixed(2) + ", " + Math.round(100 * st.overlap) + "% of connections shared with the real wiring.";
-}
-function fillCircuitTables() {
-  const rows = DATA.graphStats.map(s => "<tr><td>" + s.label + "</td><td class='num'>" + s.edges.toLocaleString() + "</td><td>" + (s.degrees_kept ? "<span class='pill ok'>kept</span>" : "<span class='pill'>not kept</span>") +
-    "</td><td class='num'>" + s.reciprocity.toFixed(2) + "</td><td class='num'>" + s.clustering.toFixed(2) + "</td><td class='num'>" + Math.round(100 * s.overlap) + "%</td></tr>").join("");
-  document.getElementById("statTable").innerHTML = "<thead><tr><th>Wiring</th><th>Connections</th><th>Each cell's count</th><th>Reciprocity</th><th>Clustering</th><th>Same as real</th></tr></thead><tbody>" + rows + "</tbody>";
-  const order = ["PPL101", "PPL102", "PPL103", "PPL104", "PPL105", "PPL106", "PPL107", "PPL108", "MBON18", "MBON19", "AVLP727m"];
-  const ids = DATA.identities.slice().sort((a, b) => order.indexOf(a.type) - order.indexOf(b.type));
-  document.getElementById("idTable").innerHTML = "<thead><tr><th>Cell type</th><th>Cells</th><th>Transmitter</th><th>MaleCNS body IDs</th></tr></thead><tbody>" +
-    ids.map(r => "<tr><td>" + r.type + "</td><td class='num'>" + r.count + "</td><td>" + r.transmitter + "</td><td class='ids'>" + r.ids + "</td></tr>").join("") + "</tbody>";
-  const c = DATA.counts;
-  document.getElementById("idNote").textContent = "The paper identifies the Tk-GAL4FruM aggression cells as MaleCNS type AVLP727m. Subgraph: " + c.nodes + " neurons, " + c.edges.toLocaleString() + " connections, " + c.synapses_in_edges.toLocaleString() + " synapses (checksum " + DATA.sha + "). Every connection has at least 5 synapses.";
-  document.getElementById("fNeurons").textContent = c.nodes; document.getElementById("fEdges").textContent = c.edges.toLocaleString();
-}
-
-// ================================================================ FINDINGS tab
+// ---------- results chart (from results/tables)
 const ARM_STYLE = {
   tabular: ["Look-up table", "--c-table"], dense: ["Ordinary net", "--c-dense"], connectome: ["Fly circuit", "--c-fly"],
   rewired: ["Shuffled fly", "--c-shuf"], random_sparse: ["Random sparse", "--c-rand"],
@@ -1109,7 +688,7 @@ function drawFindings() {
   const [g, w, h] = setupCanvas(cf);
   const F = DATA.findings.per_arm;
   const panels = [["game_a_exact", "Game A, exact practice"], ["game_a_sampled", "Game A, learning by playing"], ["game_b_exact", "Game B, exact practice"], ["game_b_sampled", "Game B, learning by playing"]];
-  const narrow = w < 700, cols = narrow ? 1 : 2, labelW = narrow ? 118 : 132;
+  const narrow = w < 700, cols = narrow ? 1 : 2, labelW = narrow ? 142 : 150;
   const rows = Math.ceil(panels.length / cols), ph = h / rows, pw = w / cols;
   panels.forEach(([exp, title], k) => {
     const P = F[exp], x0 = (k % cols) * pw, y0 = Math.floor(k / cols) * ph;
@@ -1133,45 +712,7 @@ function drawFindings() {
     });
   });
 }
-function drawAsym() {
-  const [g, w, h] = setupCanvas(document.getElementById("cAsym"));
-  const pad = { l: 52, r: 16, t: 12, b: 40 }, A = DATA.findings.asym;
-  const fx = r => pad.l + (Math.log2(r) / 3) * (w - pad.l - pad.r), fy = v => pad.t + (1 - v / 0.18) * (h - pad.t - pad.b);
-  axes(g, w, h, pad, A.map(a => [a.rho, a.rho + "×"]), [0, 0.05, 0.1, 0.15].map(v => [v, v.toFixed(2)]), "how much more a loss counts than a win", "final exploitability", fx, fy);
-  g.strokeStyle = css("--predict"); g.setLineDash([6, 4]); g.lineWidth = 1.8; g.beginPath();
-  A.forEach((a, i) => { i ? g.lineTo(fx(a.rho), fy(a.predicted)) : g.moveTo(fx(a.rho), fy(a.predicted)); }); g.stroke(); g.setLineDash([]);
-  g.strokeStyle = css("--accent"); g.lineWidth = 2.2; g.beginPath();
-  A.forEach((a, i) => { i ? g.lineTo(fx(a.rho), fy(a.mean)) : g.moveTo(fx(a.rho), fy(a.mean)); }); g.stroke();
-  for (const a of A) {
-    g.lineWidth = 1.6; g.beginPath(); g.moveTo(fx(a.rho), fy(a.min)); g.lineTo(fx(a.rho), fy(a.max)); g.stroke();
-    g.fillStyle = css("--accent"); g.beginPath(); g.arc(fx(a.rho), fy(a.mean), 4.5, 0, 7); g.fill();
-    g.fillStyle = css("--predict"); g.fillRect(fx(a.rho) - 3.5, fy(a.predicted) - 3.5, 7, 7);
-  }
-}
-function fillContrasts() {
-  const fmt = v => (v >= 0 ? "+" : "−") + Math.abs(v).toPrecision(2);
-  const rows = DATA.findings.contrasts.map(c => "<tr><td>" + c.setting + "</td><td>" + c.contrast + "</td><td class='num'>" + fmt(c.diff) + " [" + fmt(c.lo) + ", " + fmt(c.hi) + "]</td><td>" +
-    (c.sig ? "<span class='pill'>detectable</span>" : "<span class='pill ok'>no difference</span>") + "</td></tr>").join("");
-  document.getElementById("contrastTable").innerHTML = "<thead><tr><th>Setting</th><th>Fly wiring</th><th>Difference [95% range]</th><th>Verdict</th></tr></thead><tbody>" + rows + "</tbody>";
-}
-
-// ================================================================ tabs, loop, controls
-const TABS = ["lab", "game", "circuit", "findings"];
-function showTab(name) {
-  if (!TABS.includes(name)) name = "lab";
-  S.tab = name;
-  for (const t of TABS) {
-    document.getElementById(t).hidden = t !== name;
-    document.getElementById("t-" + t).setAttribute("aria-selected", String(t === name));
-  }
-  if (name === "game") drawGameStatic();
-  if (name === "circuit") drawWire();
-  if (name === "findings") { drawFindings(); drawAsym(); }
-  if (name === "lab") { circBase = null; ARENA.phase = "idle"; }
-  // "#/name", not "#name": a hash equal to a panel id makes the browser jump past the masthead on load
-  const want = name === "lab" ? location.pathname + location.search : "#/" + name;
-  try { if ((location.hash || "") !== (name === "lab" ? "" : want)) history.replaceState(null, "", want); } catch (e) { /* sandboxed viewers */ }
-}
+// ---------- loop and controls
 let lastMix = null;
 function updateStats() {
   const last = hist[hist.length - 1];
@@ -1216,29 +757,12 @@ document.getElementById("gameCards").addEventListener("click", e => {
   const b = e.target.closest(".game-card"); if (!b || b.dataset.v === S.game) return;
   S.game = b.dataset.v; reset();
 });
-document.getElementById("oppPick").addEventListener("click", e => {
-  const b = e.target.closest("button"); if (!b) return;
-  document.querySelectorAll("#oppPick button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-  opp = b.dataset.v; drawBeat();
-});
-document.getElementById("wirePick").addEventListener("click", e => {
-  const b = e.target.closest("button"); if (!b) return;
-  document.querySelectorAll("#wirePick button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-  wire = b.dataset.v; drawWire();
-});
-document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => showTab(b.id.slice(2))));
-document.querySelector("nav.tabs").addEventListener("keydown", e => {
-  if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-  const i = TABS.indexOf(S.tab), next = TABS[(i + (e.key === "ArrowRight" ? 1 : TABS.length - 1)) % TABS.length];
-  showTab(next); document.getElementById("t-" + next).focus();
-});
 document.getElementById("speed").addEventListener("input", e => { S.speed = +e.target.value; });
 document.getElementById("play").addEventListener("click", e => { S.playing = !S.playing; e.target.textContent = S.playing ? "Pause" : "Play"; });
 document.getElementById("reset").addEventListener("click", () => reset());
-window.addEventListener("resize", () => { circBase = null; if (S.tab !== "lab") showTab(S.tab); });
-fillCircuitTables(); fillContrasts();
+window.addEventListener("resize", () => { circBase = null; drawFindings(); });
 reset();
-showTab((location.hash || "#lab").replace(/^#\/?/, ""));
+drawFindings();
 requestAnimationFrame(frame);
 </script>
 </body>
