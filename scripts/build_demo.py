@@ -1,4 +1,4 @@
-"""Build demo/index.html from scripts/demo_template.html.
+"""Build the demo site (site/index.html) from scripts/demo_template.html.
 
 Everything the page shows that is not simulated live comes from the project's own
 files, never typed in: the circuit (data/connectome), the equilibria and predicted
@@ -26,7 +26,7 @@ from src.connectome.circuit import circuit_spec_for_arm, load_circuit  # noqa: E
 from src.games import GameA, TimeGrid, asymmetric_fixed_point, game_a_analytic_policy  # noqa: E402
 
 TEMPLATE = ROOT / "scripts" / "demo_template.html"
-OUT = ROOT / "demo" / "index.html"
+OUT = ROOT / "site" / "index.html"
 TABLES = ROOT / "results" / "tables"
 ARMS = ["tabular", "dense", "connectome", "connectome+sign", "rewired", "rewired+sign", "random_sparse", "random_sparse+sign"]
 
@@ -129,6 +129,7 @@ def main() -> None:
         "findings": findings(),
     }
     html = TEMPLATE.read_text(encoding="utf-8").replace("/*__DATA__*/null", json.dumps(payload, separators=(",", ":")))
+    OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(html, encoding="utf-8")
     print(f"wrote {OUT.relative_to(ROOT)} ({len(html) / 1024:.0f} KB)")
 

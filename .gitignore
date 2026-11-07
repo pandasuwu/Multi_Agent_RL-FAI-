@@ -14,3 +14,6 @@ results/game_a_exact_eval1/curves.csv
 
 # the user's own working files, untracked at the start of this work
 report/
+
+# built demo (scripts/build_demo.py); published by .github/workflows/pages.yml
+site/

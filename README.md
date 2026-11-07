@@ -28,9 +28,10 @@ section numbers below point there.
 Other docs: [docs/theory.md](docs/theory.md) (equilibria, exploitability),
 [docs/circuit.md](docs/circuit.md) (how the subgraph was extracted).
 
-There's also a small browser demo in `demo/index.html` where you can watch agents learn
-both games with the fly wiring or its controls. Rebuild it with
-`python scripts/build_demo.py` (template in `scripts/demo_template.html`).
+There's also a small browser demo at https://pandasuwu.github.io/Multi_Agent_RL-FAI-/ where you can watch agents learn
+both games with the fly wiring or its controls. It is built from
+`scripts/demo_template.html` by `python scripts/build_demo.py`, and a GitHub Action
+republishes it on every push to `main` that touches the demo.
 
 ## Arms
 

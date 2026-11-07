@@ -59,7 +59,7 @@ All tables are in `results/tables/`: `per_arm.csv`, `pairwise.csv`, `asym_*.csv`
 `game_b_deciles.csv`. Per-run records with the full config snapshot and seed are in
 `results/<experiment>/runs/`.
 
-`demo/index.html` trains the same arms in the browser on a smaller setup (10 value levels
+The [live demo](https://pandasuwu.github.io/Multi_Agent_RL-FAI-/) trains the same arms in the browser on a smaller setup (10 value levels
 in Game B, no seeds or statistics). None of the numbers here come from it.
 
 ## 2. Sanity checks
