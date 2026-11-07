@@ -442,6 +442,95 @@ def fig_game_b_bids() -> None:
     save(fig, str(FIG / "fig6_game_b_bids"))
 
 
+WELFARE_SETTINGS = {
+    "game_a_exact": "Game A, exact",
+    "game_a_sampled": "Game A, sampled",
+    "game_b_exact": "Game B, exact",
+    "game_b_sampled": "Game B, sampled",
+}
+
+
+def fig_welfare() -> None:
+    """Welfare per match against the equilibrium and the social optimum, by arm, plus
+    welfare vs exploitability along the asymmetric win/loss sweep."""
+    path = RES / "tables" / "welfare.csv"
+    if not path.exists():
+        return
+    t = pd.read_csv(path)
+    t = t[(t["loss_win_ratio"].isna()) | (t["loss_win_ratio"] == 1.0)]
+    fig, axes = plt.subplots(1, len(WELFARE_SETTINGS) + 1, figsize=(4.0 * (len(WELFARE_SETTINGS) + 1), 4.6),
+                             gridspec_kw={"width_ratios": [1] * len(WELFARE_SETTINGS) + [1.25]})
+    arms = None
+    for ax, (exp, title) in zip(axes, WELFARE_SETTINGS.items()):
+        sub = t[t["experiment"] == exp]
+        if sub.empty:
+            continue
+        if arms is None:
+            arms = [a for a in sort_arms(list(sub["arm"].unique())) if a != "oracle"]
+        _dot_panel(ax, sub, "welfare", arms, log=False)
+        opt = sub["optimum"].iloc[0]
+        eq = sub.loc[sub["arm"] == "oracle", "welfare"]
+        ax.axvline(opt, color=INK_2, lw=1.4, label="social optimum (no fight)")
+        if len(eq):
+            ax.axvline(eq.iloc[0], color=INK, ls=":", lw=1.4, label="equilibrium")
+        ax.set(title=title, xlabel="welfare per match")
+        ax.set_xlim(min(-0.05, sub["welfare_lo"].min() - 0.05), opt * 1.08)
+        if ax is not axes[0]:
+            ax.set_yticklabels([])
+    axes[0].legend(loc="center right", fontsize=8, framealpha=0.95)
+    # asymmetric sweep: welfare against exploitability, one point per arm and ratio
+    ax = axes[-1]
+    a = pd.read_csv(path)
+    a = a[(a["experiment"] == "game_a_sampled") & (a["arm"] != "oracle")]
+    for ratio, sub in a.groupby("loss_win_ratio"):
+        ax.scatter(sub["final_exploitability"], sub["welfare"], s=26, alpha=0.85,
+                   label=f"losses count {ratio:g}x", zorder=3)
+    eq = pd.read_csv(path)
+    eq = eq[(eq["experiment"] == "game_a_sampled") & (eq["arm"] == "oracle")]
+    if len(eq):
+        ax.scatter(eq["final_exploitability"], eq["welfare"], marker="*", s=140, color=INK, label="equilibrium", zorder=4)
+    ax.set(title="Game A, sampled: lopsided learning", xlabel="final utility loss", ylabel="welfare per match")
+    ax.legend(fontsize=8, loc="lower right")
+    fig.suptitle("Mean and 95% bootstrap CI over seeds; hollow = sign-constrained. Welfare = value allocated minus both players' fight cost",
+                 fontsize=10, color=INK_2)
+    fig.tight_layout()
+    save(fig, str(FIG / "fig9_welfare"))
+
+
+def fig_population_size() -> None:
+    """Final utility loss and welfare against the number of agents (Game A, sampled)."""
+    d = RES / "popsize_game_a_sampled"
+    path = RES / "tables" / "welfare.csv"
+    if not (d / "summary.csv").exists() or not path.exists():
+        return
+    t = pd.read_csv(path)
+    t = t[(t["experiment"] == "popsize_game_a_sampled")]
+    arms = sort_arms(list(t["arm"].unique()))
+    sizes = sorted(t["population_size"].dropna().unique())
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.3))
+    for k, arm in enumerate(arms):
+        sub = t[t["arm"] == arm].sort_values("population_size")
+        st = arm_style(arm)
+        x = sub["population_size"].to_numpy() * (1 + 0.035 * (k - len(arms) / 2))
+        for ax, metric in ((axes[0], "final_exploitability"), (axes[1], "welfare")):
+            err = [sub[metric] - sub[f"{metric}_lo"], sub[f"{metric}_hi"] - sub[metric]]
+            ax.errorbar(x, sub[metric], yerr=err, ls=st["linestyle"], marker="o", ms=5, capsize=2, lw=1.3,
+                        label=st["label"], **_marker(arm))
+    for ax in axes:
+        ax.set_xscale("log", base=2)
+        ax.set_xticks(sizes)
+        ax.set_xticklabels([f"{s:g}" for s in sizes])
+        ax.set_xlabel("number of agents in the population")
+    axes[0].set(title="Final utility loss", ylabel="utility loss (average agent)")
+    axes[1].set(title="Welfare per match", ylabel="welfare (optimum 1, equilibrium 0.12)")
+    axes[1].axhline(1.0, color=INK_2, lw=1.2)
+    axes[1].axhline(0.122, color=INK, ls=":", lw=1.2)
+    axes[0].legend(fontsize=8)
+    fig.suptitle("Game A, sampled REINFORCE, symmetric updates; mean and 95% bootstrap CI over 10 seeds", fontsize=10, color=INK_2)
+    fig.tight_layout()
+    save(fig, str(FIG / "fig10_population_size"))
+
+
 FIGURES = [
     fig_tabular_convergence,
     fig_convergence_all_arms,
@@ -451,6 +540,8 @@ FIGURES = [
     fig_game_b_bids,
     fig_flygm_vs_trained_edges,
     fig_reinforce_vs_ppo,
+    fig_welfare,
+    fig_population_size,
 ]
 
 

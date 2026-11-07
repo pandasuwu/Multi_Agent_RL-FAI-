@@ -2,6 +2,10 @@
 
 ## Summary
 
+Question: does building a learning agent out of the real fly give-up circuit change how
+close it gets to equilibrium in the war of attrition, compared with size-matched
+networks wired differently?
+
 Fly wiring made no difference to final exploitability. In all four settings (Game A and
 B, exact and sampled), the policy built on the real give-up circuit ends up where its two
 size-matched controls do: a degree-preserving rewire and a random sparse graph. At a
@@ -39,6 +43,13 @@ Things that did matter:
   5-neuron readout. With a readout from all neurons that goes away (§12).
 - The asymmetric win/loss learning rule pushes every arm away from equilibrium the way
   the theory predicts, and amplifies a loser effect that wiring doesn't change (§6).
+- The equilibrium wastes almost the whole prize in Game A and, in Game B, pays more to
+  sort the prize by value than that sorting is worth. Learners that weight losses more
+  than wins quit earlier: higher exploitability, roughly twice the welfare (§13).
+- Population size. A fixed pair usually settles into roles (one gives in at once), an
+  asymmetric equilibrium with almost no fight. Four agents learn worst. From 8 up the
+  population converges on the symmetric equilibrium, and at 16 all arms tie (§14).
+  Wiring makes no difference at any size.
 
 ---
 
@@ -50,13 +61,14 @@ Things that did matter:
 | Circuit | MaleCNS v1.0: PPL1 (16) → MBON18/19 (6) → AVLP727m = Tk-GAL4^FruM (5), with 54 path neurons and 177 one-hop partners; 258 neurons and 4,952 edges ([docs/circuit.md](docs/circuit.md)) |
 | Games | A: `V = c = 1`, NE `Exp(1)`. B: `v ~ Exp(1)`, BNE `v²/2`. 64-point grids ([docs/theory.md](docs/theory.md)) |
 | Exact mode | one shared policy, exact expected-payoff gradient; 20 seeds; 3,000 (A) or 4,000 (B) episodes |
-| Sampled mode | 8 independent agents, randomly re-matched, 128 matches per agent per episode, REINFORCE with baseline; 10 seeds; 3,000 episodes; `α_loss/α_win ∈ {1, 2, 4, 8}` (Game A) |
+| Sampled mode | 8 independent agents (2 to 16 in §14), randomly re-matched, 128 matches per agent per episode, REINFORCE with baseline; 10 seeds; 3,000 episodes; `α_loss/α_win ∈ {1, 2, 4, 8}` (Game A) |
+| Welfare | value allocated minus both players' fight cost, against the social optimum of no fight (§13) |
 | Primary metric | exact ex-ante utility loss (exploitability) on the grid, Bichler et al. 2021 conventions, absolute units (Game A equilibrium payoff = 0) |
 | Threshold | 0.01 (exact), 0.05 (sampled); time to threshold censored at the training length |
 | Statistics | mean with 95% percentile bootstrap CI (10,000 resamples). Each contrast: bootstrap CI of the difference, Hedges' g, permutation p, Holm-adjusted within each experiment × metric family. "Distinguishable" = CI excludes 0 and Holm p < 0.05. |
 
-All tables are in `results/tables/`: `per_arm.csv`, `pairwise.csv`, `asym_*.csv` and
-`game_b_deciles.csv`. Per-run records with the full config snapshot and seed are in
+All tables are in `results/tables/`: `per_arm.csv`, `pairwise.csv`, `asym_*.csv`,
+`game_b_deciles.csv` and `welfare*.csv` (§13–§14). Per-run records with the full config snapshot and seed are in
 `results/<experiment>/runs/`.
 
 The [live demo](https://pandasuwu.github.io/Multi_Agent_RL-FAI-/) trains the same arms in the browser on a smaller setup (10 value levels
@@ -935,3 +947,122 @@ converged. Every arm still converges with the new readout. Final exploitability:
   not tried.
 - FlyGM against the earlier runs. The two FlyGM fixes differ in parameter count by
   0.59%, just over the 0.5% used inside each experiment.
+
+## 13. Equilibrium vs the social optimum
+
+The fight itself produces nothing. Both players pay `c · min(T1, T2)`, and the prize
+goes to one of them whatever happens, so the best outcome for the pair is no fight at
+all. Welfare here is per match, both players together: the value of the prize to
+whoever gets it, minus both players' fight cost.
+
+- Game A: the social optimum is `V = 1` (one player walks away at once). At the
+  continuous equilibrium each player expects exactly 0, so the whole prize is burnt in
+  the fight. On the 64-point grid the equilibrium keeps 0.122 of it (88% dissipated);
+  the rest is discretisation.
+- Game B: the social optimum is `E[max(v1, v2)] = 1.486` (the higher value takes the
+  prize, nobody fights). The equilibrium bid `v²/2` gets the allocation almost right,
+  1.471 of the 1.486, because the higher value always waits longer. It pays 0.496 in
+  fight cost for that. Welfare 0.976, 34% below the optimum.
+- In Game B the fight is not worth it even as a sorting device. A coin flip with no
+  fight gives `E[v] = 0.993`, slightly more than the equilibrium. Sorting the prize to
+  the higher value gains 0.48 and the waiting to do it costs 0.50.
+
+Source: `results/tables/welfare.csv` (per arm, 95% bootstrap CI),
+`welfare_per_run.csv`, `welfare_contrasts.csv`; `python scripts/welfare.py`. Figure:
+`figures/fig9_welfare.png`. For sampled runs the strategy is the population mixture
+(the saved final policy), so a few self-pairings are counted; the effect is small at
+8 agents.
+
+### What the learners do
+
+| setting | equilibrium | learners (range of arm means) | direction |
+|---|---|---|---|
+| Game A, exact | 0.122 | 0.119 (all arms) | at equilibrium |
+| Game A, sampled | 0.122 | 0.07 to 0.26 | most arms waste less than equilibrium |
+| Game B, exact | 0.976 | 0.90 to 1.01 | at equilibrium |
+| Game B, sampled | 0.976 | 0.49 to 0.84 | all arms waste more |
+
+- Game A, sampled. Learners that have not quite reached equilibrium quit a little
+  early, and quitting early is what society wants. So the circuit and dense arms keep
+  0.21 to 0.26 of the prize, about twice the equilibrium's 0.12. Tabular (0.07) and the
+  rewire at its own tuned rate (0.10) have CIs that cover the equilibrium.
+- Game B, sampled. The opposite. Learners both allocate worse (1.23 to 1.40 of the
+  available 1.486, vs 1.471 at equilibrium) and fight longer (cost 0.56 to 0.75 vs
+  0.50). Not knowing the opponent's value and learning from noisy fights costs welfare
+  twice. The real-wiring connectome is the worst arm here (0.49 [0.40, 0.57]), in line
+  with its exploitability (§3).
+
+### Lopsided learning trades exploitability for welfare
+
+In the asymmetric sweep (§6) learners weight losses more than wins. That makes them
+quit earlier, which raises exploitability and also raises welfare, on every arm:
+
+| α_loss / α_win | mean welfare | mean final exploitability |
+|---|---|---|
+| 1 | 0.19 | 0.048 |
+| 2 | 0.37 | 0.102 |
+| 4 | 0.41 | 0.130 |
+| 8 | 0.45 | 0.146 |
+
+Across all 320 sweep runs, Spearman ρ between exploitability and welfare is 0.68. A
+population that learns the way flies seem to (losses count more) ends up further from
+equilibrium but wastes about half as much of the prize. The theory in §6 predicts the
+direction, since the predicted rest points put more mass on quitting at once.
+
+### Wiring
+
+Real wiring vs each control on welfare, in the shared-learning-rate experiments (27
+contrasts, Holm across all of them): nothing survives except two Game A exact
+contrasts where the connectome is ahead by 0.0001, a hundredth of a percent of the
+prize. The wiring answer is the same as for exploitability.
+
+## 14. Number of agents
+
+Game A, sampled REINFORCE, symmetric updates, population of 2, 4, 8 or 16 agents
+re-matched at random every round. Every agent plays the same 128 matches per round at
+every size, so what changes is only how many different opponents it learns against.
+Arms: tabular, dense, connectome, rewire, random sparse; the circuit arms share one
+learning rate. 10 seeds, 200 runs. Config: `configs/popsize_game_a_sampled.yaml`.
+Figure: `figures/fig10_population_size.png`. The 8-agent runs reproduce
+`robust_game_a_sampled_shared_lr` exactly (same seeds, same numbers), which is a check
+on the runner.
+
+Final exploitability of the average agent, mean [95% CI]:
+
+| agents | tabular | dense | connectome | rewire | random sparse |
+|---|---|---|---|---|---|
+| 2 | 0.081 [0.031, 0.144] | 0.038 [0.019, 0.057] | 0.049 [0.025, 0.075] | 0.072 [0.033, 0.124] | 0.070 [0.037, 0.108] |
+| 4 | 0.089 [0.077, 0.104] | 0.064 [0.058, 0.071] | 0.108 [0.080, 0.140] | 0.078 [0.067, 0.090] | 0.108 [0.083, 0.136] |
+| 8 | 0.068 [0.059, 0.079] | 0.033 [0.030, 0.036] | 0.045 [0.042, 0.049] | 0.044 [0.040, 0.049] | 0.049 [0.043, 0.056] |
+| 16 | 0.033 [0.031, 0.037] | 0.033 [0.031, 0.034] | 0.034 [0.032, 0.037] | 0.035 [0.032, 0.037] | 0.034 [0.032, 0.036] |
+
+Welfare per match (optimum 1, symmetric equilibrium 0.122):
+
+| agents | tabular | dense | connectome | rewire | random sparse |
+|---|---|---|---|---|---|
+| 2 | 0.26 | 0.60 | 0.46 | 0.30 | 0.37 |
+| 4 | 0.28 | 0.31 | 0.11 | 0.28 | 0.09 |
+| 8 | 0.07 | 0.21 | 0.23 | 0.24 | 0.24 |
+| 16 | 0.17 | 0.16 | 0.14 | 0.15 | 0.15 |
+
+What happens:
+
+- Two agents split the roles. With a fixed pair, in 58% of runs one agent learns to
+  quit almost at once and the other to hold on (median mass on quitting at t = 0 in the
+  pair's mixture: 0.49, vs 0.12 at equilibrium). That is the war of attrition's
+  asymmetric equilibrium: neither agent can gain by changing alone, so each agent's own
+  exploitability is low, but the pair is far from the symmetric equilibrium (population
+  exploitability 0.19 to 0.25). It is also the efficient outcome, since there is
+  hardly any fight, so welfare is highest here (0.26 to 0.60).
+- Four agents are the worst case. Too many opponents to settle into roles, too few to
+  average them out. Agent exploitability is highest at 4 for every arm.
+- From 8 up, the population converges on the symmetric mixed equilibrium. At 16 every
+  arm reaches 0.033 to 0.035, the arms become indistinguishable from each other, and
+  welfare falls towards the equilibrium's 0.12 (0.14 to 0.17). More agents means more
+  equilibrium-like play and more of the prize wasted.
+
+Wiring: real vs rewire and real vs random at each size, on exploitability and on
+welfare, 16 tests: none is distinguishable (on welfare every Holm p is 1.0; on
+exploitability every CI covers zero). The dense MLP beats the connectome at 8 agents
+(by 0.012 [0.007, 0.017], Holm p = 0.004 among the 12 exploitability tests), as in §3,
+and the gap closes at 16.

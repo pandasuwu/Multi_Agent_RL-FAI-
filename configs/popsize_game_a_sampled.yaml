@@ -1,0 +1,18 @@
+# Number of agents: the same sampled-mode Game A setup as game_a_sampled, with the
+# population size swept. Each agent still plays matches_per_step matches per round,
+# so every agent gets the same amount of experience at every N; what changes is how
+# many distinct opponents it learns against. N = 2 is a fixed pair.
+# Circuit arms share one learning rate (as in robust_game_a_sampled_shared_lr), so
+# within a population size the wiring arms differ only in the graph.
+base: game_a_sampled.yaml
+experiment: popsize_game_a_sampled
+arms:
+  - {name: tabular}
+  - {name: dense}
+  - {name: connectome}
+  - {name: rewired}
+  - {name: random_sparse}
+sweep:
+  training.loss_win_ratio: [1.0]   # symmetric updates only (overrides the base sweep)
+  training.population_size: [2, 4, 8, 16]
+lr_from: {file: tuned_lr.yaml, experiment: game_a_sampled, share_circuit_lr: true}
