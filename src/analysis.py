@@ -6,7 +6,7 @@ Conventions
 * Every pairwise contrast reports the difference of means, a bootstrap CI of that
   difference, Hedges' g, and a two-sided permutation p-value. The p-values are
   Holm-adjusted within each (experiment, metric) family. A contrast counts as
-  *distinguishable from zero* only if its bootstrap CI excludes 0 **and** its
+  distinguishable from zero only if its bootstrap CI excludes 0 and its
   Holm-adjusted p is below 0.05. Otherwise the table says so.
 * Time to threshold is right-censored: runs that never reach the threshold count
   as the full training length, and the fraction that reached it is reported
@@ -29,7 +29,7 @@ from .metrics.stats import benjamini_hochberg, bootstrap_mean_ci, compare, holm
 
 RESULTS = REPO_ROOT / "results"
 
-# Contrasts that answer the research question, in reporting order.
+# main wiring contrasts
 CONTRASTS: list[tuple[str, str, str]] = [
     ("connectome", "rewired", "specific wiring (unsigned)"),
     ("connectome+sign", "rewired+sign", "specific wiring (signed)"),
@@ -77,9 +77,7 @@ EXPERIMENTS = (
     "robust_flygm_game_b_sampled_shared_lr",
 )
 GAME_B_EXPERIMENTS = tuple(e for e in EXPERIMENTS if "game_b" in e)
-# The readout and gain fixes for the FlyGM collapse (RESULTS.md sec. 12). They are
-# analysed after everything else, on their own random stream and into their own
-# tables, so adding them changes no number in any table above.
+# readout / gain fixes (RESULTS.md sec. 12), own RNG stream and own tables
 READOUT_EXPERIMENTS = (
     "readout_game_b_exact",
     "wgain_game_b_exact",
@@ -345,7 +343,7 @@ def eval_resolution(rng: np.random.Generator, n_boot: int) -> pd.DataFrame:
 
     ``game_a_exact_eval1`` reruns ``game_a_exact`` with ``eval_every: 1``. Evaluation
     reads the policy without touching the RNG, so for a given seed the two runs are
-    the *same* training trajectory and the comparison is exactly paired: the coarse
+    the same training trajectory and the comparison is exactly paired: the coarse
     run's crossing time is the exact one rounded up to the next multiple of 25.
     """
     fine, coarse = RESULTS / "game_a_exact_eval1", RESULTS / "game_a_exact"

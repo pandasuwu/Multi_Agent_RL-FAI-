@@ -1,18 +1,15 @@
 """Learning-rate selection with an identical budget for every arm.
 
 For each experiment and each trainable arm we try every learning rate in the
-configured grid on the *tuning seeds* (disjoint from the evaluation seeds), and
+configured grid on the tuning seeds (disjoint from the evaluation seeds), and
 pick the one with the lowest mean ``log10_expl_auc`` (the mean of log10
 exploitability over the whole training curve), which rewards both speed and the
 final level. Ties go to the smaller learning rate. Sweep experiments are tuned at
 their first sweep point (``loss_win_ratio = 1``, the symmetric control), so the
 asymmetric conditions never get to pick their own step size.
 
-An experiment may set ``tuning.steps`` to screen the grid on shorter runs than the
-experiment itself uses. The criterion is unchanged (mean log10 exploitability over
-the curve); only the curve is shorter. This is a compute reduction, used for the
-settings where a full-length grid does not fit the laptop budget, and it is recorded
-in the experiment's config and in RESULTS.md.
+``tuning.steps`` screens the grid on shorter runs than the experiment uses (only for
+the slow settings).
 
 The chosen rates are written to ``configs/tuned_lr.yaml``, which experiment
 configs read through ``lr_from``.

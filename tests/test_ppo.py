@@ -59,7 +59,7 @@ def test_exact_mode_rejects_ppo():
 def test_first_ppo_epoch_has_exactly_the_reinforce_gradient(ratio):
     """The clipped surrogate at ratio 1 has the REINFORCE gradient, weights included.
 
-    The loss *values* differ (the surrogate carries the probability ratio where
+    The loss values differ (the surrogate carries the probability ratio where
     REINFORCE carries log pi), but d/dtheta exp(logp - logp_old) = d/dtheta logp at
     logp = logp_old, so the first PPO epoch is one REINFORCE step.
     """

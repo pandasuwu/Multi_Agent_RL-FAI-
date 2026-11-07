@@ -1,6 +1,6 @@
 """One figure style for the whole project.
 
-Colour encodes the *graph* (fixed order, never cycled). Line style encodes what
+Colour encodes the graph (fixed order, never cycled). Line style encodes what
 trains on it: solid for one weight per edge, dashed for the same under Dale's law,
 dotted for the FlyGM arm, whose synapses are frozen at their real counts and whose
 neurons train instead. So the real circuit and its two controls keep their hues

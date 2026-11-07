@@ -1,33 +1,16 @@
-"""Run the FlyGM and PPO experiments, recording the wall time of each step.
+"""Run the FlyGM and PPO experiments step by step and log each step's wall time.
 
-    python scripts/reproduce_flygm_ppo.py                      # every step, in order
-    python scripts/reproduce_flygm_ppo.py --only run-ppo-a     # one or more steps
+    python scripts/reproduce_flygm_ppo.py                      # all steps
+    python scripts/reproduce_flygm_ppo.py --only run-ppo-a     # selected steps
     python scripts/reproduce_flygm_ppo.py --list
 
-These experiments are additive: they write new ``results/<experiment>/`` directories
-and never touch the ones produced by ``scripts/reproduce.py``. The steps are separate
-because the grid does not fit one sitting on a laptop CPU (the FlyGM arm in sampled
-Game B costs about an hour of CPU per run), and because each one's learning rates
-must be tuned before its runs start.
+Writes new results/<experiment>/ dirs and doesn't touch the ones from reproduce.py.
+Split into steps because the whole grid takes too long for one sitting on a laptop.
+Wall times go to results/flygm_ppo_log.txt.
 
-Every step appends ``<name>: <seconds> s`` to ``results/flygm_ppo_log.txt``, which is
-where the wall times quoted in RESULTS.md come from.
-
-Restartable. Each run writes its own ``results/<experiment>/runs/<run_id>.json`` and
-every step resumes, so re-running the same command after a crash, a sleep or a reboot
-redoes only the runs that were in flight. Re-running a finished step costs seconds.
-
-Single-threaded workers: the pool is the parallelism, so every child gets
-``OMP/MKL/OpenBLAS/numexpr = 1`` thread (``src.training.runner.run_job`` also calls
-``torch.set_num_threads(1)``) and ``--workers`` is the only knob that decides how many
-cores are busy.
-
-Unattended runs: ``--log-file PATH`` makes the driver write its own output, and every
-child's, to that file instead of to a console, and it ignores Ctrl-C and Ctrl-Break.
-Started with ``pythonw.exe`` there is then no console window anywhere in the tree, so
-nothing in the user's session can close one and take the run down with it. A run of
-this length needs that: the longest single run here is about 4 hours, and `resume`
-redoes any run that was in flight.
+Each run saves its own JSON, so rerunning after a crash only redoes unfinished runs.
+Workers are single-threaded (BLAS threads = 1), so --workers sets the core count.
+--log-file sends all output to a file and ignores Ctrl-C (for long runs under pythonw).
 """
 
 from __future__ import annotations
@@ -44,8 +27,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 PY = sys.executable
 LOG = ROOT / "results" / "flygm_ppo_log.txt"
-# BLAS must stay single-threaded in every child: a fresh process otherwise takes one
-# thread per physical core, and `--workers` of those would oversubscribe the machine.
+# keep BLAS single-threaded in children so workers don't oversubscribe
 CHILD_ENV = {
     "OMP_NUM_THREADS": "1",
     "MKL_NUM_THREADS": "1",
@@ -53,40 +35,10 @@ CHILD_ENV = {
     "NUMEXPR_NUM_THREADS": "1",
 }
 
-# Worker cap for the FlyGM Game B steps. Measured on the laptop (AMD Ryzen AI 7 350,
-# 8 physical cores): a FlyGM Game B run takes 462 s alone, 420 s with 6 running at once
-# (no contention at all), and 1752 s with 14 -- so 14 workers deliver *half* the
-# throughput of 6. Game B puts 50 contexts x 8 agents x 258 neurons through f_psi every
-# step, and past ~6 processes they evict each other's working sets. Game A is 50x
-# smaller per step and does not need the cap.
-#
-# Re-measured on the cloud machine the last two steps were actually run on (Intel Xeon
-# @ 2.10 GHz, 4 physical cores, no SMT, 15 GiB RAM, no cgroup CPU quota). Throughput
-# for 12 runs x 400 steps of flygm_game_b_sampled, pool kept saturated, one thread per
-# worker, each count measured on the same total work:
-#     3 workers   760.5 s   6.31 steps/s
-#     4 workers   699.3 s   6.86 steps/s   <- peak
-#     6 workers   759.3 s   6.32 steps/s
-# One worker per physical core wins here and oversubscription costs ~8%, so on this
-# box the cap is the core count rather than the laptop's 6. (A first pass that used
-# runs == workers appeared to peak at 6 instead; that was an artefact of the ~15 s of
-# per-run spawn/import/connectome-load overlapping compute more at higher worker
-# counts, which measuring equal total work on a saturated pool removes.)
-HEAVY_WORKERS = 6  # laptop value; a 4-core box measured 4 (see above)
-# run-ppo-b-flygm is exactly 9 runs, so how 9 divides matters as much as peak
-# throughput. Measured on the same cloud machine, on this cell's own config and in its
-# real 9-run shape (9 runs x 100 steps of ppo_game_b_sampled_flygm):
-#     3 workers   675.7 s   1.332 steps/s
-#     5 workers   486.0 s   1.852 steps/s   <- peak
-#     9 workers   529.1 s   1.701 steps/s
-# The per-run slowdown at 9 workers is 2.59x (5.29 s/step against 2.04 s/step
-# uncontended), past the ~1.9x break-even, so one wave of 9 loses to 5+4 after all.
-# PPO is ~5x the arithmetic per step of REINFORCE and so tolerates oversubscription
-# better than the step above (5 workers on 4 cores still wins), but 9 is too many. 5
-# also packs 9 runs as 5+4, avoiding the lone-run tail that 4 would leave (4+4+1,
-# three cores idle for a whole run). Memory is not the binding constraint: 9 workers
-# peaked at 12.8 GiB RSS with 4.5 GiB still available.
-FLYGM_PPO_WORKERS = 9  # laptop value; the 4-core box measured 5 (see above)
+# FlyGM Game B is memory-bound: on the laptop (8 cores) 14 workers gave half the
+# throughput of 6. On a 4-core cloud box 4 was best for this and 5 for run-ppo-b-flygm.
+HEAVY_WORKERS = 6
+FLYGM_PPO_WORKERS = 9
 
 # name -> (script, configs, worker cap or None). "tune" steps pick learning rates on
 # the tuning seeds and write configs/tuned_lr.yaml; "run" steps run the evaluation seeds.
@@ -110,7 +62,7 @@ STEPS: list[tuple[str, str, list[str], int | None]] = [
     ("run-flygm-b-sampled", "run_experiment", ["flygm_game_b_sampled"], HEAVY_WORKERS),
     ("tune-ppo-b", "tune_lr", ["ppo_game_b_sampled"], None),
     ("run-ppo-b", "run_experiment", ["ppo_game_b_sampled"], None),
-    # Not run for RESULTS.md (the cell was dropped; see its config). Kept so it can be.
+    # not run (too expensive), kept for completeness
     ("run-ppo-b-flygm", "run_experiment", ["ppo_game_b_sampled_flygm"], FLYGM_PPO_WORKERS),
     ("robust-ppo-a", "run_experiment", ["robust_ppo_game_a_sampled_shared_lr"], None),
     ("robust-ppo-b", "run_experiment", ["robust_ppo_game_b_sampled_shared_lr"], None),
@@ -125,8 +77,7 @@ STEPS: list[tuple[str, str, list[str], int | None]] = [
         HEAVY_WORKERS,
     ),
     ("asym-ppo", "run_experiment", ["ppo_game_a_sampled_asym"], None),
-    # The readout and gain fixes for the FlyGM Game B collapse (RESULTS.md sec. 12),
-    # Game B first, then Game A as the sanity check.
+    # readout / W-gain fixes (RESULTS.md sec. 12)
     ("tune-readout-b", "tune_lr", ["readout_game_b_exact", "wgain_game_b_exact"], HEAVY_WORKERS),
     ("run-readout-b", "run_experiment", ["readout_game_b_exact", "wgain_game_b_exact"], HEAVY_WORKERS),
     ("tune-readout-a", "tune_lr", ["readout_game_a_exact", "wgain_game_a_exact"], HEAVY_WORKERS),
@@ -180,7 +131,7 @@ def sharing_changes_nothing(path: Path) -> bool:
     """True if a ``share_circuit_lr`` config would run at the rates already measured.
 
     A shared-rate robustness run is only informative when the arms were tuned to
-    *different* rates. If they all landed on the same one, the main experiment already
+    different rates. If they all landed on the same one, the main experiment already
     is the shared-rate run and re-running it would duplicate it exactly.
     """
     from src.agents.factory import arm_label

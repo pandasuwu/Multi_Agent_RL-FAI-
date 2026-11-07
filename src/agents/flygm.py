@@ -1,45 +1,19 @@
-"""FlyGM arm: frozen connectome synapses, learned neurons (Jin et al. 2026, arXiv:2602.17997).
+"""FlyGM arm (Jin et al. 2026, arXiv:2602.17997): frozen synapses, trained neurons.
 
-The circuit arms (3-5) keep the connectome's *sparsity* and train one weight per
-edge. The FlyGM arm keeps the connectome's *weights* and trains the neurons
-instead. The synaptic matrix
+W[post, pre] = sign(pre) * synapse_count, scaled to spectral radius 1. W is a buffer
+and never gets a gradient. Trained parts:
 
-    W[post, pre] = sign(pre) * synapse_count(pre -> post),   rescaled to spectral radius 1
+- eta: a D-dim descriptor per neuron
+- f_psi: shared update MLP, h_i <- act(f_psi(h_i, m_i, eta_i)), m = W h + drive
+- encoder + gate on the PPL1 inputs, drive_i = enc_i(x) * sigmoid(gate_i(x))
+- readout from AVLP727m (zero init), or from all neurons with readout_nodes: all
+- optional w_gain: one scalar g, m = g * W h + drive
 
-is a fixed buffer: it is never a parameter and never receives a gradient. What
-trains is
+All 16 PPL1 neurons are dopaminergic and have node_sign 0, which would cut the input
+off completely, so unsigned_sign decides what sign they get (logged per run).
 
-* ``eta``: a descriptor in ``R^D`` per neuron (``D = descriptor_dim``), the only
-  thing that distinguishes one neuron from another;
-* ``f_psi``: one shared update MLP applied at every neuron and every step,
-  ``h_i <- act(f_psi(h_i, m_i, eta_i))`` with messages ``m = W h + drive``;
-* the input encoder and gate on the input (PPL1) neurons,
-  ``drive_i = enc_i(x) * sigmoid(gate_i(x))``;
-* the readout from the output (AVLP727m) neurons to the ``n_bins`` logits,
-  zero-initialised like every other arm so training starts from the uniform policy.
-  ``readout_nodes: all`` reads out from every neuron through a rank-``readout_rank``
-  map instead (:class:`~src.agents.policies.GraphReadoutMixin`);
-* optionally (``w_gain``), one trainable scalar ``g`` per agent on the frozen
-  matrix, ``m = g * W h + drive``, initialised to 1. ``W`` itself stays frozen.
-
-``unroll_steps`` is shared with the circuit arms (6), so the two architectures see
-the graph for the same number of synaptic hops.
-
-**Sign of unsigned neurons.** 26 of the 258 neurons have no transmitter
-prediction (``node_sign == 0``), including all 16 dopaminergic PPL1 input
-neurons. With ``sign = 0`` those neurons have no output at all in ``W``, which
-disconnects the input neurons from the circuit entirely (``input_output_gain``
-is then exactly 0 for every graph). ``unsigned_sign`` chooses what they get; it
-is recorded per run, with the two diagnostics below.
-
-**Diagnostics** (per graph, logged on every run):
-
-* ``spectral_radius_raw``: the radius of ``W`` *before* the global rescaling
-  (about 1230 for the real graph, a few hundred for the controls). The real
-  circuit's radius is dominated by a strong recurrent core, so dividing by it
-  may be what crushes the input-to-output path.
-* ``input_output_gain``: ``sum_{k=1..unroll_steps} |(W^k)[output, input]|`` on
-  the rescaled ``W`` (about 0.008 for the real graph, 1-13 for the controls).
+Logged diagnostics: spectral_radius_raw (radius of W before scaling, ~1230 on the
+real graph) and input_output_gain = sum_k |(W^k)[out, in]| (~0.008 real, 1-13 controls).
 """
 
 from __future__ import annotations

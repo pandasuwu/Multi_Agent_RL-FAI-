@@ -159,11 +159,11 @@ class SparseCircuitPolicy(GraphReadoutMixin, Policy):
     """Recurrent network whose neuron-to-neuron weights live only on a fixed edge set.
 
     ``N`` neurons, directed edges ``(pre -> post)``. Context enters through a dense
-    projection onto the *input* neurons; after ``unroll_steps`` synchronous updates
+    projection onto the input neurons; after ``unroll_steps`` synchronous updates
 
         h <- act(A h + W_in x + bias),     A[post, pre] = w_e for e in edges,
 
-    the logits are read out from the *output* neurons. Gradient descent changes the
+    the logits are read out from the output neurons. Gradient descent changes the
     ``E`` edge weights; entries of ``A`` off the edge set are structurally zero and
     are not parameters, so the network can never create a connection the graph
     does not have.
