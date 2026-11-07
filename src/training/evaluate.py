@@ -48,12 +48,19 @@ def evaluate(game: Game, probs: np.ndarray) -> dict[str, Any]:
         pis = probs[:, 0, :]
         mix = pis.mean(axis=0)
         eq = game_a_analytic_policy(game)
+        # individual: each agent against the mixture of the others (what it trains on);
+        # mixture: the population's combined strategy against itself (population Nash)
         out["exploitability"] = mx.population_utility_loss_a(game, pis)
         out["mixture_exploitability"] = mx.exploitability_a(game, mix)
         out["tv"] = mx.total_variation(mix, eq)
         out["w1"] = mx.wasserstein_1(mix, eq, t)
         out["mean_quit"] = float(mix @ t)
         out["agent_mean_quit_sd"] = float(np.std(pis @ t)) if m > 1 else 0.0
+        # each agent's own distance from the equilibrium: separates a population that
+        # agrees on the equilibrium from one whose members differ and only average to it
+        agent_tv = np.array([mx.total_variation(p, eq) for p in pis])
+        out["agent_tv_mean"] = float(agent_tv.mean())
+        out["agent_tv_max"] = float(agent_tv.max())
     else:
         assert isinstance(game, GameB)
         bne = game_b_analytic_policy(game)
@@ -69,4 +76,7 @@ def evaluate(game: Game, probs: np.ndarray) -> dict[str, Any]:
         out["tv"] = mx.total_variation(q_mix, q_eq)
         out["w1"] = mx.wasserstein_1(q_mix, q_eq, t)
         out["mean_quit"] = float(q_mix @ t)
+        agent_tv = np.array([mx.total_variation(game.marginal(p), q_eq) for p in probs])
+        out["agent_tv_mean"] = float(agent_tv.mean())
+        out["agent_tv_max"] = float(agent_tv.max())
     return out

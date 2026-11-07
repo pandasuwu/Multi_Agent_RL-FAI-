@@ -50,6 +50,12 @@ section numbers below point there.
   From 8 agents up the population settles on the symmetric mixed equilibrium, and at 16
   every arm, real wiring included, ends at the same exploitability (§14).
 
+- Review checks (§15). The population mixture is further from Nash than each agent
+  against the others, but no wiring conclusion changes on that metric. The derived
+  rest point of loss-weighted learning matches simulations of the rule. Every control
+  graph keeps all PPL1 → AVLP727m paths. A sweep over shared learning rates shows the
+  Game A speed-up is a wiring effect, not tuning, and finds nothing else.
+
 Other docs: [docs/theory.md](docs/theory.md) (equilibria, exploitability),
 [docs/circuit.md](docs/circuit.md) (how the subgraph was extracted).
 
