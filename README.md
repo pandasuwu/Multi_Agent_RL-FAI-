@@ -42,8 +42,9 @@ section numbers below point there.
   circuit arm in Game B and removes most of the gap to the dense MLP, along with the
   earlier sign-constraint advantage (§12).
 - The equilibrium is socially wasteful. In Game A it burns the whole prize in fighting
-  (88% on the grid); in Game B it gets the prize to the higher value but pays more for
-  that than a no-fight coin flip would lose. Learners that weight losses more than wins
+  (88% on the grid); in Game B it gets the prize to the higher value, but the fight
+  costs exactly what that sorting gains (0.5 each in continuous time), so welfare only
+  breaks even with a no-fight coin flip. Learners that weight losses more than wins
   quit earlier, which raises exploitability and roughly doubles welfare (§13).
 - Number of agents changes the outcome more than wiring does. A fixed pair usually
   splits roles (one gives in at once), which is an equilibrium with almost no fighting.
@@ -129,29 +130,35 @@ python -m venv .venv
 .venv/Scripts/python scripts/reproduce.py
 ```
 
-(`.venv/bin/` on Linux/macOS, or `make reproduce`.)
+On Linux/macOS use `.venv/bin/` instead of `.venv/Scripts/`. With make:
+`make reproduce` on Windows, `make reproduce PY=.venv/bin/python` on Linux/macOS.
 
 `reproduce.py` downloads the three MaleCNS files (~566 MB, CC-BY) if they aren't there,
 rebuilds the subgraph and checks its checksum, tunes learning rates, runs the four
 experiments, and writes `results/tables/` and `figures/`. Use `--skip-connectome` and
 `--skip-tuning` to reuse the committed subgraph and learning rates.
 
-The FlyGM/PPO grid (§9–§11) is separate and much longer:
+The FlyGM/PPO grid and the readout fixes (§9–§12) are separate and much longer:
 
 ```bash
 .venv/Scripts/python scripts/reproduce_flygm_ppo.py --list
-.venv/Scripts/python scripts/reproduce_flygm_ppo.py --workers 14
+.venv/Scripts/python scripts/reproduce_flygm_ppo.py --workers 6
 ```
 
-Wall times get appended to `results/flygm_ppo_log.txt`.
+Wall times get appended to `results/flygm_ppo_log.txt`. The step `run-ppo-b-flygm`
+(about 4 h per run, not in RESULTS) is skipped unless you ask for it with `--only`.
+Heavy FlyGM steps cap their own worker count; more than 6 workers is slower for them (§9).
 
 The welfare analysis and the population-size sweep (§13–§14):
 
 ```bash
 .venv/Scripts/python scripts/run_experiment.py configs/popsize_game_a_sampled.yaml --workers 2
+.venv/Scripts/python scripts/analyze.py
 .venv/Scripts/python scripts/welfare.py
 .venv/Scripts/python scripts/make_figures.py
 ```
+
+The checks after the project review (§15): `make review`, then `make figures`.
 
 ## Layout
 

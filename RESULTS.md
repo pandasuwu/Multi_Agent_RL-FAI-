@@ -6,12 +6,14 @@ Question: does building a learning agent out of the real fly give-up circuit cha
 close it gets to equilibrium in the war of attrition, compared with size-matched
 networks wired differently?
 
-Fly wiring made no difference to final exploitability. In all four settings (Game A and
-B, exact and sampled), the policy built on the real give-up circuit ends up where its two
-size-matched controls do: a degree-preserving rewire and a random sparse graph. At a
-shared learning rate every one of these contrasts either has a CI that covers zero or
-fails Holm. Under PPO one Game B contrast passes within its own experiment but not across
-the whole project, so I treat it as suggestive (§10).
+Fly wiring made no meaningful difference to final exploitability. In all four settings
+(Game A and B, exact and sampled), the policy built on the real give-up circuit ends up
+where its two size-matched controls do: a degree-preserving rewire and a random sparse
+graph. In the main grid every one of these contrasts either has a CI that covers zero or
+fails Holm. In exact mode, where seeds barely vary, a few tiny gaps do pass Holm at a
+shared rate (§12 Game A, §15.4), but they are at most 0.003 in exploitability (≤ 7%) and
+point in opposite directions. Under PPO one Game B contrast passes within its own
+experiment but not across the whole project, so I treat it as suggestive (§10).
 
 Game A exact, 20 seeds, final exploitability, mean [95% CI]:
 
@@ -43,8 +45,9 @@ Things that did matter:
   5-neuron readout. With a readout from all neurons that goes away (§12).
 - The asymmetric win/loss learning rule pushes every arm away from equilibrium the way
   the theory predicts, and amplifies a loser effect that wiring doesn't change (§6).
-- The equilibrium wastes almost the whole prize in Game A and, in Game B, pays more to
-  sort the prize by value than that sorting is worth. Learners that weight losses more
+- The equilibrium wastes almost the whole prize in Game A and, in Game B, the fight costs
+  exactly what sorting the prize by value gains, so it only breaks even with a coin flip.
+  Learners that weight losses more
   than wins quit earlier: higher exploitability, roughly twice the welfare (§13).
 - Population size. A fixed pair usually settles into roles (one gives in at once), an
   asymmetric equilibrium with almost no fight. Four agents learn worst. From 8 up the
@@ -56,8 +59,9 @@ Nash than each agent against the others (34–47% higher exploitability at 8 age
 the wiring conclusions are unchanged on that metric; the loss-weighted rest point
 matches simulations of the learning rule; every rewired and random control keeps all
 PPL1 → AVLP727m paths (with shorter routes than the real circuit); and a full shared
-learning-rate sweep finds no wiring effect beyond the Game A speed-up, which holds at
-two shared rates and so is not a tuning effect.
+learning-rate sweep finds no wiring effect beyond the Game A speed-up (which holds at
+two shared rates and so is not a tuning effect) and a few exact-mode gaps too small to
+matter (≤ 7%, opposite directions).
 
 ---
 
@@ -208,8 +212,9 @@ quits and a heavy tail, with an exploitability floor. Mean over arms:
 | observed final exploitability (mean of 8 arms) | 0.048 | 0.102 | 0.130 | 0.146 |
 
 Every arm's final exploitability rises monotonically with ρ. Every increase over ρ = 1
-is distinguishable (Holm p ≤ 0.004, g = 1.5–10). Observed values run about 0.015–0.04
-above the prediction, which is roughly the symmetric sampling-noise floor. Asymmetry
+is distinguishable (Holm p ≤ 0.004, g = 1.5–10). Observed values run about 0.015–0.05
+above the prediction (0.048 at ρ = 1, 0.016–0.036 for ρ ≥ 2), which is roughly the
+symmetric sampling-noise floor. Asymmetry
 hurts convergence in every architecture. No wiring contrast at any ρ is
 distinguishable (`asym_pairwise.csv`). Speed cannot be compared at ρ ≥ 2 because almost
 no run gets under 0.05.
@@ -371,8 +376,10 @@ Final utility loss, 20 seeds, mean with 95% CI. Source: `results/tables/per_arm.
 - Speed is the same too: real minus rewire is -1.25 episodes [-11.3, +10.0].
 - Compare with §11. With trained edges, the real circuit crosses the
   threshold 15 episodes before its rewire, and that survives full time resolution. With
-  the synapses frozen, that advantage is gone. So the speed effect in §11 comes from the
-  *trainable* weights, not from the real connection pattern.
+  the synapses frozen, that advantage is gone. The trained-edge arms differ only in
+  their connection pattern, so the §11 speed-up is a pattern effect (§15.4), but it only
+  shows when each edge can learn its own weight. With the real synapse counts frozen in,
+  it disappears.
 - As with the circuit arms, all three sit just below the oracle, because they learn the
   exact grid equilibrium rather than the floored analytic law.
 
@@ -971,9 +978,11 @@ whoever gets it, minus both players' fight cost.
   prize, nobody fights). The equilibrium bid `v²/2` gets the allocation almost right,
   1.471 of the 1.486, because the higher value always waits longer. It pays 0.496 in
   fight cost for that. Welfare 0.976, 34% below the optimum.
-- In Game B the fight is not worth it even as a sorting device. A coin flip with no
-  fight gives `E[v] = 0.993`, slightly more than the equilibrium. Sorting the prize to
-  the higher value gains 0.48 and the waiting to do it costs 0.50.
+- In Game B the fight exactly pays for itself as a sorting device, no more. In
+  continuous time sorting gains `E[max] − E[v] = 1.5 − 1 = 0.5` and the waiting costs
+  `E[min(v1, v2)²] = 0.5` (the minimum of two Exp(1) values is Exp(2)), so equilibrium
+  welfare is 1.0, the same as a coin flip with no fight. On the grid it is 0.976 against
+  0.993 (gains 0.48, costs 0.50); that small gap is discretisation, not a finding.
 
 Source: `results/tables/welfare.csv` (per arm, 95% bootstrap CI),
 `welfare_per_run.csv`, `welfare_contrasts.csv`; `python scripts/welfare.py`. Figure:
@@ -1014,7 +1023,8 @@ quit earlier, which raises exploitability and also raises welfare, on every arm:
 
 Across all 320 sweep runs, Spearman ρ between exploitability and welfare is 0.68. A
 population that learns the way flies seem to (losses count more) ends up further from
-equilibrium but wastes about half as much of the prize. The theory in §6 predicts the
+equilibrium but keeps more than twice as much of the prize (0.45 against 0.19, so waste
+falls from about 0.81 to 0.55). The theory in §6 predicts the
 direction, since the predicted rest points put more mass on quitting at once.
 
 ### Wiring
@@ -1178,7 +1188,7 @@ None of the simulations uses the modified game or the formula. Table
 What this shows:
 
 - The derivation holds. The expected dynamics of the rule converge to the grid fixed
-  point to machine precision, and the plain-gradient version reaches the same
+  point (TV 3·10⁻⁴ at ρ = 1, 10⁻⁵ or less for ρ ≥ 2), and the plain-gradient version reaches the same
   exploitability to within 10⁻⁴ for ρ ≥ 2 (0.001 at ρ = 1). The sampled rule lands at the shifted point, not at the true
   equilibrium: its W1 distance to the prediction is 0.06–0.10 at every ρ, against
   0.31–0.53 to the equilibrium, and its baseline matches the predicted b to within 0.016.
