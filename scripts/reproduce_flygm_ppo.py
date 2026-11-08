@@ -1,6 +1,6 @@
 """Run the FlyGM and PPO experiments step by step and log each step's wall time.
 
-    python scripts/reproduce_flygm_ppo.py                      # all steps
+    python scripts/reproduce_flygm_ppo.py                      # all steps except opt-in ones
     python scripts/reproduce_flygm_ppo.py --only run-ppo-a     # selected steps
     python scripts/reproduce_flygm_ppo.py --list
 
@@ -63,7 +63,7 @@ STEPS: list[tuple[str, str, list[str], int | None]] = [
     ("tune-ppo-b", "tune_lr", ["ppo_game_b_sampled"], None),
     ("run-ppo-b", "run_experiment", ["ppo_game_b_sampled"], None),
     # not run (too expensive), kept for completeness
-    ("run-ppo-b-flygm", "run_experiment", ["ppo_game_b_sampled_flygm"], FLYGM_PPO_WORKERS),
+    ("run-ppo-b-flygm", "run_experiment", ["ppo_game_b_sampled_flygm"], FLYGM_PPO_WORKERS),  # not run; opt-in
     ("robust-ppo-a", "run_experiment", ["robust_ppo_game_a_sampled_shared_lr"], None),
     ("robust-ppo-b", "run_experiment", ["robust_ppo_game_b_sampled_shared_lr"], None),
     (
@@ -84,6 +84,11 @@ STEPS: list[tuple[str, str, list[str], int | None]] = [
     ("run-readout-a", "run_experiment", ["readout_game_a_exact", "wgain_game_a_exact"], HEAVY_WORKERS),
     ("analyze", "analyze", [], None),
 ]
+
+
+# steps left out of a plain run (no --only): run-ppo-b-flygm takes ~4 h of CPU per run
+# and is not part of RESULTS.md (sec. 10)
+OPT_IN = {"run-ppo-b-flygm"}
 
 
 def note(line: str) -> None:
@@ -196,9 +201,10 @@ def main() -> None:
     if args.list:
         for name, script, configs, cap in STEPS:
             tag = f"  [<= {cap} workers]" if cap else ""
+            tag += "  [opt-in: --only]" if name in OPT_IN else ""
             print(f"{name:22s} {script:15s} {' '.join(configs)}{tag}")
         return
-    steps = STEPS if args.only is None else [s for s in STEPS if s[0] in set(args.only)]
+    steps = [s for s in STEPS if s[0] not in OPT_IN] if args.only is None else [s for s in STEPS if s[0] in set(args.only)]
     unknown = set(args.only or []) - {s[0] for s in STEPS}
     if unknown:
         raise SystemExit(f"unknown step(s): {sorted(unknown)}")

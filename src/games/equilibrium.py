@@ -23,7 +23,7 @@ def discretise_survival(survival_at_grid: np.ndarray) -> np.ndarray:
     is ``P(T > t_k)`` evaluated at every grid point (its first entry is 1).
 
     Flooring is the right discretisation: the exact equilibrium of the discrete
-    game coincides with the floored exponential to O(delta^2) (docs/theory.md);
+    game coincides with the floored exponential to O(delta^3) per step (docs/theory.md);
     nearest-point binning leaves an exploitability floor ~20x larger.
     """
     s = np.asarray(survival_at_grid, dtype=np.float64)
