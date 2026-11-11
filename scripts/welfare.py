@@ -5,6 +5,19 @@ Writes ``results/tables/welfare_per_run.csv`` (one row per run),
 sweep point) and ``results/tables/welfare_contrasts.csv`` (real wiring minus each
 control, Holm-corrected across all of them). See ``src/metrics/welfare.py`` for the definitions.
 
+Where the welfare of a run comes from (column ``welfare_source``):
+
+* ``shared_policy``: exact-mode runs and the oracle. One policy plays both sides, so the
+  saved final policy is all that is needed.
+* ``run_record``: sampled runs that stored the welfare between distinct agents themselves.
+* ``rerun``: older sampled runs, whose records hold only the population mixture. Their
+  welfare comes from ``scripts/welfare_rerun.py`` (``results/tables/welfare_population.csv``),
+  and ``final_exploitability`` is then the retrained run's, i.e. of the same population.
+
+A sampled run with neither is left out rather than estimated from its mixture: the
+mixture against itself counts every agent fighting itself, which is not a match that
+happens.
+
     python scripts/welfare.py
 """
 
@@ -28,10 +41,22 @@ ROOT = Path(__file__).resolve().parents[1]
 RES = ROOT / "results"
 METRICS = ["welfare", "dissipation", "fight_cost", "allocated_value", "mean_fight", "final_exploitability"]
 SWEEP_KEYS = ["loss_win_ratio", "population_size"]
+WELFARE_KEYS = ["optimum", "welfare", "fight_cost", "allocated_value", "dissipation", "mean_fight"]
+POPULATION_TABLE = RES / "tables" / "welfare_population.csv"
+
+
+def population_table() -> dict[tuple[str, str], dict]:
+    """Rerun welfare of older sampled runs, keyed by (experiment, run_id)."""
+    if not POPULATION_TABLE.exists():
+        return {}
+    t = pd.read_csv(POPULATION_TABLE)
+    return {(r["experiment"], r["run_id"]): r for r in t.to_dict("records")}
 
 
 def per_run() -> pd.DataFrame:
     rows = []
+    reruns = population_table()
+    missing: dict[str, int] = {}
     for runs in sorted(RES.glob("*/runs")):
         games: dict[str, object] = {}
         for path in sorted(runs.glob("*.json")):
@@ -40,19 +65,36 @@ def per_run() -> pd.DataFrame:
             gcfg = rec["config"]["game"]
             key = json.dumps(gcfg, sort_keys=True)
             game = games.setdefault(key, build_game(gcfg))
-            p = np.asarray(rec["final_policy"], dtype=np.float64)
-            p = p.reshape(-1) if gcfg["name"] == "A" else p
+            mode = rec["config"]["training"]["mode"]
+            expl = rec["summary"]["final_exploitability"]
+            if rec.get("welfare"):
+                w, source = rec["welfare"], "run_record"
+            elif mode == "exact" or rec["arm"] == "oracle":
+                p = np.asarray(rec["final_policy"], dtype=np.float64)
+                w, source = welfare(game, p.reshape(-1) if gcfg["name"] == "A" else p), "shared_policy"
+            elif (rec["experiment"], rec["run_id"]) in reruns:
+                r = reruns[(rec["experiment"], rec["run_id"])]
+                w = {k: r["welfare" if k == "welfare" else f"welfare_{k}"] for k in WELFARE_KEYS}
+                source, expl = "rerun", r["rerun_final_exploitability"]
+            else:
+                missing[rec["experiment"]] = missing.get(rec["experiment"], 0) + 1
+                continue
             row = {
                 "experiment": rec["experiment"],
                 "game": gcfg["name"],
-                "mode": rec["config"]["training"]["mode"],
+                "mode": mode,
                 "arm": rec["arm"],
                 "seed": rec["seed"],
                 **{k: rec["overrides"].get(k) for k in SWEEP_KEYS},
-                **welfare(game, p),
-                "final_exploitability": rec["summary"]["final_exploitability"],
+                **{k: w[k] for k in WELFARE_KEYS},
+                "final_exploitability": expl,
+                "committed_final_exploitability": rec["summary"]["final_exploitability"],
+                "welfare_source": source,
             }
             rows.append(row)
+    for exp, n in missing.items():
+        print(f"[welfare] {exp}: {n} sampled runs have no between-agent welfare yet "
+              "(run scripts/welfare_rerun.py); left out")
     df = pd.DataFrame(rows)
     # sampled runs without a population-size override used the base setting (8)
     df["population_size"] = df["population_size"].fillna(

@@ -1,5 +1,8 @@
 # Fly give-up circuit and the war of attrition
 
+CS329 Foundations of AI: Multi-Agent Systems, IIT Gandhinagar, 2026. Project by Suhani,
+Mayank Choudhary, Krina Paghadar and Nakshatra Lad.
+
 Question: does building a learning agent out of a real neural circuit change how close
 it gets to equilibrium in a strategic game?
 
@@ -23,12 +26,17 @@ size-matched controls with the same neurons but different wiring.
 - Metrics: exact exploitability (how much a best responder could gain), episodes to
   threshold, and welfare against the social optimum (§13).
 
-Short version: the wiring didn't matter. Full numbers are in [RESULTS.md](RESULTS.md);
-section numbers below point there.
+Short version: I found no effect of the wiring on how close the agents get to
+equilibrium. Two caveats. The games ask little of the network (one constant input in
+Game A, one number in Game B), and in sampled Game B the 10-seed confidence intervals
+are wide enough to hide an effect of a quarter of the loss (§8 and the Summary). Full
+numbers are in [RESULTS.md](RESULTS.md); section numbers below point there.
 
 - With trained edges, the real circuit ends up at the same exploitability as a
   degree-preserving rewire or a random sparse graph, in both games and both training
-  modes (§3–§4).
+  modes (§3–§4). The one place it clearly differs is stability: in Game B at a learning
+  rate three times its tuned one, the unsigned real circuit converges on 7 of 20 seeds
+  against 15 and 16 for its controls (§4).
 - With frozen synapse counts as weights (FlyGM), Game A works and shows no wiring effect
   (§9). Game B collapses to a single bid on all three graphs. That turned out to be the
   5-neuron readout, not weak synapses: a trainable gain on W does nothing, but reading
@@ -130,6 +138,12 @@ python -m venv .venv
 .venv/Scripts/python scripts/reproduce.py
 ```
 
+`requirements.txt` gives minimum versions. `requirements-lock.txt` is the exact laptop
+environment (Python 3.14, torch 2.14.0 CPU); with it the laptop runs reproduce bit for
+bit. The runs of §15 were made on a cloud machine with a newer torch, and the committed
+§14 runs match those and not the laptop's, so both reproduce only to about 0.01 in final
+exploitability on single seeds (RESULTS §14, §15.1).
+
 On Linux/macOS use `.venv/bin/` instead of `.venv/Scripts/`. With make:
 `make reproduce` on Windows, `make reproduce PY=.venv/bin/python` on Linux/macOS.
 
@@ -186,4 +200,5 @@ tests/            pytest
 - Bichler, M., Fichtl, M., Heidekrüger, S., Kohring, N., Sutterer, P. Learning
   equilibria in symmetric auction games using artificial neural networks. Nature
   Machine Intelligence 3, 687–695 (2021).
-- Jin et al. 2026, arXiv:2602.17997.
+- Jin, Z., Zhu, Y., Zhang, C., Sui, Y. Whole-brain connectomic graph model enables
+  whole-body locomotion control in fruit fly. arXiv:2602.17997 (2026).
