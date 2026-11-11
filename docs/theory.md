@@ -51,7 +51,7 @@ is an ESS.
 Asymmetric equilibria also exist. "Player 1 quits at 0, player 2 never quits" is also a
 Nash equilibrium, and so is a continuum of asymmetric mixed profiles. By Selten's (1980)
 theorem, a role-asymmetric game has no mixed ESS, so two *independently parameterised*
-learners locked in a fixed pair can drift to one of these dominance equilibria. My
+learners locked in a fixed pair can drift to one of these dominance equilibria. Our
 protocols avoid that confound in two ways (README, "Games and training"). Exact mode
 uses a single shared policy in self-play, the convention of Bichler et al. (2021) for
 symmetric games. Sampled mode uses a randomly re-matched population, the setting in
@@ -169,7 +169,7 @@ neighbouring grid points, weighted so that the mean is exact. Its utility loss i
 ## 3. Asymmetric win/loss updates: what the learner converges to
 
 Sampled self-play uses REINFORCE with a baseline `b` that tracks the mean reward. Real
-flies take losses harder than wins, and I model this by scaling the per-sample policy
+flies take losses harder than wins, and we model this by scaling the per-sample policy
 gradient by `α_loss` after a loss and `α_win` after a win, with ratio `ρ = α_loss/α_win ≥ 1`.
 The weights are normalised to mean 1, `α_win = 2/(1+ρ)` and `α_loss = 2ρ/(1+ρ)`, so
 changing `ρ` does not change the overall step size.
@@ -226,7 +226,7 @@ experiment tests whether they do, and whether wiring changes how closely they do
 ### 3.2 Ties are coin flips
 
 On a grid, ties have positive probability, so the update needs an outcome label for
-them. I resolve a tie by a fair coin for the prize. The realised payoffs are
+them. We resolve a tie by a fair coin for the prize. The realised payoffs are
 `V − ct` / `−ct`, so the expected tie payoff is exactly the game's `V/2 − ct`, and every
 round is a clean win or loss. Giving ties their own weight (for example the mean
 weight 1) instead adds `(ρ−1)/(ρ+1)·V/2` to the diagonal of the modified game. That makes
@@ -249,12 +249,12 @@ Conventions follow Bichler et al., *Nature Machine Intelligence* 3, 687–695 (2
   their relative form `1 − u/(u+ℓ)` would divide by roughly 0.
   - Exact mode, one shared policy: `π_opp = π`.
   - Sampled mode, population of `M` agents: each agent's opponent is the leave-one-out
-    mixture of the others, and I average over agents. I also report the
+    mixture of the others, and we average over agents. We also report the
     exploitability of the population mixture `π̄`, which is what a random opponent faces
     and what the fly survival curve measures.
 - Relative utility loss vs the BNE (Game B), `L = 1 − u(β, β*)/u(β*, β*)`: their eq. (10).
 - L2 (Game B): probability-weighted RMSE between the learned mean quitting time per
-  type and `b(v)`. Their eq. (11). I also report MSE per value decile.
+  type and `b(v)`. Their eq. (11). We also report MSE per value decile.
 - TV and W1 between the learned quitting-time law and the floored exponential. W1 on
   the grid is `Σ_k |F_p(t_k) − F_q(t_k)| Δ`, which is exact.
 - Convergence speed: the first evaluated episode at which exploitability falls below
@@ -279,7 +279,7 @@ such noise everywhere, and worst of all in the tail. The restoring force on the 
 of time `t` is `∝ π_t · (curvature)`, while the tail has `π_t ~ 10⁻³`. So tail logits
 relax over `~10⁴` updates while every update's sampling noise keeps kicking them.
 
-I checked that the estimator is unbiased (`tests/test_training.py::
+We checked that the estimator is unbiased (`tests/test_training.py::
 test_sampled_gradient_is_unbiased`: mean REINFORCE gradient vs exact gradient,
 correlation > 0.99). Across batch sizes 16–2048, SGD and Adam, lr decay, shared vs
 population, the floor stayed at 0.02–0.05. It is a property of the estimator on this
@@ -299,5 +299,5 @@ Two other choices came from the same pilot runs:
   differ from each other (`Σ_m δ_m = 0`) grow at rate `∝ 1/(M−1)`. This is because
   `−U` is positive definite on the tangent space: the multi-population instability
   behind Selten's theorem. Agents therefore partly specialise; in the tabular runs the
-  SD of per-agent mean quitting time is about 0.4. I report both the mean individual
+  SD of per-agent mean quitting time is about 0.4. We report both the mean individual
   utility loss (primary) and the population-mixture exploitability.

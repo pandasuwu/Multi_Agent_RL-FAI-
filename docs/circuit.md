@@ -1,7 +1,7 @@
 # The give-up circuit subgraph
 
 MaleCNS v1.0 (Berg et al., *Cell* 2026; CC-BY 4.0), the complete male
-*Drosophila* CNS. I read the public flat-connectome tables from
+*Drosophila* CNS. We read the public flat-connectome tables from
 `https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/`:
 
 - `body-annotations-male-cns-v1.0-minconf-0.5.feather` (14.5 MB)
@@ -47,7 +47,7 @@ known identities.
 
 The paper reports that at a threshold of 5 synapses no neuron within 2 synapses
 downstream of the V2 MBONs is AVLP727m. It traces MBON→AVLP727m connections as
-4-neuron paths (MBON → X → Y → AVLP727m). I follow both choices:
+4-neuron paths (MBON → X → Y → AVLP727m). We follow both choices:
 
 - Connecting neurons: every neuron on a directed path of at most 3 synapses from
   {MBON18, MBON19} to AVLP727m, with every edge having at least 5 synapses. This gives
@@ -60,13 +60,13 @@ downstream of the V2 MBONs is AVLP727m. It traces MBON→AVLP727m connections as
   PPL105 → MBON19 has 98. PPL104 and PPL106 contacts fall below 5 synapses. No
   intermediate neurons are needed on this leg.
 
-Core plus connecting neurons gives 81 neurons, which I felt was too small for a policy
-network (I wanted something in the low hundreds).
+Core plus connecting neurons gives 81 neurons, which we felt was too small for a policy
+network (we wanted something in the low hundreds).
 
 ## 3. One-hop expansion (+177 → 258 neurons)
 
-To get a bigger network I expanded it by one synaptic hop. A full hop (every neuron
-with any ≥5-synapse contact) adds about 6,400 neurons, so the hop is restricted by connection strength. I add every neuron that exchanges at
+To get a bigger network we expanded it by one synaptic hop. A full hop (every neuron
+with any ≥5-synapse contact) adds about 6,400 neurons, so the hop is restricted by connection strength. We add every neuron that exchanges at
 least 400 synapses (inputs plus outputs, over edges of at least 5 synapses) with the
 81-neuron circuit. This adds 177 neurons. They are mostly central-brain intrinsic
 neurons (166), plus 5 descending, 4 ascending and 2 visual projection neurons. Among them
@@ -170,21 +170,21 @@ commit `cd7f809` (2026-09-18):
 - It is not on PyPI. `pip install connectorch` fails ("No matching distribution"),
   despite the README.
 - Its MaleCNS loader (`datasets/malecns.py`) reads the same public flat-connectome
-  feather files I use, and supports metadata filtering (`Connectome.where(cell_type=…)`
+  feather files we use, and supports metadata filtering (`Connectome.where(cell_type=…)`
   plus `subgraph()`). Neuron-level filtering by cell type *is* possible. There is no
-  path-based or strength-thresholded partner selection, which is what I needed.
+  path-based or strength-thresholded partner selection, which is what we needed.
 - Its model (`nn.ConnectomeRNN`) is a recurrent network over the whole graph, and its
   controls (`transforms/rewire.py`) include degree-preserving and random-topology
-  rewires. It builds a bigger model than I needed, with its
+  rewires. It builds a bigger model than we needed, with its
   own dynamics and parameterisation.
 
-I therefore wrote a small loader against the same raw files, about 250 lines in
+We therefore wrote a small loader against the same raw files, about 250 lines in
 `src/connectome/`, adopting its conventions:
 
 - the `traced-only` connectivity variant;
 - the transmitter-to-sign mapping (ACh +, GABA/Glu −, modulators unsigned);
 - refusing to download or substitute data without being told.
 
-My own sparse layer (`SparseCircuitPolicy`) stores only the edge weights as parameters,
+Our sparse layer (`SparseCircuitPolicy`) stores only the edge weights as parameters,
 so the no-new-connections rule holds by construction
 (`test_masked_weights_cannot_grow_new_connections`).
