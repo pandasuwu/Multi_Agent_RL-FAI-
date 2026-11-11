@@ -117,7 +117,9 @@ in Game B, no seeds or statistics). None of the numbers here come from it.
 
 Mean [95% CI]. Source: `results/tables/per_arm.csv`. Figure: `figures/fig3_main_comparison.png`.
 
-![Final exploitability by arm in the four main settings](figures/fig3_main_comparison.png)
+![Final exploitability by arm in the four main settings](figures/fig3b_main_four_settings.png)
+
+`figures/fig3_main_comparison.png` has the same plot for every experiment, with episodes to threshold.
 
 | arm | A exact (20) | A sampled, ρ=1 (10) | B exact (20) | B sampled (10) |
 |---|---|---|---|---|

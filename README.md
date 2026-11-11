@@ -67,13 +67,15 @@ numbers are in [RESULTS.md](RESULTS.md); section numbers below point there.
   graph keeps all PPL1 → AVLP727m paths. A sweep over shared learning rates shows the
   Game A speed-up is a wiring effect, not tuning, and finds nothing else.
 
-![Final exploitability by arm in the four main settings](figures/fig3_main_comparison.png)
+![Final exploitability by arm in the four main settings](figures/fig3b_main_four_settings.png)
 
 What would count as an answer: a difference between the real circuit and its
 degree-preserving rewire that holds at a shared learning rate and survives Holm
 correction would be a wiring effect; confidence intervals tight around zero would be
 evidence of none. The exact-gradient settings give the second. The sampled settings
 give neither firmly.
+
+The project report is [final_report.pdf](final_report.pdf).
 
 Other docs: [docs/theory.md](docs/theory.md) (equilibria, exploitability),
 [docs/circuit.md](docs/circuit.md) (how the subgraph was extracted).
