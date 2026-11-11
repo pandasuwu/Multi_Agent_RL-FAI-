@@ -7,21 +7,16 @@ close it gets to equilibrium in the war of attrition, compared with size-matched
 networks wired differently?
 
 We found no effect of fly wiring on final exploitability. In all four settings
-(Game A and B, exact and sampled), the policy built on the real give-up circuit ends up
-where its two size-matched controls do: a degree-preserving rewire and a random sparse
-graph. In the main grid every one of these contrasts either has a CI that covers zero or
-fails Holm. In exact mode, where seeds barely vary, a few tiny gaps do pass Holm at a
-shared rate (§12 Game A, §15.4), but they are at most 0.003 in exploitability (≤ 7%) and
-point in opposite directions. Under PPO one Game B contrast passes within its own
-experiment but not across the whole project, so we treat it as suggestive (§10).
+(Game A and B, exact and sampled), the policy built on the real circuit ends up where
+its two size-matched controls do: a degree-preserving rewire and a random sparse graph.
+In the main grid every contrast either has a CI that covers zero or fails Holm. A few
+exact-mode gaps pass Holm at a shared rate (§12, §15.4), but they are at most 0.003 in
+exploitability (≤ 7%) and point in opposite directions.
 
-How firmly "no effect" is pinned down depends on the setting. The 95% CIs on
-real-minus-control (§4) have half-widths of 3–11% of the arms' own loss in Game A exact
-and 10–21% in Game B exact (the unsigned random graph aside, where three seeds failed),
-so an effect larger than that is ruled out there. In sampled mode, with 10 seeds, they are
-13–16% (Game A) and 14–29% (Game B): connectome − rewire in Game B sampled is
-−0.027 [−0.069, +0.012] on means of 0.15–0.18. There the result is "no effect detected",
-and an effect of a quarter of the loss in either direction would not have been seen.
+How firmly "no effect" is pinned down depends on the setting. The 95% CI half-widths on
+real-minus-control are 3–11% of the arms' own loss in Game A exact, 10–21% in Game B
+exact, and 13–29% in sampled mode with 10 seeds. In sampled Game B an effect of a
+quarter of the loss in either direction would not have been seen (§4, §8).
 
 Game A exact, 20 seeds, final exploitability, mean [95% CI]:
 
@@ -32,50 +27,42 @@ Game A exact, 20 seeds, final exploitability, mean [95% CI]:
 | random sparse | 0.00130 [0.00128, 0.00133] |
 | connectome − rewire | +0.000002 [−0.00009, +0.00018], g = 0.01 |
 
-Exploitability isn't the whole policy though. In Game B exact the sign-constrained real
-circuit bids worse for the highest-value types (top-decile bid MSE 0.99 [0.49, 1.67] vs
-0.24 for the rewire and 0.28 for random; bid L2 +0.11 [0.04, 0.19] over the rewire, Holm
-p = 0.022). Those types sit where the interim payoff is almost flat, so it barely shows
-up in exploitability (§4).
+Where wiring did show up:
 
-Speed effects of wiring are small and go both ways. In Game A exact the unsigned
-connectome hits the threshold 19–24 episodes before its controls (226 vs 245 and 250,
-Holm p = 0.001); at full time resolution that's 15–20 episodes and still holds (§11). The
-signed version doesn't show it. In Game B exact the signed connectome is 45–50 episodes
-slower than its signed controls. Nowhere does fly wiring reliably help, and the one thing
-that recurs in Game B is a small cost.
+- Stability, the largest effect. In Game B exact at a learning rate of 0.03, three times
+  its tuned rate, the unsigned real circuit reaches the threshold in 7 of 20 seeds,
+  against 15 for the rewire and 16 for random (§4). At its own tuned rate, and with sign
+  constraints, there is no such gap.
+- Speed, small and in both directions. In Game A exact the unsigned connectome reaches
+  the threshold 15–20 episodes before its controls (§11). In Game B exact the signed
+  connectome is 45–50 episodes slower than its signed controls.
+- High-value bids. In Game B exact the signed real circuit bids worse for the
+  highest-value types (top-decile bid MSE 0.99 vs 0.24 and 0.28). The payoff is almost
+  flat there, so it barely shows in exploitability (§4).
+- Under PPO one Game B contrast passes Holm within its own experiment but not across
+  the whole project, so we treat it as suggestive (§10).
 
-The largest wiring-dependent effect is about stability, and it is not small. In Game B
-exact at a learning rate of 0.03, three times the 0.01 the unsigned connectome tuned to,
-the unsigned real circuit reaches the threshold in 7 of 20 seeds, against 15 for the rewire
-and 16 for random (§4; 4, 8 and 7 of 10 on the separate seeds of §15.4). At its own tuned
-rate, and with sign constraints at any rate, there is no such gap.
-
-Things that did matter:
+Things that mattered more than wiring:
 
 - Architecture class. The dense MLP beats every circuit arm in 3 of 4 settings; the
   circuits only win in Game A exact.
-- Sign constraints (Dale's law) improve all three circuit graphs in Game B with the
-  5-neuron readout. With a readout from all neurons that goes away (§12).
+- The readout. Reading the policy from all 258 neurons instead of 5 improves every
+  circuit arm in Game B, fixes the collapse of the frozen-synapse (FlyGM) arms, and
+  removes the advantage sign constraints had with the 5-neuron readout (§9, §12).
 - The asymmetric win/loss learning rule pushes every arm away from equilibrium the way
   the theory predicts, and amplifies a loser effect that wiring doesn't change (§6).
-- The equilibrium wastes almost the whole prize in Game A and, in Game B, the fight costs
-  exactly what sorting the prize by value gains, so it only breaks even with a coin flip.
-  Learners that weight losses more
-  than wins quit earlier: higher exploitability, almost three times the welfare (§13).
-- Population size. A fixed pair usually settles into roles (one gives in at once), an
-  asymmetric equilibrium with almost no fight. Four agents learn worst. From 8 up the
-  population converges on the symmetric equilibrium, and at 16 all arms tie (§14).
-  Wiring makes no difference at any size.
+- Welfare. The equilibrium wastes almost the whole prize in Game A and only breaks even
+  with a coin flip in Game B. Learners that weight losses more than wins quit earlier:
+  higher exploitability, almost three times the welfare (§13).
+- Population size. A fixed pair usually settles into roles with almost no fight. Four
+  agents learn worst. From 8 up the population converges on the symmetric equilibrium,
+  and at 16 all arms tie (§14).
 
-Checks added after the project review (§15): the population as a whole is further from
-Nash than each agent against the others (34–47% higher exploitability at 8 agents), but
-the wiring conclusions are unchanged on that metric; the loss-weighted rest point
-matches simulations of the learning rule; every rewired and random control keeps all
-PPL1 → AVLP727m paths (with shorter routes than the real circuit); and a full shared
-learning-rate sweep finds no wiring effect beyond the Game A speed-up (which holds at
-two shared rates and so is not a tuning effect) and a few exact-mode gaps too small to
-matter (≤ 7%, opposite directions).
+Checks added after the project review (§15) leave the wiring conclusions unchanged: the
+population as a whole is further from Nash than each agent against the others; the
+loss-weighted rest point matches simulations of the learning rule; every control graph
+keeps all PPL1 → AVLP727m paths; and a full shared learning-rate sweep finds no wiring
+effect beyond the Game A speed-up.
 
 ---
 
@@ -93,33 +80,26 @@ matter (≤ 7%, opposite directions).
 | Threshold | 0.01 (exact), 0.05 (sampled); time to threshold censored at the training length |
 | Statistics | mean with 95% percentile bootstrap CI (10,000 resamples). Each contrast: bootstrap CI of the difference, Hedges' g, permutation p, Holm-adjusted within each experiment × metric family. "Distinguishable" = CI excludes 0 and Holm p < 0.05. |
 
-All tables are in `results/tables/`: `per_arm.csv`, `pairwise.csv`, `asym_*.csv`,
-`game_b_deciles.csv` and `welfare*.csv` (§13–§14). Per-run records with the full config snapshot and seed are in
-`results/<experiment>/runs/`.
-
-The [live demo](https://pandasuwu.github.io/Multi_Agent_RL-FAI-/) trains the same arms in the browser on a smaller setup (10 value levels
-in Game B, no seeds or statistics). None of the numbers here come from it.
+Tables are in `results/tables/`; per-run records with the full config and seed are in
+`results/<experiment>/runs/`. Theory is in [docs/theory.md](docs/theory.md), the circuit
+in [docs/circuit.md](docs/circuit.md).
 
 ## 2. Sanity checks
 
 - Oracle: grid exploitability 0.00149 in Game A and 0.0058 in Game B. These are the
-  discretisation floors; the exact grid equilibrium has 0.
-- Tabular, Game A exact: converges to 0.0032 and crosses 0.01 at episode 650. Its
-  learned survival curve lies on `exp(−t)` (`figures/fig1_*`).
-- `b(v) = v²/2` is a best response to itself: confirmed by quadrature, with no grid
+  discretisation floors.
+- Tabular, Game A exact: converges to 0.0032, and its learned survival curve lies on
+  `exp(−t)` (`figures/fig1_*`).
+- `b(v) = v²/2` is a best response to itself, confirmed by quadrature
   (`tests/test_games.py`).
-- Parameter counts: matched at 5,584 vs 5,610 (0.5%). This is asserted before every
-  run, and every rewired control preserves every in- and out-degree exactly (asserted).
-- Rebuild: the subgraph rebuilt from the raw MaleCNS files reproduced the committed
-  SHA-256 exactly.
+- Parameter counts are matched within 0.5%, and every rewired control preserves every
+  in- and out-degree. Both are asserted before every run.
 
 ## 3. Final exploitability by arm
 
-Mean [95% CI]. Source: `results/tables/per_arm.csv`. Figure: `figures/fig3_main_comparison.png`.
-
 ![Final exploitability by arm in the four main settings](figures/fig3b_main_four_settings.png)
 
-`figures/fig3_main_comparison.png` has the same plot for every experiment, with episodes to threshold.
+Mean [95% CI]; seeds in brackets. `figures/fig3_main_comparison.png` has every experiment.
 
 | arm | A exact (20) | A sampled, ρ=1 (10) | B exact (20) | B sampled (10) |
 |---|---|---|---|---|
@@ -133,15 +113,15 @@ Mean [95% CI]. Source: `results/tables/per_arm.csv`. Figure: `figures/fig3_main_
 | random sparse | 0.00130 [0.00128, 0.00133] | 0.049 [0.043, 0.056] | 0.064 [0.009, 0.146]† | 0.143 [0.116, 0.172] |
 | random sparse, signed | 0.00132 [0.00125, 0.00145] | 0.044 [0.040, 0.048] | 0.0054 [0.0049, 0.0062] | 0.079 [0.068, 0.090] |
 
-\* Tuned to a different learning rate from the connectome (§5). †Three of 20 seeds ended far from equilibrium (0.12, 0.28, 0.72), and 4 never reached the threshold.
+\* Tuned to a different learning rate from the connectome (§5). †Three of 20 seeds ended far from equilibrium.
 
-Circuit arms in Game A exact (about 0.00127) sit *below* the oracle. They learn the
-exact grid equilibrium (exploitability 0) better than the floored analytic law does.
+Circuit arms in Game A exact sit below the oracle because they learn the exact grid
+equilibrium, which the floored analytic law only approximates.
 
 ## 4. Real wiring vs controls
 
-Differences in final exploitability, connectome minus control, with 95% CI [Holm p].
-Negative means the connectome is better. Source: `results/tables/pairwise.csv`.
+Final exploitability, connectome minus control, 95% CI (Holm p). Negative means the
+connectome is better.
 
 | setting | vs rewire (unsigned) | vs rewire (signed) | vs random (unsigned) | vs random (signed) |
 |---|---|---|---|---|
@@ -150,10 +130,8 @@ Negative means the connectome is better. Source: `results/tables/pairwise.csv`.
 | B exact | +0.0004 [−0.0002, 0.0015] (1.0) | +0.0007 [−0.0002, 0.0019] (0.76) | −0.056 [−0.140, −0.002] (0.22) | +0.0005 [−0.0007, 0.0018] (1.0) |
 | B sampled, shared lr | −0.027 [−0.069, 0.012] (0.92) | +0.004 [−0.027, 0.026] (1.0) | +0.011 [−0.025, 0.044] (1.0) | +0.015 [0.003, 0.028] (0.22) |
 
-No cell is distinguishable from zero. The effect sizes are near zero wherever the
-CIs are tight (Game A exact: |g| ≤ 0.3).
-
-Where speed or secondary metrics *are* distinguishable at a matched learning rate:
+No cell is distinguishable from zero. Speed and secondary metrics that *are*
+distinguishable at a matched learning rate:
 
 | setting | contrast | effect | Holm p |
 |---|---|---|---|
@@ -167,230 +145,102 @@ Where speed or secondary metrics *are* distinguishable at a matched learning rat
 | B exact, shared lr 0.03 | connectome − rewire (unsigned), episodes to 0.01, censored at 4,000 | +1,425 [465, 2,303] (g = 0.91); 7 of 20 seeds reach it vs 15 | 0.036 |
 | B exact, shared lr 0.03 | connectome − random (unsigned), episodes to 0.01, censored at 4,000 | +1,500 [555, 2,370] (g = 1.0); 7 of 20 vs 16 | 0.029 |
 
-The Game B L2 gap is concentrated in the top value decile: bid MSE 0.99 for the
-signed connectome vs 0.24 (rewire) and 0.28 (random). Those types bid 7–10 time units,
-where the interim payoff is nearly flat, so a weak gradient there barely moves utility
-loss (`figures/fig6_game_b_bids.png`). Deciles 1–9 are indistinguishable across all
-signed arms.
+- Game A exact: a small speed-up for the unsigned connectome that vanishes under sign
+  constraints (§11).
+- Game B exact, signed: a small slow-down and worse bids for the highest values (top
+  decile bid MSE 0.99 vs 0.24 and 0.28). The payoff is nearly flat there, so it barely
+  moves exploitability.
+- Game B exact, unsigned, at lr 0.03 (three times the connectome's tuned rate): the real
+  circuit is less stable, 7 of 20 seeds reaching the threshold against 15 and 16. At a
+  shared rate of 0.01 the three graphs end within 12% of each other (§15.4).
 
 ![Game B bid functions and bid error by value decile](figures/fig6_game_b_bids.png)
 
-Degree structure (rewire vs random) never mattered for final loss either.
-The only wiring-specific effects are:
-
-- a sub-evaluation-interval speed-up in Game A exact that vanishes under sign
-  constraints;
-- a small, consistent *slow-down plus worse high-value bids* for the signed real
-  circuit in Game B.
-
-- less stable training for the *unsigned* real circuit in Game B exact at lr 0.03 (the
-  last two rows above). This is at the shared rate of `robust_game_b_exact_shared_lr`,
-  which is the signed arms' tuned rate and three times the unsigned connectome's (0.01).
-  Most of the gap is seeds that never reach the threshold, so the episode counts are
-  mostly censoring. Final loss there is 0.165 against 0.050 (rewire) and 0.064 (random),
-  but those two contrasts fail Holm (p = 0.44 and 0.92) because the failed seeds make
-  every arm's spread large. At a shared rate of 0.01 the three unsigned graphs end
-  within 12% of each other (0.0086, 0.0078, 0.0077; §15.4).
-
-The first two don't change how well the agents end up playing. The third does, at a
-rate the unsigned arms were not tuned for, and goes against the real wiring.
-
 ## 5. Learning-rate confound
 
-Per-arm learning-rate tuning, with 2 tuning seeds per grid point, gave the unsigned
-rewired control a rate 10× higher than the connectome in sampled Game A (0.03 vs
-0.003) and 3× *lower* in sampled Game B (0.003 vs 0.01). At those rates the "wiring"
-contrasts looked significant:
-
-- Game B sampled: connectome worse by +0.059 [0.036, 0.078], Holm p = 0.004.
-- Game A sampled: connectome better on TV and on the loser effect (§6).
-
-Both confounds were in sampled mode, the only mode where the arms being compared
-tuned to different rates. We re-ran the circuit arms of sampled Game A, sampled Game B
-and exact Game B at one shared learning rate (the modal tuned value,
-`configs/robust_*_shared_lr.yaml`), so that the arms differ only in their mask. Every
-effect that rested on a rate difference disappears:
+Per-arm tuning gave the unsigned rewire a rate 10× higher than the connectome in sampled
+Game A and 3× lower in sampled Game B. At those rates two "wiring" contrasts looked
+significant (Game B sampled: connectome worse by +0.059, Holm p = 0.004). We re-ran the
+circuit arms at one shared rate (`configs/robust_*_shared_lr.yaml`) and both disappear:
 
 - Game B sampled: −0.027 [−0.069, 0.012].
 - Game A sampled: +0.0004 [−0.0054, 0.0061].
 
-That does not mean every wiring effect disappears at a shared rate. The two exact-mode
-speed effects were measured at a shared rate from the start, and they remain:
-
-- Game A exact: all six circuit arms tuned to the same rate (0.03), so the unsigned
-  connectome's speed-up (§4, §11) involves no rate difference. There is no separate
-  shared-rate rerun of Game A exact, because it would repeat the same runs.
-- Game B exact, signed: all three signed arms tuned to 0.03. The signed connectome's
-  slowdown (+45 and +50 episodes) and its worse bid L2 (+0.11 above the rewire) come from
-  the same runs in the shared-rate grid, and are distinguishable there (Holm p = 0.036,
-  0.029 and 0.022).
-- Under PPO, one Game B sampled contrast also holds at a shared rate (§10).
-
-The shared-lr runs are reported alongside the per-arm-tuned ones in every table. I
-treat only effects that survive both protocols as real.
+The exact-mode speed effects of §4 were measured at a shared rate from the start and
+remain. We treat only effects that survive both protocols as real.
 
 ## 6. Asymmetric win/loss updates and the loser effect (sampled Game A)
 
-Source: `results/tables/asym_*.csv`, `figures/fig4_asymmetric_sweep.png`.
-
 ![Loss-weighted updates: exploitability, distance to the predicted rest point, loser effect](figures/fig4_asymmetric_sweep.png)
 
-The rest point moves exactly where the theory says. With a reward-tracking
-baseline, loss-weighted REINFORCE converges to the equilibrium of a *modified* game, not
-the real one (docs/theory.md §3). The prediction is a decreasing hazard, more immediate
-quits and a heavy tail, with an exploitability floor. Mean over arms:
+With losses weighted ρ times more than wins, REINFORCE converges to the equilibrium of a
+*modified* game (docs/theory.md §3): more immediate quits, a heavy tail, and an
+exploitability floor.
 
 | ρ = α_loss/α_win | 1 | 2 | 4 | 8 |
 |---|---|---|---|---|
 | predicted exploitability of the rest point | 0 | 0.066 | 0.108 | 0.130 |
 | observed final exploitability (mean of 8 arms) | 0.048 | 0.102 | 0.130 | 0.146 |
 
-Every arm's final exploitability rises monotonically with ρ. Every increase over ρ = 1
-is distinguishable (Holm p ≤ 0.004, g = 1.5–10). Observed values run about 0.015–0.05
-above the prediction (0.048 at ρ = 1, 0.016–0.036 for ρ ≥ 2), which is roughly the
-symmetric sampling-noise floor. Asymmetry
-hurts convergence in every architecture. No wiring contrast at any ρ is
-distinguishable (`asym_pairwise.csv`). Speed cannot be compared at ρ ≥ 2 because almost
-no run gets under 0.05.
+- Every arm's exploitability rises with ρ (every increase over ρ = 1 has Holm p ≤ 0.004).
+  Observed values sit 0.015–0.05 above the prediction, about the sampling-noise floor.
+- No wiring contrast at any ρ is distinguishable.
+- Loser effect. Losing lowers an agent's next-round quitting time in every arm, even at
+  ρ = 1. Loss-weighting amplifies it about 1.8×. Wiring does not change it: at a shared
+  rate every connectome-vs-control difference has a CI that includes 0.
 
-Winner/loser effect. For every agent and round we regressed the *exact* change in
-its mean quitting time caused by its own update on the fraction of that round's 128
-matches it lost. This is a within-agent measure, free of between-agent heterogeneity.
-
-- Losing lowers the next-round quitting time in every arm, even at ρ = 1: about
-  −6·10⁻⁶ per lost match relative to a won one. So an all-loss round vs an all-win
-  round moves the mean by about −0.0008, against a mean near 0.9. This is mechanical:
-  winners' long quitting times get reinforced by a positive advantage, and losers'
-  quitting times carry no such push.
-- Asymmetric updates amplify it about 1.8×, to about −1.1·10⁻⁵ per loss at ρ = 4–8.
-  That is distinguishable from ρ = 1 in 7 of 8 arms at ρ = 4 and 8.
-- Wiring does not modulate it. With signed arms, or with the shared learning rate,
-  every connectome-vs-control difference is ≤ 10⁻⁶ with a CI that includes 0. The
-  apparent unsigned connectome-vs-rewire difference is the learning-rate artefact of §5:
-  at the shared rate, rewired gives −7·10⁻⁶, the same as the others.
-- The *raw* behavioural measure (next-round sampled quitting time vs loss fraction) is
-  about 10³× larger, −0.015 to −0.047, because agents that lose are agents that quit early.
-  That confound is exactly why the within-agent measure is the one reported.
-
-So the learning agents do show a loser effect of the fly kind. It is small, it grows
-with loss-weighting, and it comes from the learning rule, not from the fly wiring.
+So the agents show a loser effect of the fly kind, but it comes from the learning rule
+and not from the fly wiring.
 
 ## 7. Other findings
 
-- Sign constraints help in Game B, with the 5-neuron readout. Signed minus unsigned
-  final loss:
-  - exact: −0.0023 (connectome), −0.0026 (rewire), −0.058 (random); all Holm p ≤ 0.006;
-  - sampled, shared-lr run: −0.059, −0.090, −0.064; all Holm p ≤ 0.016.
-
-  Unsigned circuits are also less stable at high learning rates. In the shared-lr
-  Game B exact run at lr 0.03, only 35% of unsigned-connectome seeds reached the
-  threshold. In Game A the constraint makes no difference. With a readout from all 258
-  neurons the Game B advantage is gone: all three signed-minus-unsigned contrasts have
-  Holm p = 1.0 (§12).
-- Dense vs circuit. Dense is better in A sampled (0.033 vs 0.045), B exact (0.0029
-  vs 0.0060) and B sampled (0.072 vs 0.094); all Holm p ≤ 0.04. The circuits are
-  better and faster in A exact: 0.00127 vs 0.00159, and 226 vs 341 episodes. Plausible
-  cause: the circuit reads out from only 5 AVLP727m neurons, which suits a
-  one-context distribution but is a bottleneck for Game B's value-dependent bids. This
-  is a property of the whole architecture, shared with its controls, not of the wiring.
-  §12 tests it: with a readout from all 258 neurons the Game B gap to dense mostly
-  closes (connectome 0.0039 against dense 0.0024).
-- Stability. Late-training policy variance is tiny in exact mode (< 2·10⁻⁶ for
-  every arm in Game A). No arm orbits the equilibrium. In sampled mode the
-  variance reflects sampling noise.
+- Sign constraints help all three circuit graphs in Game B with the 5-neuron readout
+  (all Holm p ≤ 0.016), and not in Game A. With the all-neuron readout the advantage is
+  gone (§12).
+- Dense vs circuit. Dense is better in A sampled (0.033 vs 0.045), B exact (0.0029 vs
+  0.0060) and B sampled (0.072 vs 0.094). The circuits are better and faster in A exact
+  (0.00127 vs 0.00159; 226 vs 341 episodes). Most of the Game B gap is the 5-neuron
+  readout (§12).
+- No arm orbits the equilibrium: late-training policy variance in exact mode is below
+  2·10⁻⁶.
 
 ## 8. Limitations
 
-- Game A has a single context, so any policy is a reparameterisation of one
-  distribution. All circuit arms share the readout bias path, which limits how much
-  wiring can matter there by construction. The six circuit variants in Game A exact
-  agree to within about 6%. Game B, where the network must compute a value-dependent
-  bid, is the stronger test, and there too no final-loss effect survives.
-- Sampled REINFORCE never reaches near-zero exploitability. Tabular and every
-  network stall at 0.03–0.05 in Game A: exploitability is first-order in policy noise
-  at a mixed equilibrium (docs/theory.md §5). In Game B sampled, no network arm reached
-  the 0.05 threshold (tabular: 2 of 10 seeds), so speed there is uninformative. Final
-  loss there is 0.07–0.15 for the network arms against an equilibrium payoff of 0.49, so
-  the Game B sampled wiring contrasts compare learners that have not converged, and the
-  small tabular baseline (0.053) beats every network.
-- The games ask little of the network, which limits what "no wiring effect" can mean.
-  The input is one constant in Game A and one number in Game B, and the output is a
-  distribution over 64 times. A circuit whose wiring matters for processing structured
-  sensory input would not show it here. With the all-neuron readout of §12 the policy
-  can also read the input neurons directly.
-- Compute reductions (the full grid must run on a laptop CPU in under 2 h):
-  - sampled modes use the minimum 10 seeds and 3,000 episodes (exact modes use 20);
-  - learning rates were tuned on 2 seeds per grid point;
-  - the tabular grid has only three rates, and under PPO more arms sit on an edge (§10);
-  - several tuned rates sit on a grid edge: dense 0.0003 in A sampled, and tabular 0.03
-    in both sampled games, so better rates may exist outside the grid.
-
-  Measured wall time for the whole pipeline on an 8-core laptop (AMD Ryzen AI 7 350,
-  12 workers):
-  - 59.7 min for the connectome rebuild, tuning, the four experiments, analysis and
-    figures (`results/reproduce_log.txt`);
-  - +23.7 min for the three shared-learning-rate robustness experiments;
-  - 83 min in total.
-- Only one circuit definition was tested. It uses the 5-synapse threshold, ≤3-synapse
-  MBON→AVLP727m paths, and a one-hop expansion at ≥400 exchanged synapses. We did not
-  test sensitivity to these choices, to the unroll depth (6), or to the choice of
-  PPL1 as input and AVLP727m as output. Kenyon cells are excluded by the per-neuron
-  strength criterion (docs/circuit.md §3).
-- Transmitter signs are EM-based predictions (26 of 258 neurons are unsigned); we
-  did not test alternative sign maps.
-- Independent learners partly specialise. Deviations in which agents differ are
-  unstable at rate ∝ 1/(M−1) (docs/theory.md §5). With 8 agents in sampled Game A,
-  the SD of per-agent mean quitting time ends near 0.4–0.5 (dense 0.41, circuits
-  0.50–0.51; 1.2 for the rewired arm at lr 0.03). We report individual utility loss;
-  population-mixture exploitability is in the per-run files.
-- Not established:
-  - whether a *larger* or differently cut subgraph, or a task where the circuit's
-    inputs carry real sensory structure, would reveal a wiring effect;
-  - whether the Game B top-decile deficit of the signed connectome reflects its
-    reciprocity and clustering (0.43 and 0.39, vs 0.10 and 0.21 after rewiring) or
-    something else.
-- Statistical power. With 10 seeds the sampled-mode intervals are wide (in Game B
-  sampled at a shared rate, real minus rewire is −0.027 with a 95% CI of [−0.069, +0.012]
-  on means of 0.15–0.18), so "no effect found" there rules out large effects only, not
-  moderate ones.
-- The tests are unpaired although arms share seed numbers. A seed sets the initial
-  weights and the sampling stream, but the arms differ in architecture and the rewired
-  graphs differ per seed, so the same seed number does not give matched runs. The
-  across-arm Spearman correlation of per-seed final exploitability has a median of 0.02
-  to 0.10 in the four main settings (pairs range from −0.54 to +0.79 with 10–20 seeds),
-  so a paired test would gain little. The one exactly paired comparison is §11.
-- The learning-rate sweep of §15.4 covers exact mode only. In sampled mode the evidence
-  on the rate confound is the shared-rate reruns of §5, at one rate per game.
+- Game A has a single context, so wiring can matter little there by construction.
+  Game B is the stronger test.
+- The games ask little of the network: one constant input in Game A, one number in
+  Game B. A circuit whose wiring matters for structured sensory input would not show it
+  here.
+- Sampled REINFORCE does not converge closely. It stalls at 0.03–0.05 in Game A, and in
+  Game B no network arm reaches the 0.05 threshold, so those wiring contrasts compare
+  learners that have not converged.
+- Statistical power. With 10 seeds the sampled intervals are wide, so "no effect found"
+  there rules out large effects only.
+- Tuning. Learning rates were tuned on 2 seeds per grid point, and several sit on a grid
+  edge (dense in A sampled, tabular in both sampled games, more under PPO).
+- The tests are unpaired although arms share seed numbers. The across-arm correlation of
+  per-seed final exploitability has a median of 0.02 to 0.10 in the four main settings,
+  so a paired test would gain little.
+- The shared learning-rate sweep (§15.4) covers exact mode only.
+- One circuit definition: one synapse threshold, one unroll depth (6), PPL1 as input and
+  AVLP727m as output. Sensitivity to these was not tested. Transmitter signs are
+  predictions, and 26 of 258 neurons have none.
+- Independent learners partly specialise, so per-agent exploitability understates how
+  far the population is from equilibrium (§15.1).
+- Not run: FlyGM under PPO in Game B, loss-weighting under PPO, and welfare for the PPO
+  and FlyGM sampled runs.
+- Some runs (§14, §15, part of FlyGM Game B sampled) were made on a different machine
+  and torch version and reproduce to about 0.01 on single seeds, not bit for bit.
 
 ---
 
 ## 9. FlyGM: frozen synapse weights
 
-### The arm
-
-Arms 3 to 5 keep the *shape* of the fly circuit. They know which neuron connects to
-which, and then they learn a strength for every one of those 4,952 connections from
-scratch. The real synapse counts are thrown away.
-
-The FlyGM arm (arms 6 to 8, after Jin et al. 2026) keeps the real numbers as well:
-
-- Every connection is fixed at its measured synapse count, with a plus or minus sign
-  taken from what the sending neuron releases. This matrix `W` never changes. It is
-  stored as a buffer, not a parameter, so no gradient can reach it.
-- The whole matrix is divided by one number so that its spectral radius is 1. Without
-  that, the weights are far too large to pass a signal through sensibly.
-- What learns instead is the *neurons*: a 9-number description per neuron, one small
-  network shared by all 258 neurons that updates them, the input layer on the 16 PPL1
-  neurons, and the readout from the 5 AVLP727m neurons.
-- Size is matched like every other arm: 5,638 trainable numbers against 5,610 for
-  the connectome arm, a difference of 0.5%. The runner checks this before every run.
-- All three graphs get the same treatment, so "real wiring" can still be compared with
-  "rewired" and "random".
-
-So arms 3 to 5 ask whether the connectome's *shape* helps. Arms 6 to 8 ask whether its
-*strengths* help.
-
-### Spectral radius and input-output gain
+The circuit arms above keep the *shape* of the fly circuit and learn every edge weight.
+The FlyGM arms (after Jin et al. 2026) keep the real synapse counts as fixed weights,
+scaled to spectral radius 1, and train the neurons instead: a 9-number description per
+neuron and one small update network shared by all 258. Parameters are matched (5,638
+against 5,610). The same is done on the rewired and random graphs.
 
 | graph | spectral radius before scaling | input to output gain |
 |---|---|---|
@@ -398,26 +248,13 @@ So arms 3 to 5 ask whether the connectome's *shape* helps. Arms 6 to 8 ask wheth
 | degree-preserving rewire | 373 to 922 (varies by seed) | 1.4 to 23.3 (median 10.9) |
 | random sparse | 368 to 511 (varies by seed) | 2.2 to 20.9 (median 8.8) |
 
-Ranges are over the 20 control graphs of the exact runs (seeds 0–19); the 10-seed
-sampled runs use the first 10 of the same graphs.
+The gain is how much of a signal put into the input neurons arrives at the output
+neurons within the 6 steps. The real circuit passes 180 to 2,900 times less than its
+controls.
 
-The gain is `sum over k = 1..6 of |(W^k)[AVLP727m, PPL1]|`. That is, if you put a
-signal into the input neurons, how much of it arrives at the output neurons within the
-6 steps the network runs for. The real circuit passes 180 to 2,900 times less than
-its controls do (median about 1,400 times for the rewire and 1,100 times for random
-sparse). The reason is in the first column: the real circuit's radius is
-dominated by a strong loop elsewhere in the graph, so dividing by it shrinks the
-input-to-output path far more than it shrinks the controls' paths.
-
-One setting matters a lot here. 26 of the 258 neurons have no transmitter prediction,
-and all 16 PPL1 input neurons are among them. If those are given sign 0, they have
-no outgoing weight at all and the gain is exactly 0 on every graph, so the policy cannot
-see its input. `unsigned_sign` is therefore set to +1, and every run records which value
-it used (`results/tables/flygm_diagnostics.csv`).
-
-### Game A
-
-Final utility loss, 20 seeds, mean with 95% CI. Source: `results/tables/per_arm.csv`.
+**Game A** works, with no wiring effect (largest contrast has Holm p = 1.0). The speed-up
+the real circuit has with trained edges (§11) is gone with frozen synapses. In sampled
+mode the three graphs also tie (0.044, 0.040, 0.044).
 
 | arm | final loss | episodes to 0.01 |
 |---|---|---|
@@ -426,24 +263,7 @@ Final utility loss, 20 seeds, mean with 95% CI. Source: `results/tables/per_arm.
 | FlyGM, random sparse | 0.001391 [0.001357, 0.001428] | 262.5 |
 | oracle (the grid floor) | 0.001488 | n/a |
 
-- No contrast between the three graphs is distinguishable. The largest is real minus
-  random sparse, 6.7e-06 with an effect size of 0.08 and a Holm p of 1.0.
-- Speed is the same too: real minus rewire is -1.25 episodes [-11.3, +10.0].
-- Compare with §11. With trained edges, the real circuit crosses the
-  threshold 15 episodes before its rewire, and that survives full time resolution. With
-  the synapses frozen, that advantage is gone. The trained-edge arms differ only in
-  their connection pattern, so the §11 speed-up is a pattern effect (§15.4), but it only
-  shows when each edge can learn its own weight. With the real synapse counts frozen in,
-  it disappears.
-- As with the circuit arms, all three sit just below the oracle, because they learn the
-  exact grid equilibrium rather than the floored analytic law.
-
-In Game A sampled the picture is the same: 0.0443, 0.0396 and 0.0439 for real, rewire
-and random, and no contrast is distinguishable (smallest Holm p is 0.35).
-
-### Game B: collapse to a constant bid
-
-The main result here is not about wiring.
+**Game B** collapses to a constant bid.
 
 | arm | final loss | seeds reaching the 0.01 threshold |
 |---|---|---|
@@ -453,11 +273,8 @@ The main result here is not about wiring.
 | connectome, trained edges | 0.0082 | 19 of 20 |
 | dense MLP | 0.0029 | 20 of 20 |
 
-For the real circuit, a confidence interval that narrow across 20 seeds is not noise:
-every seed lands in the same place. The policies show why. In Game B each player gets a private value `v` and should quit later when `v` is
-larger. Here is the mean quitting time each arm chooses for the smallest and the largest
-value, averaged over the 20 seeds, and how many seeds bid differently for different
-values at all:
+Mean quitting time each arm chooses for the smallest and the largest value (it should
+rise with the value):
 
 | arm | at the smallest value | at the largest value | seeds whose bid varies with `v` | correlation with `b(v)` |
 |---|---|---|---|---|
@@ -468,198 +285,30 @@ values at all:
 | dense MLP | 0.000 | 10.567 | 20 of 20 | 1.00 |
 | correct answer, `b(v) = v²/2` | 0.000 | 10.604 | n/a | 1.00 |
 
-The FlyGM arm almost always plays the same thing no matter what value it holds. For
-the real circuit the stored policies are identical row for row, to within 1e-8, on every
-seed. The controls do the same on 38
-of their 40 seeds (flat to four decimal places). The two exceptions are rewire seed 3
-(bid spread 1.13 across values, final loss 0.295) and random-sparse seed 2 (spread 1.59,
-loss 0.243), which move the control means above.
+- 58 of 60 runs bid the same for every value. Sampled mode does the same on all 30 runs
+  (final loss 0.26–0.28).
+- The input does enter the network, but the 5 readout neurons end up pinned at ±1 of
+  the tanh for every value, and then almost no gradient reaches anything upstream.
+- Weak synapses are not the cause: the controls collapse too, with far more gain. §12
+  shows the cause is the readout.
+- So the Game B rows say nothing about wiring, and should not be compared with the
+  other arms as they stand.
 
-The context does enter the network, but it does not arrive where the policy is read
-from. The table gives the spread across the 50 values after the last of the six steps,
-for seed 0 of each graph, before and after training. It was measured by hand on
-retrained copies of those runs, which reproduce the committed policies exactly.
-`src/analysis.py` does not produce it, and the run records store only the final policy,
-so it cannot be recomputed from them.
+In Game A exact, FlyGM matches the trained-edge connectome on final loss, is 36 episodes
+slower, and beats the dense MLP.
 
-| graph | gain of `W` | before training: largest spread over all 258 neurons | before training: largest spread at the 5 readout neurons | after training: all 258 | after training: readout |
-|---|---|---|---|---|---|
-| real circuit | 0.008 | 0.92 | 0.000016 | 1.91 | 0 |
-| rewire | 12.8 | 0.93 | 0.039 | 1.30 | 1.2e-07 |
-| random sparse | 12.9 | 0.83 | 0.042 | 2.00 | 0 |
-
-- Before training, the input signal is strong inside the network and much weaker at the
-  5 neurons the policy is read from: 20 to 25 times weaker on the controls and about
-  57,000 times weaker on the real circuit.
-- After training, the signal at the readout is gone on all three graphs, even though it
-  is still strong elsewhere in the network. All 5 readout neurons end up pinned at +1 or
-  -1 of the tanh (pre-activations of 5.3 to 9.7 in size) for every value. The readout
-  weights then act as one fixed bias. And since the slope of the tanh is close to zero
-  there, almost no gradient reaches anything upstream that could make the readout depend
-  on value again (`d logits / d input` of 7e-14 on the real circuit, 6e-08 and 8e-20 on
-  the controls). Once a run falls into this state it stays there.
-- In the two seeds that escaped (rewire 3, random sparse 2), four readout neurons are
-  pinned. The fifth switches from -1 to +1 partway along the values (pre-activation from
-  about -4 to +4), and that switch is the bid.
-- For the first two of the six steps the readout spread on the real circuit is exactly
-  0. Its readout neurons are 2 connections from the input, and the input only enters at
-  step 1, so the signal reaches them at step 3. On the controls they are 1 or 2
-  connections away and the signal arrives from step 2.
-- The gain diagnostic predicts the spread *before training* well: 0.008 goes with
-  1.6e-05, and 12.8 goes with 0.039.
-- But the controls collapse too, in Game B exact and in Game B sampled, with 180 to 2,900
-  times more gain to work with. So gain does not explain the collapse. Nor does it pick
-  out the exceptions: the only two control seeds that bid by value have gains of 6.1 and
-  2.2, in the lower half of their arms. §12 tests the two obvious fixes: a trainable
-  gain on `W`, which does nothing, and reading the policy out from every neuron, which
-  removes the collapse.
-
-So:
-
-- The Game B rows above measure an arm that almost never conditions on its input. They
-  are not a statement about fly wiring, and they should not be compared with dense or
-  with the trained-edge circuits as though they were. §12 gives the arm with the
-  collapse fixed.
-- The wiring comparison inside Game B is still "no difference", but for a degenerate
-  reason, so it carries no weight.
-- Game A is unaffected. It has a single context, so there is nothing to condition on,
-  and the arm performs like the circuit arms there.
-
-Sampled Game B behaves the same way. 10 seeds per graph, 3,000 episodes:
-
-| arm | final loss | bid L2 | seeds reaching the 0.05 threshold | bid spread across the 50 values |
-|---|---|---|---|---|
-| FlyGM, real circuit | 0.2805 [0.2671, 0.2937] | 2.14 | 0 of 10 | 0.0000 |
-| FlyGM, rewire | 0.2761 [0.2507, 0.3058] | 2.23 | 0 of 10 | 0.0000 |
-| FlyGM, random sparse | 0.2551 [0.2409, 0.2709] | 2.50 | 0 of 10 | 0.0000 |
-| oracle (the grid floor) | 0.0058 | 0.0 | 10 of 10 | n/a |
-
-- Every one of the 30 runs plays one policy for all 50 values. The collapse is not
-  specific to exact gradients.
-- No wiring contrast is distinguishable. The closest is real against random sparse,
-  +0.0253 [0.0048, 0.0453], Holm p = 0.097.
-- Every arm is about 45 times the grid floor, and no seed got near the threshold.
-
-### FlyGM vs trained-edge arms
-
-Same game, same seeds, each arm at its own tuned rate. Source:
-`results/tables/cross_experiment.csv`.
-
-| setting | comparison | difference in final loss | episodes |
-|---|---|---|---|
-| A exact | FlyGM vs connectome (same graph) | +0.00013, not distinguishable | +36.3, distinguishable |
-| A exact | FlyGM rewire vs rewire | +0.00013, distinguishable | +18.8, distinguishable |
-| A exact | FlyGM vs dense MLP | -0.00019, distinguishable | -78.8, distinguishable |
-| A sampled | FlyGM vs connectome (same graph) | -0.0011, not distinguishable | +20, not distinguishable |
-| A sampled | FlyGM vs dense MLP | +0.011, distinguishable | -5, not distinguishable |
-
-- In Game A exact, freezing the synapses costs a little speed against trained edges
-  (about 36 episodes) but not accuracy.
-- The FlyGM arm still beats the dense MLP there, on both measures.
-- In Game A sampled it is as good as the trained-edge connectome and worse than dense,
-  which is the same pattern the circuit arms show (§7).
-
-### Compute and caveats
-
-- Tuning: 2 seeds per grid point, as everywhere else. The grid for sampled mode was
-  extended down to 0.0001 for this work. Every FlyGM graph picked the same rate in
-  every setting (0.03, 0.003, 0.01, 0.03), so this arm has none of the per-arm
-  learning-rate confound described in §5, and its shared-rate robustness runs are
-  no-ops that the driver skips.
-- The rate for Game B sampled needs a longer note, below.
-- Game B sampled was split across two machines because of its cost: 23 runs on a
-  4-core cloud box and the last 7 on the laptop. The per-run wall times in its
-  `summary.csv` are therefore a mix of two machines and are not one measurement. The
-  laptop logged 8,200 s at 6 workers for its share.
-- Measured wall times on the laptop (AMD Ryzen AI 7 350, 8 physical cores), from
-  `results/flygm_ppo_log.txt`: tuning for Game A exact, Game A sampled and Game B exact
-  took 1,518 s at 14 workers; the runs for those three settings took 8,483 s at 14
-  workers; tuning for Game B sampled took 10,555 s at 6 workers. The last of these ran
-  while the machine was also busy with an unrelated program, which cost about 1.9x, so it is an upper
-  bound.
-- Worker counts are not a free choice for this arm. One FlyGM Game B run takes 462 s
-  alone, 420 s with 6 running at once, and 1,752 s with 14. Fourteen workers deliver
-  half the throughput of six, because each step pushes 50 contexts by 8 agents by 258
-  neurons through the shared update network and they crowd each other out of cache.
-
-### Game B sampled: tuning horizon
-
-To keep the cost down, `flygm_game_b_sampled.yaml` screens learning rates on
-1,000 steps (`tuning.steps`) but the real runs are 3,000 steps. On a short
-horizon the rate that drops fastest wins. That is not always the rate that ends up in
-the best place.
-
-That is what happened. Per-run curves:
-
-| arm | runs | best value reached | final value | ends worse than its own best by | best value reached in the first half |
-|---|---|---|---|---|---|
-| FlyGM, real circuit | 10 | 0.2511 | 0.2806 | 12.1% | 10 of 10 |
-| FlyGM, rewire | 10 | 0.2426 | 0.2761 | 14.1% | 6 of 10 |
-| FlyGM, random sparse | 10 | 0.2457 | 0.2545 | 3.6% | 6 of 10 |
-
-- Nothing is NaN or infinite, so this is not numerical blow-up. It is overshoot: the
-  runs descend quickly, reach their best point early, then drift back up and stay there.
-- Some are extreme. One seed reached its best value at step 50 of 3,000 and got
-  worse for the remaining 2,950.
-- So the number reported for this arm is not its best under this setting. Reported is
-  about 0.28; the best reached during training is about 0.24.
-
-Two more checks:
-
-- The grid for this setting stopped at 0.03 and final loss was still falling there, so
-  we extended the screen to 0.1 and 0.3 afterwards. 0.1 came out best, beating 0.03 by
-  3.5% (`results/tuning/flygm_game_b_sampled_grid_extension.csv`). But that extension
-  used the same 1,000-step screen, so it carries the same bias. It shows the grid
-  was truncated. It does not show which rate is best over 3,000 steps.
-- So we also ran the next rate down, 0.01, for the
-  full 3,000 steps, 3 seeds per graph, matched seed for seed against the 0.03 runs
-  (`results/tuning/flygm_game_b_sampled_horizon_check.csv`).
-
-| arm | final at 0.03 | final at 0.01 | best reached at 0.03 |
-|---|---|---|---|
-| FlyGM, real circuit | 0.2868 | 0.2870 | 0.2506 |
-| FlyGM, rewire | 0.2968 | 0.2647 | 0.2486 |
-| FlyGM, random sparse | 0.2679 | 0.2635 | 0.2420 |
-
-  The lower rate ends better on 5 of the 9 matched runs, which is a coin flip, and the
-  means are the same for the real circuit. So the overshoot is real and visible in the
-  curves, but lowering the rate does not fix it: a smaller step overshoots less and
-  also descends less far, and both land in the same place.
-- So the rate was picked on a shorter horizon than the
-  runs it was used for, and that shows up as overshoot, but it is not what holds this
-  arm at 0.27. Nothing between 0.001 and 0.3 moves it.
-
-What it does not change:
-
-- The arm plays the same policy for every value, at every rate we have tried, between
-  0.001 and 0.3. A step size cannot fix an arm that does not read its input.
-- All three graphs share the rate, so the comparison between them is unaffected.
-- Game A is unaffected: its rates were screened on the full run length, and its runs do
-  not overshoot.
+Caveat: for Game B sampled, learning rates were screened on 1,000 steps but the runs are
+3,000, and the runs overshoot (best about 0.24, final about 0.28). A full-length check at
+a lower rate ends in the same place, so this is not what holds the arm back.
 
 ---
 
 ## 10. PPO instead of REINFORCE
 
-### The learner
+PPO reuses each batch of 128 matches for 4 clipped updates (epsilon 0.2) instead of 1,
+with the same baseline and no entropy bonus (`training.sampled_algorithm: ppo`).
 
-Sampled self-play so far used REINFORCE: play 128 matches, take one gradient step, throw
-the matches away. PPO reuses them:
-
-- The same batch of matches is used for 4 updates instead of 1.
-- Each update is clipped, with epsilon 0.2, so one batch cannot move the policy too far.
-- The critic is the running-mean baseline the project already had. There is no entropy
-  bonus.
-- The win/loss weighting still multiplies the update, so asymmetric learning still works.
-- Everything else is shared: same rollout, same optimizer, same cosine decay, one
-  scheduler step per round rather than per update.
-
-It is available to every arm, including FlyGM, by setting
-`training.sampled_algorithm: ppo`.
-
-### Speed
-
-Episodes to reach the convergence threshold, 10 seeds, censored at the training length.
+Episodes to threshold, 10 seeds, censored at 3,000:
 
 | arm | Game A, REINFORCE | Game A, PPO | Game B, REINFORCE | Game B, PPO |
 |---|---|---|---|---|
@@ -672,19 +321,7 @@ Episodes to reach the convergence threshold, 10 seeds, censored at the training 
 | FlyGM, real circuit | 715 | 460 | n/a | n/a |
 | tabular | 425 | 975 | 2,890 | 3,000 |
 
-- Every network arm reaches the threshold sooner under PPO in Game A. The connectome
-  (unsigned and signed) and the signed random sparse arm reach it about 4 times sooner;
-  the other circuit arms 1.5 to 2.3 times sooner.
-- In Game B, where almost nothing reached the threshold before, dense now does so at
-  1,860 episodes and two signed circuits get there as well.
-- The tabular baseline is the exception. It is slower under PPO in both games. Its PPO
-  rate sits on the edge of its three-point grid in both (0.003, the lowest, in Game A;
-  0.03, the highest, in Game B), so this may be the grid and not PPO.
-
-### Final exploitability
-
-Final utility loss, 10 seeds. A negative change means PPO ended closer to equilibrium.
-Changes marked * are distinguishable (CI excludes 0 and Holm p < 0.05).
+Final utility loss; * marks a distinguishable change:
 
 | game | arm | REINFORCE | PPO | change |
 |---|---|---|---|---|
@@ -700,21 +337,13 @@ Changes marked * are distinguishable (CI excludes 0 and Holm p < 0.05).
 | B | random sparse, signed | 0.0790 | 0.0510 | -0.0280 * |
 | B | connectome | 0.1536 | 0.1364 | -0.0172 |
 
-- In Game A, PPO helps the tabular baseline a lot and hurts the connectome arms.
-- In Game B, it is the other way round. PPO helps dense and the signed circuits and
-  hurts tabular.
-- Our reading: PPO moves the policy faster per round. Where the limit is how fast
-  you can move (Game B, where nothing had converged), that helps. Where the limit is
-  sampling noise at a mixed equilibrium (Game A, see docs/theory.md §5), moving faster
-  just settles sooner in a worse place.
-- Late-training policy variance rises under PPO almost everywhere, which fits that
-  reading: it is noisier at the end.
+- Speed: every network arm reaches the threshold sooner in Game A, up to 4 times sooner.
+  In Game B, dense and two signed circuits now reach it.
+- Final loss: PPO helps where the limit is how fast the policy can move (Game B) and
+  hurts where the limit is sampling noise at a mixed equilibrium (Game A).
+- Tabular is slower under PPO, but its rate sits on a grid edge in both games.
 
-### Wiring contrasts under PPO
-
-As in §5, if two arms tune to different learning rates, a difference between them may
-be the rate rather than the wiring. Two contrasts looked distinguishable at first, so both PPO grids were re-run
-with one shared rate per family.
+Wiring contrasts, re-run at one shared rate per family:
 
 | contrast | at each arm's own rate | at one shared rate | verdict |
 |---|---|---|---|
@@ -722,96 +351,19 @@ with one shared rate per family.
 | B sampled, connectome signed minus rewire signed | -0.0294, Holm p = 0.039 | +0.0049, Holm p = 0.710 | gone, and the sign flips |
 | B sampled, connectome minus random sparse | +0.0417, Holm p = 0.009 | +0.0417, Holm p = 0.008 | survives the shared rate; suggestive only across the project (below) |
 
-- The first two were the §5 confound again. In Game B the two signed arms had tuned to 0.003
-  and 0.03, and once both run at 0.01 the difference disappears and changes direction.
-- The third is different. The connectome, rewire and random sparse arms had all
-  tuned to 0.01 in Game B sampled, so they were already sharing a rate and those runs
-  are identical in both grids. There is no rate confound to remove.
-- So under PPO in Game B sampled, the real circuit ends worse than random wiring by
-  +0.0417 [0.022, 0.061], effect size 1.68. Its raw permutation p is 0.0013, and
-  0.008 after Holm within this experiment. Against the degree-preserving rewire it is
-  +0.0249, Holm p = 0.20, which is not distinguishable.
-- We treat it as suggestive, not established. Holm within one experiment is the
-  rule used everywhere else in this report, and by that rule it passes. But this project
-  has run many wiring contrasts. Corrected as one family (every wiring contrast on final
-  exploitability, in every experiment and at every loss-weighting ratio: 108 tests,
-  `results/tables/wiring_familywide.csv`), it gets Holm p = 0.14 and
-  Benjamini-Hochberg q = 0.035. It survives a false-discovery-rate correction, not a
-  family-wise one. Dropping the 18 rows that are the same runs analysed twice (a
-  shared-rate grid repeating an arm pair whose tuned rates already matched, as here)
-  gives 0.11 and 0.036.
-- Only two wiring contrasts pass family-wide Holm, and both are learning-rate artefacts
-  this report already discounts: REINFORCE Game B sampled connectome minus rewire (§5),
-  and PPO Game B sampled rewire signed minus random signed (tuned to 0.03 and 0.01;
-  +0.0019 at a shared rate). No wiring contrast measured at a shared rate passes
-  family-wide Holm.
-- It is one of two wiring contrasts that pass within-experiment Holm at a shared rate.
-  The other is between two controls: under PPO in Game A sampled, rewire signed minus
-  random signed is -0.0168 [-0.027, -0.008], Holm p = 0.036 (family-wide Holm 0.29, BH
-  0.043), and it did not show at each arm's own rate.
-- This is "wiring and degrees together", not "the specific wiring",
-  because the rewire control is not distinguishable. It is one cell of the grid with 10
-  seeds. It points the same way as §4: where the real wiring does anything at all in
-  Game B, it makes things slightly worse.
-
-### Compute and caveats
-
-- 10 seeds per arm, 3,000 episodes, symmetric updates. Learning rates were tuned for PPO
-  separately, with the sampled grid extended down to 0.0001.
-- The shared-rate re-runs (`configs/robust_ppo_game_*_shared_lr.yaml`) were added after
-  the first two contrasts came up.
-- FlyGM under PPO in Game B sampled (`configs/ppo_game_b_sampled_flygm.yaml`, driver
-  step `run-ppo-b-flygm`) was not run, and no numbers from it appear here. At about
-  4 hours of CPU per run it would have been the most expensive cell in the project, and
-  given §9 it would have measured an arm that almost never conditions on its input. The
-  config is kept, marked as not run.
-- Loss-weighting under PPO (`configs/ppo_game_a_sampled_asym.yaml`, driver step
-  `asym-ppo`) was planned in the project idea review and was not run either. §6 and the
-  welfare trade-off in §13 are REINFORCE results only.
-- Grid edges under PPO: besides tabular (above), dense tuned to 0.0001 in Game A, the
-  bottom of the extended grid, and the signed rewire to 0.03 in Game B, the top. Better
-  rates may exist outside the grid for those arms.
-- Wall times for `tune-ppo-a` (6,906 s) and `run-ppo-a` (2,841 s) were measured while the
-  machine was also busy with an unrelated program. They are upper bounds and not comparable with the
-  other steps. The rest, all at 6 workers on the laptop: `tune-ppo-b` 3,135 s,
-  `run-ppo-b` 7,366 s, `robust-ppo-a` 3,862 s, `robust-ppo-b` 5,777 s.
-
----
+- The first two were the §5 confound again.
+- The third has no rate confound. The real circuit ends worse than random wiring by
+  +0.0417 [0.022, 0.061]; against the rewire it is not distinguishable (Holm p = 0.20).
+- We treat it as suggestive. It passes Holm within its experiment, but across all 108
+  wiring contrasts in the project (`results/tables/wiring_familywide.csv`) it gets Holm
+  p = 0.14. No wiring contrast at a shared rate passes family-wide Holm.
 
 ## 11. Game A speed-up at full time resolution
 
-§4 reported the unsigned connectome crossing the 0.01 threshold 19–24 episodes before
-its controls, but evaluation only ran every 25 episodes, so it wasn't clear the gap was
-real. `configs/game_a_exact_eval1.yaml` reruns the whole
-Game A exact grid (the same 9 arms, the same 20 evaluation seeds, the same tuned
-learning rates in `configs/tuned_lr.yaml` under `game_a_exact`) with `eval_every: 1`.
-
-Compute. 180 runs, 306 s wall on 8 workers (CPU only), run alongside the FlyGM
-tuning. Evaluating after every episode makes the per-run records 3,001 points instead
-of 121, so `results/game_a_exact_eval1/runs/` and its `curves.csv` are 106 MB and 68 MB
-and are *not* committed (`.gitignore` says so, with the command to rebuild them); the
-committed `summary.csv` holds every crossing time this section uses.
-
-The comparison is exactly paired. Evaluation reads the policy under `no_grad` and
-draws no random numbers, so for a given seed the two runs are the *same* training
-trajectory, observed 3,001 times instead of 121. Verified per seed: every coarse
-crossing time is the exact one rounded up to the next multiple of 25 (gap in [0, 25)
-for all 180 runs), and final exploitability agrees. Mean episodes to 0.01, 20 seeds:
-
-| arm | `eval_every: 1` | `eval_every: 25` | rounding gap |
-|---|---|---|---|
-| connectome | 216.6 | 226.2 | 9.7 |
-| connectome, signed | 239.5 | 251.2 | 11.8 |
-| rewire | 231.6 | 245.0 | 13.4 |
-| rewire, signed | 227.3 | 236.2 | 8.9 |
-| random sparse | 236.7 | 250.0 | 13.3 |
-| random sparse, signed | 228.9 | 241.2 | 12.3 |
-| dense MLP | 327.4 | 341.2 | 13.9 |
-| tabular | 629.0 | 650.0 | 21.0 |
-
-The speed-up is real, and about a fifth smaller than the coarse grid suggested.
-Differences in episodes to 0.01, 95% CI [Holm p]; source `results/tables/pairwise.csv`
-(experiment `game_a_exact_eval1`).
+§4's speed-up was measured with evaluation every 25 episodes. Rerunning Game A exact with
+evaluation every episode (`configs/game_a_exact_eval1.yaml`) gives the same training
+trajectories observed more often, so the comparison is exactly paired. Differences in
+episodes to 0.01, 95% CI [Holm p]:
 
 | contrast | `eval_every: 1` | `eval_every: 25` (§4) |
 |---|---|---|
@@ -822,81 +374,20 @@ Differences in episodes to 0.01, 95% CI [Holm p]; source `results/tables/pairwis
 | connectome, signed − random, signed | +10.6 [2.0, 19.8] [0.122], not distinguishable | +10.0 [0.0, 20.0] [0.355] |
 | connectome, signed − connectome | +23.0 [14.8, 31.9] [0.001] | +25.0 [16.3, 33.8] [0.001] |
 
-The coarse grid inflated the gap because the rounding is not the same for every arm:
-the connectome's mean rounding gap is 9.7 episodes against 13.4 (rewire) and 13.3
-(random), so roughly 4 of the reported 19–24 episodes were an artefact of where the
-evaluation grid happened to fall. What remains, 15 and 20 episodes or 6.5 to 8.5 percent,
-is distinguishable with a tight CI and a large effect size.
-
-Caveats:
-
-- It is a *speed* result only. The trajectories are identical, so final exploitability
-  is identical too, and §3–§4's conclusion that no final-loss contrast is
-  distinguishable is untouched.
-- The sign-constrained version still shows nothing, and with the opposite sign. The
-  effect does not survive Dale's law, which is the §4 reading unchanged.
-- 15 episodes out of 217 is small in a setting where the dense MLP needs 327 and the
-  tabular baseline 629, and Game A has a single context, so any policy there is a
-  reparameterisation of one distribution (§8).
+The speed-up is real and about a fifth smaller than the coarse grid suggested: 15 and 20
+episodes out of about 217. It is a speed result only (final exploitability is identical),
+and it does not appear with sign constraints.
 
 ## 12. Fixing the FlyGM collapse: wider readout vs gain on W
 
-### Two fixes
+Two fixes, each testing one explanation of §9:
 
-§9 found that the FlyGM arm stops listening to its input in Game B: the 5 neurons it
-reads the policy from saturate, and once they do, no gradient can bring them back. Two
-small changes could plausibly fix that, and each tests a different explanation.
+- a trainable gain on `W`, if the frozen synapses are too weak;
+- a readout from all 258 neurons through a rank-4 map, if the problem is where the
+  policy is read from. Parameter counts are re-matched (6,578), and the dense and
+  trained-edge arms get the same readout.
 
-- A gain on `W`. If the problem is that the frozen synapses are too weak to carry the
-  input to the readout (the real circuit's gain is 0.008), then letting the network learn
-  one number that scales all of `W` should help. The synapses themselves stay frozen.
-  This is `network.flygm.w_gain: true`, which starts at 1.
-- A readout from every neuron. If the problem is *where* the policy is read from,
-  then reading it from all 258 neurons should help. To keep the parameter count matched,
-  this goes through a rank-4 bottleneck: 258 × 4 + 4 × 64 + 64 = 1,352 parameters, in
-  place of the 5 × 64 + 64 = 384 of the 5-neuron readout. This is `network.readout: all`
-  with `readout_rank: 4`. The last factor starts at zero, so every arm still starts from
-  the uniform policy.
-
-Neither change touches the synapses, the update network or the encoder. With the
-defaults, the code reproduces the earlier runs bit for bit.
-
-The rank-4 readout is also given to dense and to the six trained-edge circuit arms, so
-the comparison between FlyGM and the arms that train their edges stays fair.
-
-### Setup
-
-| experiment | arms | readout | trainable parameters per agent |
-|---|---|---|---|
-| `readout_game_b_exact`, `readout_game_a_exact` | dense, 6 trained-edge circuit arms, 3 FlyGM graphs | rank 4 from all 258 neurons | 6,578 (circuit), 6,598 (dense), 6,606 (FlyGM) |
-| `wgain_game_b_exact`, `wgain_game_a_exact` | 3 FlyGM graphs | the original 5 neurons, plus the gain on `W` | 6,567 (update network widened to 55) |
-
-- Matching. Every arm in each experiment is within 0.5% of the connectome arm
-  with the rank-4 readout (6,578), and the runner asserts this before any run starts.
-  The two FlyGM fixes differ from each other by 0.59%, because no single update-network
-  width gets both within 0.5% of the dense arm.
-- Runs. 20 seeds per arm, exact gradients, 4,000 steps for Game B and 3,000 for
-  Game A. Rates were tuned per arm on the usual grid.
-- Learning rates inside the new experiments. In `readout_game_b_exact` all six
-  circuit arms and all three FlyGM graphs chose 0.003, and dense chose 0.01. In
-  `readout_game_a_exact` every arm chose 0.003. So the wiring contrasts inside these
-  experiments are at one shared rate and do not have the §5 confound. The gain
-  experiments chose 0.01 (Game B) and 0.03 (Game A) for all three graphs.
-- Learning rates across experiments. The comparisons with the earlier runs are not
-  at a shared rate: the earlier circuit arms used 0.01 or 0.03. The tuning sweep at a
-  rate both share, 0.003 (2 seeds), shows the fix is not a rate effect. The 5-neuron
-  FlyGM is still collapsed there (0.330), against 0.011 with the new readout, and the
-  5-neuron connectome reaches 0.016, against 0.0037 with the new readout.
-- Sources. The new tables are `results/tables/readout_per_arm.csv`,
-  `readout_pairwise.csv`, `readout_cross.csv`, `readout_flygm_diagnostics.csv` and the
-  new rows of `game_b_value_dependence.csv`. They are computed on their own random
-  stream, so no number in any earlier table changed.
-- Compute. 286 minutes of wall time for Game B (tuning 101 minutes, runs 185
-  minutes) and 7 minutes for Game A, on 6 workers.
-
-### Game B
-
-Final exploitability, mean [95% CI], 20 seeds:
+Game B exact, final exploitability, 20 seeds:
 
 | arm | 5-neuron readout (§9) | gain on `W` | readout from all 258 neurons |
 |---|---|---|---|
@@ -904,51 +395,14 @@ Final exploitability, mean [95% CI], 20 seeds:
 | FlyGM, rewire | 0.3290 | 0.3222 [0.3041, 0.3314] | 0.0189 [0.0115, 0.0298] |
 | FlyGM, random sparse | 0.3263 | 0.3293 [0.3256, 0.3313] | 0.0183 [0.0112, 0.0310] |
 
-- The wider readout. Exploitability falls by 0.31 to 0.32 on every graph (Holm
-  p = 0.002 each).
-- The gain on `W`. No change on any graph (Holm p = 1.0 each). The learned gain stays
-  near where it started: a mean of 1.04 [1.01, 1.06] on the real circuit, and 1.06 and
-  1.17 on the controls (range over seeds 0.77 to 1.98). The network had the freedom to
-  strengthen its synapses and did not use it.
+- The wider readout removes the collapse (Holm p = 0.002 on every graph). All 60 FlyGM
+  seeds now bid by value, against 2 of 60 before.
+- The gain does nothing; the learned gain stays near 1.
+- Fixed, FlyGM is still worse than the trained-edge connectome (+0.0075) and dense
+  (+0.0090), and its bids cover about 6 of the 10.6 units the correct answer spans.
+- Still no wiring effect inside FlyGM (both contrasts Holm p = 1.0).
 
-So the explanation is *where* the policy is read from, not *how strong* the synapses
-are.
-
-The arm now bids by value.
-
-| arm | seeds whose bid varies with `v` | spread of the mean quitting time across values (median) | correlation with `b(v) = v²/2` (median) |
-|---|---|---|---|
-| FlyGM, real, 5 neurons (§9) | 0 of 20 | 0 | undefined |
-| FlyGM, real, gain on `W` | 0 of 20 | 0 | undefined |
-| FlyGM, real, all neurons | 20 of 20 | 5.97 | 0.94 |
-| FlyGM, rewire, all neurons | 20 of 20 | 5.98 | 0.94 |
-| FlyGM, random sparse, all neurons | 20 of 20 | 6.13 | 0.95 |
-| connectome, trained edges, all neurons | 20 of 20 | 10.46 | 0.9995 |
-| dense MLP, all neurons | 20 of 20 | 10.56 | 0.9997 |
-| correct answer | n/a | 10.60 | 1.00 |
-
-The bid now rises with value on all 60 FlyGM seeds, against 2 of 60 before. It is still
-compressed, though. The bid covers about 6 of the 10.6 units the correct answer spans,
-and only 3, 6 and 6 of 20 seeds reach the 0.01 threshold within 4,000 steps.
-
-Fixed, FlyGM is still clearly worse than the arms that train their edges:
-
-- +0.0075 [0.0064, 0.0086] above the trained-edge connectome (Holm p = 0.0017);
-- +0.0090 [0.0084, 0.0097] above dense (Holm p = 0.0017);
-- two to three times the grid floor of 0.0058.
-
-The trained-edge arms reach the threshold in about 350 steps on average. FlyGM's average
-is 3,500 to 3,900, counting the seeds that never reach it as 4,000.
-
-Still no wiring effect inside FlyGM. Real circuit against rewire is −0.0075
-[−0.0185, +0.0001], and against random sparse −0.0068 [−0.0193, +0.0004]. Both have
-Holm p = 1.0. The real circuit's mean is the lowest of the three, but both CIs reach
-zero. (The controls are wider because a few of their seeds end higher, up to 0.13.)
-
-### Trained-edge arms with the wider readout
-
-The 5-neuron readout was also holding back the arms that train their edges. Final
-exploitability, mean, and the change with the wider readout (95% CI, Holm p):
+The 5-neuron readout was also holding back the trained-edge arms:
 
 | arm | 5-neuron readout (§3) | all neurons | change |
 |---|---|---|---|
@@ -960,117 +414,31 @@ exploitability, mean, and the change with the wider readout (95% CI, Holm p):
 | random sparse, signed | 0.0054 | 0.0029 | −0.0025 [−0.0033, −0.0019], p = 0.002 |
 | dense MLP | 0.0029 | 0.0024 | −0.0005 [−0.0009, −0.0001], p = 0.018 |
 
-- The circuit arms now nearly match dense. The unsigned connectome and rewire used
-  to stop at a bid spread of about 7.6 (correlation 0.96). With the wider readout every
-  circuit arm reaches 10.4 to 10.5 (correlation 0.9994 to 0.9995).
-- Most of the old gap to dense was the readout. Only the two connectome arms still
-  differ from dense under Holm: unsigned +0.0015 [0.0007, 0.0024], p = 0.015, and signed
-  +0.0007, p = 0.049. Random sparse is +0.0007, p = 0.12.
-- Speed. The circuit arms reach the threshold 175 to 1,300 steps sooner (Holm
-  p = 0.002 for each). Dense does not change (p = 1.0).
-- No wiring contrast survives. All six contrasts among real, rewire and random
-  sparse, signed and unsigned, have Holm p = 1.0. The largest is rewire against random
-  sparse, +0.0010 [−0.0005, +0.0033].
-- The sign effect is gone. The finding that sign constraints improved all three
-  graphs in Game B (§7, and the summary at the top) does not hold with this readout:
-  connectome −0.0008 [−0.0018, +0.0001], rewire −0.0011 [−0.0034, +0.0003], random
-  sparse −0.0002 [−0.0008, +0.0003], all with Holm p = 1.0. It looks like the sign
-  constraint was partly making up for the narrow readout.
+- The circuit arms now nearly match dense.
+- No wiring contrast survives (all six Holm p = 1.0).
+- The sign-constraint advantage of §7 is gone (all three Holm p = 1.0).
 
-### Game A
+In Game A the wider readout lowers every arm by 0.0002 to 0.0005 and the gain again does
+nothing. Three trained-edge wiring contrasts favour the connectome there, by 1 to 2.5%
+of the loss.
 
-Game A has a single context, so the collapse cannot happen there, and every arm already
-converged. Every arm still converges with the new readout. Final exploitability:
-
-| arm | 5-neuron readout | gain on `W` | all neurons |
-|---|---|---|---|
-| FlyGM, real circuit | 0.00140 | 0.00138 | 0.00100 [0.00093, 0.00111] |
-| FlyGM, rewire | 0.00140 | 0.00136 | 0.00094 |
-| FlyGM, random sparse | 0.00139 | 0.00137 | 0.00095 |
-| connectome, trained edges | 0.00127 | n/a | 0.00093 |
-| dense MLP | 0.00159 | n/a | 0.00138 |
-
-- The gain. It does nothing again (Holm p = 1.0), and the learned gain stays at
-  0.99 to 1.01.
-- The wider readout. It lowers every arm by 0.0002 to 0.0005 (Holm p = 0.002).
-  Most arms also cross the threshold 29 to 64 episodes sooner. The signed circuit arms
-  are the exception: the signed connectome does not change, and signed rewire and signed
-  random sparse are 14 to 15 episodes slower.
-- These Game A differences may be partly the rate. The earlier Game A circuit arms
-  ran at 0.03, and every arm here chose 0.003.
-- Wiring. No contrast inside FlyGM is distinguishable. Among the trained-edge arms,
-  3 of the 6 wiring contrasts put the connectome ahead of its controls, by 1.5e-05 to
-  2.2e-05 (Holm p = 0.009 to 0.046). Those differences are 1 to 2.5% of the arms' own
-  loss and far below anything that matters.
-
-### What this changes
-
-- §9's main finding stands, and now has a cause. FlyGM's collapse in Game B came
-  from the 5-neuron readout, not from the strength of the frozen synapses. With a readout
-  from every neuron, the arm learns a bid that rises with value on every seed.
-- The wiring answer stays the same. With the readout fixed, no contrast among real,
-  rewire and random wiring survives Holm in Game B, for FlyGM or the trained-edge arms.
-- But two Game B findings came from the readout:
-  - the gap between the circuit arms and dense, which mostly closes;
-  - the advantage of sign constraints, which disappears.
-
-  §3 and §7 reported both as properties of the architectures. With a different readout
-  they are not, so they should be read as findings about circuits read out through 5
-  neurons.
-- The new readout sees the input neurons directly. The 258 neurons include the 16
-  PPL1 neurons that receive the input. So part of the value signal can reach the policy
-  without passing through the circuit at all, which would dilute any wiring effect. A
-  readout from every neuron *except* the inputs would test this, and has not been run.
-- One rank only. Rank 4 was chosen to fit the parameter budget, and other ranks were
-  not tried.
-- FlyGM against the earlier runs. The two FlyGM fixes differ in parameter count by
-  0.59%, just over the 0.5% used inside each experiment.
+Caveats: the new readout sees the 16 input neurons directly, which could dilute a wiring
+effect (a readout excluding them was not run), and only rank 4 was tried.
 
 ## 13. Equilibrium vs the social optimum
 
-The fight itself produces nothing. Both players pay `c · min(T1, T2)`, and the prize
-goes to one of them whatever happens, so the best outcome for the pair is no fight at
-all. Welfare here is per match, both players together: the value of the prize to
-whoever gets it, minus both players' fight cost.
+Welfare is per match, both players together: the value of the prize to whoever gets it,
+minus both players' fight cost. The fight produces nothing, so the optimum is no fight.
 
-- Game A: the social optimum is `V = 1` (one player walks away at once). At the
-  continuous equilibrium each player expects exactly 0, so the whole prize is burnt in
-  the fight. On the 64-point grid the exact equilibrium keeps 0.119 of it (88%
-  dissipated), which is discretisation: a tie at t = 0 has positive probability. The
-  oracle, the continuous law floored onto the grid, keeps 0.122; the figures draw that
-  as the equilibrium line.
-- Game B: the social optimum is `E[max(v1, v2)] = 1.486` (the higher value takes the
-  prize, nobody fights). The equilibrium bid `v²/2` gets the allocation almost right,
-  1.471 of the 1.486, because the higher value always waits longer. It pays 0.496 in
-  fight cost for that. Welfare 0.976, 34% below the optimum.
-- In Game B the fight exactly pays for itself as a sorting device, no more. In
-  continuous time sorting gains `E[max] − E[v] = 1.5 − 1 = 0.5` and the waiting costs
-  `E[min(v1, v2)²] = 0.5` (the minimum of two Exp(1) values is Exp(2)), so equilibrium
-  welfare is 1.0, the same as a coin flip with no fight. On the grid it is 0.976 against
-  0.993 (gains 0.48, costs 0.50); that small gap is discretisation, not a finding.
-
-Source: `results/tables/welfare.csv` (per arm, 95% bootstrap CI),
-`welfare_per_run.csv`, `welfare_contrasts.csv`; `python scripts/welfare.py`. Figure:
-`figures/fig9_welfare.png`.
+- Game A: optimum 1. The equilibrium burns the whole prize (0.119 is kept on the grid).
+- Game B: optimum 1.486. The equilibrium sorts the prize almost perfectly but pays 0.50
+  in fight cost, so welfare is 0.976, the same as a coin flip with no fight.
 
 ![Welfare per match by arm, and welfare against exploitability in the loss-weighting sweep](figures/fig9_welfare.png)
 
-For sampled runs, welfare is the mean over pairs of two *different* agents, since an
-agent never meets itself. An earlier version of this section computed it from the
-population mixture against itself, which counts every agent fighting itself in 1/M of
-the matches. When agents differ, that overstates the fight: for pairs it reported 0.26
-to 0.60 where the true value is 0.73 to 0.93, and at 8 agents it was low by 0.03 to
-0.16. All sampled welfare numbers below are the corrected ones.
-
-The run records store only the mixture, so the corrected values come from retraining
-each sampled run from its stored configuration (`scripts/welfare_rerun.py`,
-`results/tables/welfare_population.csv`); new runs store the welfare themselves. On the
-laptop the retrained runs of `game_a_sampled`, `game_b_sampled` and the shared-rate
-experiments match the committed final exploitability exactly. Not redone, and so absent
-from the welfare tables: the PPO experiments and the FlyGM sampled experiments (about
-60 CPU-hours). No welfare statement here concerns them.
-
-### What the learners do
+For sampled runs welfare is the mean over pairs of two *different* agents, obtained by
+retraining each run from its stored configuration (`scripts/welfare_rerun.py`). The PPO
+and FlyGM sampled runs were not retrained and are absent.
 
 | setting | equilibrium | learners (range of arm means) | direction |
 |---|---|---|---|
@@ -1079,21 +447,11 @@ from the welfare tables: the PPO experiments and the FlyGM sampled experiments (
 | Game B, exact | 0.976 | 0.90 to 1.01 | at equilibrium |
 | Game B, sampled | 0.976 | 0.59 to 0.84 | all arms waste more |
 
-- Game A, sampled. Learners that have not quite reached equilibrium quit a little
-  early, and quitting early is what society wants. So the circuit and dense arms keep
-  0.24 to 0.31 of the prize, two to two and a half times the equilibrium's 0.12. Tabular
-  keeps 0.16 [0.08, 0.25], the only arm whose CI covers the equilibrium.
-- Game B, sampled. The opposite. Learners both allocate worse (1.24 to 1.40 of the
-  available 1.486, vs 1.471 at equilibrium) and fight longer (cost 0.56 to 0.66 vs
-  0.50). Not knowing the opponent's value and learning from noisy fights costs welfare
-  twice. The worst arms are the unsigned real-wiring connectome, 0.59 [0.52, 0.66], and
-  unsigned random sparse, 0.60 [0.47, 0.72], in line with their exploitability (§3).
-  Tabular (0.84) and dense (0.82) are the best.
+- Game A sampled: learners quit a little early, which is what society wants, so they
+  keep two to two and a half times the equilibrium's share.
+- Game B sampled: learners both allocate worse and fight longer.
 
-### Lopsided learning trades exploitability for welfare
-
-In the asymmetric sweep (§6) learners weight losses more than wins. That makes them
-quit earlier, which raises exploitability and also raises welfare, on every arm:
+Weighting losses more than wins (§6) trades exploitability for welfare, on every arm:
 
 | α_loss / α_win | mean welfare | mean final exploitability |
 |---|---|---|
@@ -1102,36 +460,14 @@ quit earlier, which raises exploitability and also raises welfare, on every arm:
 | 4 | 0.68 | 0.130 |
 | 8 | 0.72 | 0.146 |
 
-Across all 320 sweep runs, Spearman ρ between exploitability and welfare is 0.85
-(within one ratio it is 0.08 at ratio 1 and 0.4 to 0.65 above it, so most of it is the
-ratio). A population that learns the way flies seem to (losses count more) ends up
-further from equilibrium but keeps almost three times as much of the prize (0.72 against
-0.26, so waste falls from about 0.74 to 0.28). The theory in §6 predicts the
-direction, since the predicted rest points put more mass on quitting at once.
-
-### Wiring
-
-Real wiring vs each control on welfare, in the shared-learning-rate experiments other
-than PPO (24 contrasts, Holm across all of them): nothing survives except two Game A
-exact contrasts where the connectome is ahead by 0.0001, a hundredth of a percent of the
-prize. The largest gaps are at the shared rate in Game B, and their CIs are wide:
-sampled, connectome − rewire +0.13 [−0.02, +0.28]; exact at lr 0.03, where the unsigned
-connectome is unstable (§4), −0.25 [−0.62, +0.01]. So the wiring answer is the same as
-for exploitability, with the same caveat about precision in Game B.
+Wiring: of 24 real-vs-control contrasts on welfare at a shared rate, none survives except
+two in Game A exact of size 0.0001.
 
 ## 14. Number of agents
 
-Game A, sampled REINFORCE, symmetric updates, population of 2, 4, 8 or 16 agents
-re-matched at random every round. Every agent plays the same 128 matches per round at
-every size, so what changes is only how many different opponents it learns against.
-Arms: tabular, dense, connectome, rewire, random sparse; the circuit arms share one
-learning rate. 10 seeds, 200 runs. Config: `configs/popsize_game_a_sampled.yaml`.
-Figure: `figures/fig10_population_size.png`. The 8-agent runs repeat
-`robust_game_a_sampled_shared_lr` (same seeds, graphs and rates). The committed ones were
-made on a different machine and torch version, so they differ from it by up to 0.009 in
-final exploitability on single seeds (arm means within 0.001). Rerun on the laptop, the
-30 shared runs agree with it to 10⁻¹¹ (`results/tables/welfare_population.csv`), which is a check
-on the runner.
+Game A, sampled REINFORCE, 2, 4, 8 or 16 agents re-matched at random every round, 10
+seeds (`configs/popsize_game_a_sampled.yaml`). Each agent plays 128 matches per round at
+every size, so only the number of different opponents changes.
 
 ![Final exploitability and welfare against the number of agents](figures/fig10_population_size.png)
 
@@ -1144,9 +480,7 @@ Final exploitability of the average agent, mean [95% CI]:
 | 8 | 0.068 [0.059, 0.079] | 0.033 [0.030, 0.036] | 0.045 [0.042, 0.049] | 0.044 [0.040, 0.049] | 0.049 [0.043, 0.056] |
 | 16 | 0.033 [0.031, 0.037] | 0.033 [0.031, 0.034] | 0.034 [0.032, 0.037] | 0.035 [0.032, 0.037] | 0.034 [0.032, 0.036] |
 
-Welfare per match between two different agents (optimum 1, symmetric grid equilibrium
-0.119), mean [95% CI]. These come from retraining the runs on the laptop (§13), so the
-populations are the laptop's, within the drift above of the committed ones:
+Welfare per match between two different agents (optimum 1, equilibrium 0.119):
 
 | agents | tabular | dense | connectome | rewire | random sparse |
 |---|---|---|---|---|---|
@@ -1155,56 +489,24 @@ populations are the laptop's, within the drift above of the committed ones:
 | 8 | 0.16 [0.08, 0.24] | 0.24 [0.22, 0.25] | 0.28 [0.26, 0.32] | 0.29 [0.26, 0.31] | 0.29 [0.27, 0.31] |
 | 16 | 0.20 [0.18, 0.22] | 0.16 [0.16, 0.17] | 0.16 [0.15, 0.17] | 0.16 [0.15, 0.18] | 0.16 [0.15, 0.17] |
 
-What happens:
-
-- Two agents split the roles. With a fixed pair, in 58% of runs one agent learns to
-  quit almost at once and the other to hold on (median mass on quitting at t = 0 in the
-  pair's mixture: 0.49, vs 0.12 at equilibrium). That is the war of attrition's
-  asymmetric equilibrium: neither agent can gain by changing alone, so each agent's own
-  exploitability is low, but the pair is far from the symmetric equilibrium (population
-  exploitability 0.19 to 0.25). It is also the efficient outcome, since there is
-  hardly any fight, so welfare is highest here: the pair keeps 0.73 to 0.93 of the prize.
-- Four agents are the worst case. Too many opponents to settle into roles, too few to
-  average them out. Agent exploitability is highest at 4 for every arm.
-- From 8 up, the population converges on the symmetric mixed equilibrium. At 16 every
-  arm reaches 0.033 to 0.035, the arms become indistinguishable from each other, and
-  welfare falls towards the equilibrium's 0.12 (0.16 to 0.20). More agents means more
-  equilibrium-like play and more of the prize wasted.
-
-Wiring: real vs rewire and real vs random at each size, on exploitability and on
-welfare, 16 tests: none is distinguishable (on welfare every Holm p is 1.0; on
-exploitability every CI covers zero). The dense MLP beats the connectome at 8 agents
-(by 0.012 [0.007, 0.017], Holm p = 0.004 among the 12 exploitability tests), as in §3,
-and the gap closes at 16.
+- Two agents split the roles: in 58% of runs one learns to quit at once and the other to
+  hold on. That is the asymmetric equilibrium, with hardly any fight, so welfare is
+  highest (0.73 to 0.93).
+- Four agents are the worst case for every arm.
+- From 8 up the population converges on the symmetric equilibrium. At 16 every arm
+  reaches 0.033 to 0.035 and welfare falls towards the equilibrium's 0.12.
+- Wiring: 16 tests across sizes, none distinguishable.
 
 ---
 
 ## 15. Checks after the project review
 
-The TA's review of the project idea raised four points. Each gets its own check here.
-New code: `src/games/asym_dynamics.py`, `scripts/validate_asymmetric.py`,
-`scripts/path_diagnostics.py`, the `population_nash` and `lr_sweep_analysis` functions in
-`src/analysis.py`, and `tests/test_review_checks.py`. The new runs were made on a
-2-core cloud machine with a newer torch than the earlier runs (see the note on
-reproduction under 15.1).
+The TA's review of the project idea raised four points (`make review`).
 
 ### 15.1 Population-level Nash
 
-The point: an agent measured against the mixture of the *other* agents can look close to
-equilibrium even when the population as a whole is not. Two agents that split into
-"quit at once" and "never quit" each best-respond to the other, so each scores 0, but
-their mixture is far from the symmetric equilibrium (`test_split_population_...`).
-
-Every run already stored both numbers: `exploitability` is each agent against the
-mixture of the others (what it trains on), and `mixture_exploitability` is the
-population's combined strategy against itself, ℓ(π̄; π̄). We now report the second
-everywhere (`results/tables/population_nash.csv`). Runs also record each agent's own TV
-distance from the equilibrium (`agent_tv_mean`, `agent_tv_max`), which shows whether the
-agents agree on one strategy or differ and only average to it. To get that number for
-the main sampled comparison we reran Game A sampled at the shared learning rate, with
-tabular and dense added (`configs/popnash_game_a_sampled.yaml`, 10 seeds, 80 runs).
-
-Game A sampled, 8 agents, REINFORCE, mean [95% CI]:
+An agent measured against the mixture of the *other* agents can look close to
+equilibrium when the population as a whole is not. Game A sampled, 8 agents, shared rate:
 
 | arm | each agent vs the others | population mixture vs itself | each agent's TV to equilibrium |
 |---|---|---|---|
@@ -1217,97 +519,35 @@ Game A sampled, 8 agents, REINFORCE, mean [95% CI]:
 | random sparse | 0.049 [0.043, 0.056] | 0.066 [0.056, 0.077] | 0.57 [0.54, 0.60] |
 | random sparse, signed | 0.044 [0.040, 0.048] | 0.059 [0.052, 0.066] | 0.56 [0.52, 0.59] |
 
-What this shows:
-
-- The population is further from Nash than the per-agent number suggests: the mixture's
-  exploitability is 34–47% higher for every arm. The individual agents are far from the
-  equilibrium distribution (TV 0.56–0.59 for the circuits), while their mixture is much
-  closer (TV 0.26–0.28). So at 8 agents the population is a spread of different
-  strategies that only partly averages out to the exponential, which is the TA's point.
-- It does not change any wiring conclusion. On the mixture metric no wiring contrast is
-  distinguishable at the shared rate (6 tests, all Holm p ≥ 0.98; largest connectome −
-  rewire +0.007 [−0.002, +0.015]).
-- Across all sampled experiments the mixture metric flags 8 wiring contrasts
-  (`population_nash_pairwise.csv`), all in places already explained: the per-arm-tuned
-  runs where the rewired arm got a different rate from the others (§5; in Game A its
-  agents also spread out most, SD of mean quitting time 1.2 against 0.5), and PPO Game B
-  (§10). None appears at a shared rate outside PPO Game B. It drops the two PPO Game A
-  contrasts the per-agent metric flagged.
-- With population size (§14, `figures/fig13_population_nash.png`) the gap is largest for
-  a fixed pair: 0.04–0.08 per agent against 0.18–0.25 for the pair's mixture. It shrinks
-  as the population grows, and at 16 agents both measures agree within 0.003–0.013.
-  No wiring contrast is distinguishable at any size on the mixture metric either.
-
-Reproduction: the rerun matches `robust_game_a_sampled_shared_lr` seed for seed on the
-same graphs (identical graph checksums), up to floating-point drift from the different
-machine and torch version: largest difference in final exploitability 0.009 (one rewired
-seed), mean difference ≤ 0.001 for every arm.
+- The mixture's exploitability is 34–47% higher than the per-agent number for every arm:
+  the population is a spread of different strategies that only partly averages out.
+- No wiring conclusion changes. On the mixture metric no wiring contrast is
+  distinguishable at the shared rate (all Holm p ≥ 0.98).
+- The gap is largest for a fixed pair and nearly closes at 16 agents
+  (`figures/fig13_population_nash.png`).
 
 ### 15.2 The shifted equilibrium under loss weighting
 
-The point: the rest point of loss-weighted REINFORCE (§6, docs/theory.md §3) was derived
-on paper and needs checking against simulations. `scripts/validate_asymmetric.py`
-compares, for ρ = 1, 2, 4, 8:
-
-- the continuous closed form (Lomax survival, hazard ρc / (V + (ρ−1)(ct + b))), floored
-  onto the grid;
-- the grid fixed point (the equilibrium of the modified game), which §6 uses as the
-  target;
-- the expected update of the learning rule itself, iterated with no sampling, both as
-  plain policy gradient and preconditioned by the softmax Fisher matrix (same rest
-  points, but unused quitting times die out exponentially instead of like 1/steps);
-- the rule run with sampled matches, coin-flip ties, per-sample weights and a running
-  baseline (tabular, 4 seeds, 30,000 steps of 4,096 matches).
-
-None of the simulations uses the modified game or the formula. Table
-`results/tables/asym_validation.csv`, figure `figures/fig11_asym_validation.png`.
+The rest point of §6 was derived on paper. `scripts/validate_asymmetric.py` checks it
+against simulations of the learning rule that use neither the modified game nor the
+formula (`figures/fig11_asym_validation.png`).
 
 | ρ | 1 | 2 | 4 | 8 |
 |---|---|---|---|---|
 | baseline b: grid fixed point | 0.059 | 0.182 | 0.241 | 0.270 |
-| b: expected update (Fisher-preconditioned) | 0.059 | 0.182 | 0.241 | 0.270 |
 | b: sampled rule (mean of 4 seeds) | 0.058 | 0.188 | 0.231 | 0.286 |
 | b: closed form | 0 | 0.125 | 0.188 | 0.219 |
 | exploitability: grid fixed point | 0.000 | 0.066 | 0.108 | 0.130 |
-| exploitability: closed form on the grid | 0.001 | 0.067 | 0.106 | 0.127 |
-| exploitability: expected update (plain gradient) | 0.001 | 0.066 | 0.108 | 0.130 |
 | exploitability: sampled rule | 0.022 | 0.076 | 0.130 | 0.163 |
-| TV, expected update (Fisher) to fixed point | 3·10⁻⁴ | 5·10⁻⁷ | 2·10⁻¹³ | 4·10⁻⁶ |
 | W1, sampled rule to fixed point | 0.074 | 0.064 | 0.089 | 0.099 |
 | W1, sampled rule to the true equilibrium | 0.074 | 0.313 | 0.441 | 0.534 |
-| max hazard error, closed form vs grid, t ≤ 2 | 0.003 | 0.022 | 0.035 | 0.096 |
 
-What this shows:
-
-- The derivation holds. The expected dynamics of the rule converge to the grid fixed
-  point (TV 3·10⁻⁴ at ρ = 1, 10⁻⁵ or less for ρ ≥ 2), and the plain-gradient version reaches the same
-  exploitability to within 10⁻⁴ for ρ ≥ 2 (0.001 at ρ = 1). The sampled rule lands at the shifted point, not at the true
-  equilibrium: its W1 distance to the prediction is 0.06–0.10 at every ρ, against
-  0.31–0.53 to the equilibrium, and its baseline matches the predicted b to within 0.016.
-  Its exploitability sits 0.01–0.035 above the prediction, the same sampling-noise floor
-  it has at ρ = 1 (0.022), as in §6.
-- The closed form and the grid fixed point agree where the mass is. Up to t = 2 the
-  hazards agree to within 0.02–0.10 (on hazards of 0.5–3), probability of quitting at 0
-  agrees to within 0.006, and exploitability to within 3%. The baseline differs by a
-  constant 0.05–0.06 at every ρ, including ρ = 1 where the continuous value is exactly 0,
-  so that offset is the grid (coin-flip ties at spacing Δ = 0.127), not the formula.
-- Two grid artefacts, neither of which moves the target. After t ≈ 2 the grid fixed
-  point's hazard splits into two interleaved branches (alternate bins) whose average
-  follows the closed form. And the tail is cut off at T_max = 8: the grid puts about
-  twice the closed form's mass beyond 8 (0.027 / 0.045 / 0.053 against 0.015 / 0.024 /
-  0.028) into an atom at t = 8, leaving 18–28 empty bins before it. Re-solving on a
-  grid twice as long with the same spacing recovers the closed-form tail mass beyond 8
-  exactly (0.0153 / 0.0240 / 0.0277) and changes b by ≤ 0.0002 and exploitability by
-  < 10⁻⁴. So the exploitability floor §6 compares against is right; the shape of the
-  tail beyond t ≈ 4–6 on the default grid is not, and should not be read as a prediction.
+The derivation holds. The expected dynamics converge to the grid fixed point, and the
+sampled rule lands at the shifted point, not at the true equilibrium. The closed form
+differs from the grid fixed point by a constant 0.05–0.06 in the baseline, which is the
+grid and not the formula.
 
 ### 15.3 Do the rewired controls keep the input-output paths?
-
-The point: degree-preserving rewiring keeps every neuron's degree but does not guarantee
-that the control still connects PPL1 to AVLP727m. `scripts/path_diagnostics.py`
-rebuilds the exact graphs the runs used (real circuit, and the rewired and random graphs
-of seeds 0–19, matched to the runs by graph checksum). With 6 unrolled steps, a path
-carries the input only if it has at most 5 synapses.
 
 | | real circuit | rewire (20 graphs) | random (20 graphs) |
 |---|---|---|---|
@@ -1318,33 +558,14 @@ carries the input only if it has at most 5 synapses.
 | log10 number of walks, length 1–5 | 5.76 | 6.22–6.28 | 5.82–6.03 |
 | distinct neurons PPL1 synapses onto | 97 | 150–169 | 173–197 |
 
-Every control keeps every functional path, and the controls are better connected than
-the real circuit, not worse: shorter routes and more of them. Each PPL1 neuron keeps
-its out-degree, but in the real circuit the 16 PPL1 neurons converge on shared targets,
-and rewiring scatters them. This is the structural side of the FlyGM gain result (§9),
-where the real circuit passes 180–2,900× less signal from input to output than its
-controls.
-
-Within a control family, the number of walks varies from graph to graph, so we also
-checked whether runs on better-connected graphs did better (Spearman correlation with
-final exploitability, control arms of 8 Game B experiments, 30 tests,
-`path_vs_performance.csv`). None survives Holm (smallest Holm p = 0.28). Pairs and
-shortest paths don't vary across control graphs, so they can't be tested this way.
-
-So the "no wiring effect" results are not because the controls lost their input path.
+Every control keeps every PPL1 → AVLP727m path within the 5 synapses the network can
+use, and the controls are better connected than the real circuit. So "no wiring effect"
+is not because the controls lost their input path.
 
 ### 15.4 Shared learning rate vs per-arm tuning
 
-The point: per-arm tuning mixes tuning effects with topology effects. The project
-already ran the circuit arms at one shared rate (§5). That was one rate per experiment,
-the modal tuned value. The new experiment sweeps all of them: every network arm at every
-rate of the exact-mode grid (0.001 to 0.1), 10 evaluation seeds, Game A and B exact
-(`configs/lrsweep_game_*_exact.yaml`, 700 runs, `results/tables/lr_sweep*.csv`,
-`figures/fig12_lr_sweep.png`). Per-arm tuning (tuning seeds 1000+, eval seeds 0–19) stays
-the second, separate protocol. The wiring contrasts are Holm-adjusted over all rates and
-contrasts of one experiment and metric (45 tests per family).
-
-Final exploitability at a shared rate (unsigned arms; the signed arms are in the table):
+Every network arm at every rate of the exact-mode grid, 10 seeds, Game A and B exact
+(`figures/fig12_lr_sweep.png`). Final exploitability, unsigned arms:
 
 | Game | rate | connectome | rewire | random | dense |
 |---|---|---|---|---|---|
@@ -1357,31 +578,11 @@ Final exploitability at a shared rate (unsigned arms; the signed arms are in the
 | B exact | 0.01 | 0.0086 | 0.0078 | 0.0077 | 0.0028 |
 | B exact | 0.03 | 0.18 (4/10 reach threshold) | 0.071 | 0.018 | 0.027 |
 
-What this shows:
-
-- Wiring, read at one rate at a time. In every stable setting the three graphs end within
-  7% of each other in Game A and 12% in Game B. Exact-mode runs vary so little across
-  seeds that some of these tiny gaps pass Holm: in Game A the connectome is 0.4–7% better
-  at the three lower rates; in Game B at rate 0.001 it is 4–7% worse. They point in
-  opposite directions and none is larger than about 0.003 in exploitability.
-- The Game A exact speed-up of the unsigned connectome (§4, §11) is a topology effect,
-  not tuning. It shows at two shared rates: 57 episodes sooner than the rewire at 0.01
-  (750 vs 808, CI [−73, −43]) and 25 sooner at 0.03 (225 vs 250). Both Holm p = 0.011.
-  The signed connectome shows no speed-up at either rate, as before.
-- The Game B signed-connectome cost (§4, §5) has the same sign at a shared rate:
-  at 0.03 its bid L2 is +0.12 above the signed rewire [+0.01, +0.24] and it reaches the
-  threshold 50 episodes later [+5, +90]. With 10 seeds and 45 tests per family neither
-  passes Holm here, so this sweep supports the direction but doesn't confirm it.
-- Stability depends on wiring at high rates, and only for the unsigned arms. At 0.03 in
-  Game B the unsigned connectome reaches the threshold in 4 of 10 seeds, the rewire in 8,
-  random in 7, and every signed arm in 10. This is the instability noted in §7.
-- Dense against the circuits can only be compared with each architecture at its own
-  rate. Dense is best at 0.003 (A) and 0.01 (B). It diverges in Game A from 0.01 up and
-  is five times worse than the signed circuits in Game B at 0.03, where they do best. At any single shared rate the gap swings from dense far ahead
-  to dense far behind, so the dense-vs-circuit numbers in §3 and §7 come from per-arm
-  tuning by necessity, and the sweep shows that this is a tuning comparison, not a
-  topology one.
-
-Not done here: a shared-rate sweep for sampled mode and FlyGM. Sampled runs take 7–11×
-longer, and the FlyGM Game B runs about 30 minutes each, so they remain covered
-only by the single shared-rate reruns of §5, §9 and §10.
+- In every stable setting the three graphs end within 7% of each other in Game A and
+  12% in Game B. A few of these gaps pass Holm, in opposite directions, none above 0.003.
+- The Game A speed-up of the unsigned connectome holds at two shared rates (Holm
+  p = 0.011), so it is a wiring effect and not tuning.
+- At 0.03 in Game B the unsigned connectome is unstable (4 of 10 seeds reach the
+  threshold, against 8 and 7).
+- Dense diverges in Game A at the rates where the circuits do best, so dense-vs-circuit
+  numbers are a tuning comparison, not a topology one.
