@@ -217,6 +217,38 @@ def fig_main_comparison() -> None:
     save(fig, str(FIG / "fig3_main_comparison"))
 
 
+MAIN_FOUR = ("game_a_exact", "game_a_sampled", "game_b_exact", "game_b_sampled")
+
+
+def fig_main_four_settings() -> None:
+    """Final utility loss per arm in the four main settings only: one row, readable at
+    page width. ``fig3_main_comparison`` has every experiment and both metrics."""
+    tables = _tables()
+    if tables is None:
+        return
+    per = tables["per_arm"]
+    per = per[per["experiment"].isin(MAIN_FOUR)]
+    arms = [a for a in sort_arms(list(per["arm"].unique())) if a != "oracle"]
+    fig, axes = plt.subplots(1, len(MAIN_FOUR), figsize=(12.5, 3.9), sharey=True)
+    for ax, exp in zip(axes, MAIN_FOUR):
+        t = per[per["experiment"] == exp]
+        _dot_panel(ax, t, "final_exploitability", arms, log=True)
+        oracle = t[t["arm"] == "oracle"]
+        if len(oracle):
+            ax.axvline(oracle["final_exploitability"].iloc[0], color=INK, ls=":", lw=1.2, label="oracle (grid floor)")
+        ax.set(title=EXPERIMENT_TITLES[exp], xlabel="final utility loss (log scale)")
+        lo, hi = ax.get_xlim()
+        if not any(lo <= 10.0**k <= hi for k in range(-6, 2)):
+            # less than a decade wide, so no power of ten to label: label 1-2-3-5 steps
+            ticks = [m * 10.0**k for k in range(-6, 2) for m in (1, 1.5, 2, 3, 5) if lo <= m * 10.0**k <= hi]
+            ax.set_xticks(ticks)
+            ax.set_xticklabels([f"{x:g}" for x in ticks])
+    axes[0].legend(loc="lower right", fontsize=8)
+    fig.suptitle("Mean and 95% bootstrap CI over evaluation seeds; hollow markers = sign-constrained", fontsize=10, color=INK_2)
+    fig.tight_layout()
+    save(fig, str(FIG / "fig3b_main_four_settings"))
+
+
 def _rows_for(per: pd.DataFrame, experiment: str, arms: tuple[str, ...]) -> pd.DataFrame:
     sub = per[(per["experiment"] == experiment) & (per["arm"].isin(arms))]
     return sub
@@ -595,6 +627,7 @@ FIGURES = [
     fig_tabular_convergence,
     fig_convergence_all_arms,
     fig_main_comparison,
+    fig_main_four_settings,
     fig_asymmetric_sweep,
     fig_survival_by_arm,
     fig_game_b_bids,
