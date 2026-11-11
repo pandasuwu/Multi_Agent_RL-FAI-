@@ -336,7 +336,7 @@ with loss-weighting, and it comes from the learning rule, not from the fly wirin
   test sensitivity to these choices, to the unroll depth (6), or to the choice of
   PPL1 as input and AVLP727m as output. Kenyon cells are excluded by the per-neuron
   strength criterion (docs/circuit.md §3).
-- Transmitter signs are EM-based predictions (26 of 258 neurons are unsigned); I
+- Transmitter signs are EM-based predictions (26 of 258 neurons are unsigned); we
   did not test alternative sign maps.
 - Independent learners partly specialise. Deviations in which agents differ are
   unstable at rate ∝ 1/(M−1) (docs/theory.md §5). With 8 agents in sampled Game A,
@@ -348,7 +348,19 @@ with loss-weighting, and it comes from the learning rule, not from the fly wirin
     inputs carry real sensory structure, would reveal a wiring effect;
   - whether the Game B top-decile deficit of the signed connectome reflects its
     reciprocity and clustering (0.43 and 0.39, vs 0.10 and 0.21 after rewiring) or
-    something else;
+    something else.
+- Statistical power. With 10 seeds the sampled-mode intervals are wide (in Game B
+  sampled at a shared rate, real minus rewire is −0.027 with a 95% CI of [−0.069, +0.012]
+  on means of 0.15–0.18), so "no effect found" there rules out large effects only, not
+  moderate ones.
+- The tests are unpaired although arms share seed numbers. A seed sets the initial
+  weights and the sampling stream, but the arms differ in architecture and the rewired
+  graphs differ per seed, so the same seed number does not give matched runs. The
+  across-arm Spearman correlation of per-seed final exploitability has a median of 0.02
+  to 0.10 in the four main settings (pairs range from −0.54 to +0.79 with 10–20 seeds),
+  so a paired test would gain little. The one exactly paired comparison is §11.
+- The learning-rate sweep of §15.4 covers exact mode only. In sampled mode the evidence
+  on the rate confound is the shared-rate reruns of §5, at one rate per game.
 
 ---
 
