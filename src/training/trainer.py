@@ -37,6 +37,7 @@ from ..agents.policies import Policy
 from ..games.equilibrium import asymmetric_weights
 from ..games.war_of_attrition import Game, GameA, GameB
 from ..metrics.exploitability import policy_variance
+from ..metrics.welfare import population_welfare
 from .evaluate import context_tensors, evaluate, policy_probs
 
 
@@ -46,6 +47,8 @@ class RunOutput:
     summary: dict[str, Any]
     winner_loser: dict[str, Any] = field(default_factory=dict)
     final_policy: list[Any] = field(default_factory=list)  # population mixture, (K, n_bins)
+    # welfare per match between two different agents; the mixture above cannot give it
+    welfare: dict[str, float] = field(default_factory=dict)
 
 
 def make_optimizer(policy: Policy, cfg: dict[str, Any], lr: float) -> torch.optim.Optimizer:
@@ -384,12 +387,13 @@ def train_run(
     wall = time.perf_counter() - started
     summary = summarise(curve, snapshots, window_start, threshold, policy.n_agents)
     summary["wall_seconds"] = wall
-    final_policy = policy_probs(policy, game).mean(axis=0).tolist()
+    final_probs = policy_probs(policy, game)
     return RunOutput(
         curve=curve,
         summary=summary,
         winner_loser=tracker.result() if tracker else {},
-        final_policy=final_policy,
+        final_policy=final_probs.mean(axis=0).tolist(),
+        welfare=population_welfare(game, final_probs),
     )
 
 

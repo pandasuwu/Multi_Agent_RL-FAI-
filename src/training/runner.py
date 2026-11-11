@@ -40,6 +40,7 @@ from ..agents.factory import (
 from ..config import REPO_ROOT, config_hash, deep_merge
 from ..games.equilibrium import game_a_analytic_policy, game_b_analytic_policy
 from ..games.war_of_attrition import GameA, build_game
+from ..metrics.welfare import population_welfare
 from .evaluate import evaluate
 from .trainer import summarise, train_run
 
@@ -178,6 +179,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             summary=summary,
             winner_loser={},
             final_policy=probs[0].tolist(),
+            welfare=population_welfare(game, probs),
         )
     else:
         circuit = circuit_for(cfg, arm, seed) if arm["name"] in GRAPH_ARMS else None
@@ -192,6 +194,7 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             summary=out.summary,
             winner_loser=out.winner_loser,
             final_policy=out.final_policy,
+            welfare=out.welfare,
             # arm-specific diagnostics (FlyGM: unsigned_sign used, spectral radius
             # before scaling, input-to-output gain of the frozen W)
             diagnostics=dict(getattr(policy, "diagnostics", {}) or {}),

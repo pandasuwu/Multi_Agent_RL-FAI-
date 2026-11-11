@@ -6,7 +6,7 @@ Question: does building a learning agent out of the real fly give-up circuit cha
 close it gets to equilibrium in the war of attrition, compared with size-matched
 networks wired differently?
 
-Fly wiring made no meaningful difference to final exploitability. In all four settings
+I found no effect of fly wiring on final exploitability. In all four settings
 (Game A and B, exact and sampled), the policy built on the real give-up circuit ends up
 where its two size-matched controls do: a degree-preserving rewire and a random sparse
 graph. In the main grid every one of these contrasts either has a CI that covers zero or
@@ -14,6 +14,14 @@ fails Holm. In exact mode, where seeds barely vary, a few tiny gaps do pass Holm
 shared rate (§12 Game A, §15.4), but they are at most 0.003 in exploitability (≤ 7%) and
 point in opposite directions. Under PPO one Game B contrast passes within its own
 experiment but not across the whole project, so I treat it as suggestive (§10).
+
+How firmly "no effect" is pinned down depends on the setting. The 95% CIs on
+real-minus-control (§4) have half-widths of 3–11% of the arms' own loss in Game A exact
+and 10–21% in Game B exact (the unsigned random graph aside, where three seeds failed),
+so an effect larger than that is ruled out there. In sampled mode, with 10 seeds, they are
+13–16% (Game A) and 14–29% (Game B): connectome − rewire in Game B sampled is
+−0.027 [−0.069, +0.012] on means of 0.15–0.18. There the result is "no effect detected",
+and an effect of a quarter of the loss in either direction would not have been seen.
 
 Game A exact, 20 seeds, final exploitability, mean [95% CI]:
 
@@ -37,6 +45,12 @@ signed version doesn't show it. In Game B exact the signed connectome is 45–50
 slower than its signed controls. Nowhere does fly wiring reliably help, and the one thing
 that recurs in Game B is a small cost.
 
+The largest wiring-dependent effect is about stability, and it is not small. In Game B
+exact at a learning rate of 0.03, three times the 0.01 the unsigned connectome tuned to,
+the unsigned real circuit reaches the threshold in 7 of 20 seeds, against 15 for the rewire
+and 16 for random (§4; 4, 8 and 7 of 10 on the separate seeds of §15.4). At its own tuned
+rate, and with sign constraints at any rate, there is no such gap.
+
 Things that did matter:
 
 - Architecture class. The dense MLP beats every circuit arm in 3 of 4 settings; the
@@ -48,7 +62,7 @@ Things that did matter:
 - The equilibrium wastes almost the whole prize in Game A and, in Game B, the fight costs
   exactly what sorting the prize by value gains, so it only breaks even with a coin flip.
   Learners that weight losses more
-  than wins quit earlier: higher exploitability, roughly twice the welfare (§13).
+  than wins quit earlier: higher exploitability, almost three times the welfare (§13).
 - Population size. A fixed pair usually settles into roles (one gives in at once), an
   asymmetric equilibrium with almost no fight. Four agents learn worst. From 8 up the
   population converges on the symmetric equilibrium, and at 16 all arms tie (§14).
@@ -146,6 +160,8 @@ Where speed or secondary metrics *are* distinguishable at a matched learning rat
 | B exact | connectome − rewire (signed), episodes to 0.01 | +45 [17, 75] (g = 0.89) | 0.050 (0.036 in the shared-lr run) |
 | B exact | connectome − rewire (signed), bid L2 | +0.109 [0.039, 0.189] (g = 0.85) | 0.022 |
 | B sampled | connectome − random (signed), bid L2 | +0.227 [0.102, 0.341] (g = 1.5) | 0.025 |
+| B exact, shared lr 0.03 | connectome − rewire (unsigned), episodes to 0.01, censored at 4,000 | +1,425 [465, 2,303] (g = 0.91); 7 of 20 seeds reach it vs 15 | 0.036 |
+| B exact, shared lr 0.03 | connectome − random (unsigned), episodes to 0.01, censored at 4,000 | +1,500 [555, 2,370] (g = 1.0); 7 of 20 vs 16 | 0.029 |
 
 The Game B L2 gap is concentrated in the top value decile: bid MSE 0.99 for the
 signed connectome vs 0.24 (rewire) and 0.28 (random). Those types bid 7–10 time units,
@@ -161,7 +177,17 @@ The only wiring-specific effects are:
 - a small, consistent *slow-down plus worse high-value bids* for the signed real
   circuit in Game B.
 
-Neither changes how well the agents end up playing.
+- less stable training for the *unsigned* real circuit in Game B exact at lr 0.03 (the
+  last two rows above). This is at the shared rate of `robust_game_b_exact_shared_lr`,
+  which is the signed arms' tuned rate and three times the unsigned connectome's (0.01).
+  Most of the gap is seeds that never reach the threshold, so the episode counts are
+  mostly censoring. Final loss there is 0.165 against 0.050 (rewire) and 0.064 (random),
+  but those two contrasts fail Holm (p = 0.44 and 0.92) because the failed seeds make
+  every arm's spread large. At a shared rate of 0.01 the three unsigned graphs end
+  within 12% of each other (0.0086, 0.0078, 0.0077; §15.4).
+
+The first two don't change how well the agents end up playing. The third does, at a
+rate the unsigned arms were not tuned for, and goes against the real wiring.
 
 ## 5. Learning-rate confound
 
@@ -275,10 +301,19 @@ with loss-weighting, and it comes from the learning rule, not from the fly wirin
 - Sampled REINFORCE never reaches near-zero exploitability. Tabular and every
   network stall at 0.03–0.05 in Game A: exploitability is first-order in policy noise
   at a mixed equilibrium (docs/theory.md §5). In Game B sampled, no network arm reached
-  the 0.05 threshold (tabular: 2 of 10 seeds), so speed there is uninformative.
+  the 0.05 threshold (tabular: 2 of 10 seeds), so speed there is uninformative. Final
+  loss there is 0.07–0.15 for the network arms against an equilibrium payoff of 0.49, so
+  the Game B sampled wiring contrasts compare learners that have not converged, and the
+  small tabular baseline (0.053) beats every network.
+- The games ask little of the network, which limits what "no wiring effect" can mean.
+  The input is one constant in Game A and one number in Game B, and the output is a
+  distribution over 64 times. A circuit whose wiring matters for processing structured
+  sensory input would not show it here. With the all-neuron readout of §12 the policy
+  can also read the input neurons directly.
 - Compute reductions (the full grid must run on a laptop CPU in under 2 h):
   - sampled modes use the minimum 10 seeds and 3,000 episodes (exact modes use 20);
   - learning rates were tuned on 2 seeds per grid point;
+  - the tabular grid has only three rates, and under PPO more arms sit on an edge (§10);
   - several tuned rates sit on a grid edge: dense 0.0003 in A sampled, and tabular 0.03
     in both sampled games, so better rates may exist outside the grid.
 
@@ -622,7 +657,9 @@ Episodes to reach the convergence threshold, 10 seeds, censored at the training 
   the other circuit arms 1.5 to 2.3 times sooner.
 - In Game B, where almost nothing reached the threshold before, dense now does so at
   1,860 episodes and two signed circuits get there as well.
-- The tabular baseline is the exception. It is slower under PPO in both games.
+- The tabular baseline is the exception. It is slower under PPO in both games. Its PPO
+  rate sits on the edge of its three-point grid in both (0.003, the lowest, in Game A;
+  0.03, the highest, in Game B), so this may be the grid and not PPO.
 
 ### Final exploitability
 
@@ -708,6 +745,12 @@ with one shared rate per family.
   4 hours of CPU per run it would have been the most expensive cell in the project, and
   given §9 it would have measured an arm that almost never conditions on its input. The
   config is kept, marked as not run.
+- Loss-weighting under PPO (`configs/ppo_game_a_sampled_asym.yaml`, driver step
+  `asym-ppo`) was planned in the project idea review and was not run either. §6 and the
+  welfare trade-off in §13 are REINFORCE results only.
+- Grid edges under PPO: besides tabular (above), dense tuned to 0.0001 in Game A, the
+  bottom of the extended grid, and the signed rewire to 0.03 in Game B, the top. Better
+  rates may exist outside the grid for those arms.
 - Wall times for `tune-ppo-a` (6,906 s) and `run-ppo-a` (2,841 s) were measured while the
   machine was also running a game. They are upper bounds and not comparable with the
   other steps. The rest, all at 6 workers on the laptop: `tune-ppo-b` 3,135 s,
@@ -972,8 +1015,10 @@ whoever gets it, minus both players' fight cost.
 
 - Game A: the social optimum is `V = 1` (one player walks away at once). At the
   continuous equilibrium each player expects exactly 0, so the whole prize is burnt in
-  the fight. On the 64-point grid the equilibrium keeps 0.122 of it (88% dissipated);
-  the rest is discretisation.
+  the fight. On the 64-point grid the exact equilibrium keeps 0.119 of it (88%
+  dissipated), which is discretisation: a tie at t = 0 has positive probability. The
+  oracle, the continuous law floored onto the grid, keeps 0.122; the figures draw that
+  as the equilibrium line.
 - Game B: the social optimum is `E[max(v1, v2)] = 1.486` (the higher value takes the
   prize, nobody fights). The equilibrium bid `v²/2` gets the allocation almost right,
   1.471 of the 1.486, because the higher value always waits longer. It pays 0.496 in
@@ -986,28 +1031,42 @@ whoever gets it, minus both players' fight cost.
 
 Source: `results/tables/welfare.csv` (per arm, 95% bootstrap CI),
 `welfare_per_run.csv`, `welfare_contrasts.csv`; `python scripts/welfare.py`. Figure:
-`figures/fig9_welfare.png`. For sampled runs the strategy is the population mixture
-(the saved final policy), so a few self-pairings are counted; the effect is small at
-8 agents.
+`figures/fig9_welfare.png`.
+
+For sampled runs, welfare is the mean over pairs of two *different* agents, since an
+agent never meets itself. An earlier version of this section computed it from the
+population mixture against itself, which counts every agent fighting itself in 1/M of
+the matches. When agents differ, that overstates the fight: for pairs it reported 0.26
+to 0.60 where the true value is 0.73 to 0.93, and at 8 agents it was low by 0.03 to
+0.16. All sampled welfare numbers below are the corrected ones.
+
+The run records store only the mixture, so the corrected values come from retraining
+each sampled run from its stored configuration (`scripts/welfare_rerun.py`,
+`results/tables/welfare_population.csv`); new runs store the welfare themselves. On the
+laptop the retrained runs of `game_a_sampled`, `game_b_sampled` and the shared-rate
+experiments match the committed final exploitability exactly. Not redone, and so absent
+from the welfare tables: the PPO experiments and the FlyGM sampled experiments (about
+60 CPU-hours). No welfare statement here concerns them.
 
 ### What the learners do
 
 | setting | equilibrium | learners (range of arm means) | direction |
 |---|---|---|---|
-| Game A, exact | 0.122 | 0.119 (all arms) | at equilibrium |
-| Game A, sampled | 0.122 | 0.07 to 0.26 | most arms waste less than equilibrium |
+| Game A, exact | 0.119 | 0.119 to 0.122 | at equilibrium |
+| Game A, sampled | 0.119 | 0.16 to 0.31 | every arm wastes less than equilibrium |
 | Game B, exact | 0.976 | 0.90 to 1.01 | at equilibrium |
-| Game B, sampled | 0.976 | 0.49 to 0.84 | all arms waste more |
+| Game B, sampled | 0.976 | 0.59 to 0.84 | all arms waste more |
 
 - Game A, sampled. Learners that have not quite reached equilibrium quit a little
   early, and quitting early is what society wants. So the circuit and dense arms keep
-  0.21 to 0.26 of the prize, about twice the equilibrium's 0.12. Tabular (0.07) and the
-  rewire at its own tuned rate (0.10) have CIs that cover the equilibrium.
-- Game B, sampled. The opposite. Learners both allocate worse (1.23 to 1.40 of the
-  available 1.486, vs 1.471 at equilibrium) and fight longer (cost 0.56 to 0.75 vs
+  0.24 to 0.31 of the prize, two to two and a half times the equilibrium's 0.12. Tabular
+  keeps 0.16 [0.08, 0.25], the only arm whose CI covers the equilibrium.
+- Game B, sampled. The opposite. Learners both allocate worse (1.24 to 1.40 of the
+  available 1.486, vs 1.471 at equilibrium) and fight longer (cost 0.56 to 0.66 vs
   0.50). Not knowing the opponent's value and learning from noisy fights costs welfare
-  twice. The real-wiring connectome is the worst arm here (0.49 [0.40, 0.57]), in line
-  with its exploitability (§3).
+  twice. The worst arms are the unsigned real-wiring connectome, 0.59 [0.52, 0.66], and
+  unsigned random sparse, 0.60 [0.47, 0.72], in line with their exploitability (§3).
+  Tabular (0.84) and dense (0.82) are the best.
 
 ### Lopsided learning trades exploitability for welfare
 
@@ -1016,23 +1075,27 @@ quit earlier, which raises exploitability and also raises welfare, on every arm:
 
 | α_loss / α_win | mean welfare | mean final exploitability |
 |---|---|---|
-| 1 | 0.19 | 0.048 |
-| 2 | 0.37 | 0.102 |
-| 4 | 0.41 | 0.130 |
-| 8 | 0.45 | 0.146 |
+| 1 | 0.26 | 0.048 |
+| 2 | 0.51 | 0.102 |
+| 4 | 0.68 | 0.130 |
+| 8 | 0.72 | 0.146 |
 
-Across all 320 sweep runs, Spearman ρ between exploitability and welfare is 0.68. A
-population that learns the way flies seem to (losses count more) ends up further from
-equilibrium but keeps more than twice as much of the prize (0.45 against 0.19, so waste
-falls from about 0.81 to 0.55). The theory in §6 predicts the
+Across all 320 sweep runs, Spearman ρ between exploitability and welfare is 0.85
+(within one ratio it is 0.08 at ratio 1 and 0.4 to 0.65 above it, so most of it is the
+ratio). A population that learns the way flies seem to (losses count more) ends up
+further from equilibrium but keeps almost three times as much of the prize (0.72 against
+0.26, so waste falls from about 0.74 to 0.28). The theory in §6 predicts the
 direction, since the predicted rest points put more mass on quitting at once.
 
 ### Wiring
 
-Real wiring vs each control on welfare, in the shared-learning-rate experiments (27
-contrasts, Holm across all of them): nothing survives except two Game A exact
-contrasts where the connectome is ahead by 0.0001, a hundredth of a percent of the
-prize. The wiring answer is the same as for exploitability.
+Real wiring vs each control on welfare, in the shared-learning-rate experiments other
+than PPO (24 contrasts, Holm across all of them): nothing survives except two Game A
+exact contrasts where the connectome is ahead by 0.0001, a hundredth of a percent of the
+prize. The largest gaps are at the shared rate in Game B, and their CIs are wide:
+sampled, connectome − rewire +0.13 [−0.02, +0.28]; exact at lr 0.03, where the unsigned
+connectome is unstable (§4), −0.25 [−0.62, +0.01]. So the wiring answer is the same as
+for exploitability, with the same caveat about precision in Game B.
 
 ## 14. Number of agents
 
@@ -1041,8 +1104,11 @@ re-matched at random every round. Every agent plays the same 128 matches per rou
 every size, so what changes is only how many different opponents it learns against.
 Arms: tabular, dense, connectome, rewire, random sparse; the circuit arms share one
 learning rate. 10 seeds, 200 runs. Config: `configs/popsize_game_a_sampled.yaml`.
-Figure: `figures/fig10_population_size.png`. The 8-agent runs reproduce
-`robust_game_a_sampled_shared_lr` exactly (same seeds, same numbers), which is a check
+Figure: `figures/fig10_population_size.png`. The 8-agent runs repeat
+`robust_game_a_sampled_shared_lr` (same seeds, graphs and rates). The committed ones were
+made on a different machine and torch version, so they differ from it by up to 0.009 in
+final exploitability on single seeds (arm means within 0.001). Rerun on the laptop, the
+30 shared runs agree with it to 10⁻¹¹ (`results/tables/welfare_population.csv`), which is a check
 on the runner.
 
 Final exploitability of the average agent, mean [95% CI]:
@@ -1054,14 +1120,16 @@ Final exploitability of the average agent, mean [95% CI]:
 | 8 | 0.068 [0.059, 0.079] | 0.033 [0.030, 0.036] | 0.045 [0.042, 0.049] | 0.044 [0.040, 0.049] | 0.049 [0.043, 0.056] |
 | 16 | 0.033 [0.031, 0.037] | 0.033 [0.031, 0.034] | 0.034 [0.032, 0.037] | 0.035 [0.032, 0.037] | 0.034 [0.032, 0.036] |
 
-Welfare per match (optimum 1, symmetric equilibrium 0.122):
+Welfare per match between two different agents (optimum 1, symmetric grid equilibrium
+0.119), mean [95% CI]. These come from retraining the runs on the laptop (§13), so the
+populations are the laptop's, within the drift above of the committed ones:
 
 | agents | tabular | dense | connectome | rewire | random sparse |
 |---|---|---|---|---|---|
-| 2 | 0.26 | 0.60 | 0.46 | 0.30 | 0.37 |
-| 4 | 0.28 | 0.31 | 0.11 | 0.28 | 0.09 |
-| 8 | 0.07 | 0.21 | 0.23 | 0.24 | 0.24 |
-| 16 | 0.17 | 0.16 | 0.14 | 0.15 | 0.15 |
+| 2 | 0.76 [0.57, 0.94] | 0.93 [0.85, 0.99] | 0.88 [0.77, 0.97] | 0.73 [0.48, 0.90] | 0.81 [0.70, 0.91] |
+| 4 | 0.51 [0.41, 0.61] | 0.44 [0.36, 0.52] | 0.25 [0.04, 0.44] | 0.44 [0.32, 0.55] | 0.26 [0.06, 0.44] |
+| 8 | 0.16 [0.08, 0.24] | 0.24 [0.22, 0.25] | 0.28 [0.26, 0.32] | 0.29 [0.26, 0.31] | 0.29 [0.27, 0.31] |
+| 16 | 0.20 [0.18, 0.22] | 0.16 [0.16, 0.17] | 0.16 [0.15, 0.17] | 0.16 [0.15, 0.18] | 0.16 [0.15, 0.17] |
 
 What happens:
 
@@ -1071,12 +1139,12 @@ What happens:
   asymmetric equilibrium: neither agent can gain by changing alone, so each agent's own
   exploitability is low, but the pair is far from the symmetric equilibrium (population
   exploitability 0.19 to 0.25). It is also the efficient outcome, since there is
-  hardly any fight, so welfare is highest here (0.26 to 0.60).
+  hardly any fight, so welfare is highest here: the pair keeps 0.73 to 0.93 of the prize.
 - Four agents are the worst case. Too many opponents to settle into roles, too few to
   average them out. Agent exploitability is highest at 4 for every arm.
 - From 8 up, the population converges on the symmetric mixed equilibrium. At 16 every
   arm reaches 0.033 to 0.035, the arms become indistinguishable from each other, and
-  welfare falls towards the equilibrium's 0.12 (0.14 to 0.17). More agents means more
+  welfare falls towards the equilibrium's 0.12 (0.16 to 0.20). More agents means more
   equilibrium-like play and more of the prize wasted.
 
 Wiring: real vs rewire and real vs random at each size, on exploitability and on

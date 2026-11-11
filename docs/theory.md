@@ -210,7 +210,7 @@ and a positive mean payoff. On the default grid, `asymmetric_fixed_point` gives:
 
 | ρ | baseline b | exploitability of the rest point | TV to equilibrium | P(quit at 0) |
 |---|-----------:|----:|----:|----:|
-| 1 | 0.060 | 0.000 | 0.001 | 0.119 |
+| 1 | 0.059 | 0.000 | 0.001 | 0.119 |
 | 2 | 0.182 | 0.066 | 0.161 | 0.191 |
 | 4 | 0.241 | 0.108 | 0.246 | 0.249 |
 | 8 | 0.270 | 0.130 | 0.295 | 0.285 |
