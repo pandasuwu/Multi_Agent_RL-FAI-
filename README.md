@@ -53,9 +53,11 @@ numbers are in [RESULTS.md](RESULTS.md); section numbers below point there.
   (88% on the grid); in Game B it gets the prize to the higher value, but the fight
   costs exactly what that sorting gains (0.5 each in continuous time), so welfare only
   breaks even with a no-fight coin flip. Learners that weight losses more than wins
-  quit earlier, which raises exploitability and roughly doubles welfare (§13).
+  quit earlier, which raises exploitability and nearly triples welfare (0.26 to 0.72 of
+  the prize, §13).
 - Number of agents changes the outcome more than wiring does. A fixed pair usually
-  splits roles (one gives in at once), which is an equilibrium with almost no fighting.
+  splits roles (one gives in at once), which is an equilibrium with almost no fighting,
+  so pairs keep 0.73 to 0.93 of the prize against 0.16 to 0.20 at 16 agents.
   From 8 agents up the population settles on the symmetric mixed equilibrium, and at 16
   every arm, real wiring included, ends at the same exploitability (§14).
 
@@ -171,6 +173,10 @@ The welfare analysis and the population-size sweep (§13–§14):
 .venv/Scripts/python scripts/welfare.py
 .venv/Scripts/python scripts/make_figures.py
 ```
+
+Runs made before the welfare fix store only the population's average policy.
+`scripts/welfare_rerun.py` retrains them to get the welfare between different agents
+(`results/tables/welfare_population.csv`, which `welfare.py` reads); new runs don't need it.
 
 The checks after the project review (§15): `make review`, then `make figures`.
 
