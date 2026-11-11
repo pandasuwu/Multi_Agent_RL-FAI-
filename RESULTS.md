@@ -575,7 +575,7 @@ Same game, same seeds, each arm at its own tuned rate. Source:
   `results/flygm_ppo_log.txt`: tuning for Game A exact, Game A sampled and Game B exact
   took 1,518 s at 14 workers; the runs for those three settings took 8,483 s at 14
   workers; tuning for Game B sampled took 10,555 s at 6 workers. The last of these ran
-  while the machine was also running a game, which cost about 1.9x, so it is an upper
+  while the machine was also busy with an unrelated program, which cost about 1.9x, so it is an upper
   bound.
 - Worker counts are not a free choice for this arm. One FlyGM Game B run takes 462 s
   alone, 420 s with 6 running at once, and 1,752 s with 14. Fourteen workers deliver
@@ -772,7 +772,7 @@ with one shared rate per family.
   bottom of the extended grid, and the signed rewire to 0.03 in Game B, the top. Better
   rates may exist outside the grid for those arms.
 - Wall times for `tune-ppo-a` (6,906 s) and `run-ppo-a` (2,841 s) were measured while the
-  machine was also running a game. They are upper bounds and not comparable with the
+  machine was also busy with an unrelated program. They are upper bounds and not comparable with the
   other steps. The rest, all at 6 workers on the laptop: `tune-ppo-b` 3,135 s,
   `run-ppo-b` 7,366 s, `robust-ppo-a` 3,862 s, `robust-ppo-b` 5,777 s.
 
