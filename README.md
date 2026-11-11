@@ -9,7 +9,7 @@ it gets to equilibrium in a strategic game?
 The game is the war of attrition. Two players contest a prize, both pay for every
 second the contest lasts, and whoever quits first loses. Male fruit flies fighting over
 food play it, and Ventimiglia et al. 2026 found the circuit that makes them give up:
-PPL1 → V2 MBONs (MBON18/19) → Tk-GAL4^FruM (AVLP727m). I cut that circuit out of the
+PPL1 → V2 MBONs (MBON18/19) → Tk-GAL4^FruM (AVLP727m). We cut that circuit out of the
 MaleCNS v1.0 connectome and used it as the policy network of learning agents, against
 size-matched controls with the same neurons but different wiring.
 
@@ -26,7 +26,7 @@ size-matched controls with the same neurons but different wiring.
 - Metrics: exact exploitability (how much a best responder could gain), episodes to
   threshold, and welfare against the social optimum (§13).
 
-Short version: I found no effect of the wiring on how close the agents get to
+Short version: we found no effect of the wiring on how close the agents get to
 equilibrium. Two caveats. The games ask little of the network (one constant input in
 Game A, one number in Game B), and in sampled Game B the 10-seed confidence intervals
 are wide enough to hide an effect of a quarter of the loss (§8 and the Summary). Full
@@ -45,7 +45,7 @@ numbers are in [RESULTS.md](RESULTS.md); section numbers below point there.
 - PPO gets to the threshold up to 4x sooner in Game A. Final accuracy depends on the
   game: it helps dense and the signed circuits in Game B and hurts the connectome arms
   in Game A. One Game B contrast (real circuit worse than random) passes Holm within its
-  experiment but not across all 108 wiring tests in the project, so I don't count it (§10).
+  experiment but not across all 108 wiring tests in the project, so we don't count it (§10).
 - The readout matters more than the wiring. Reading out from every neuron improves every
   circuit arm in Game B and removes most of the gap to the dense MLP, along with the
   earlier sign-constraint advantage (§12).
@@ -66,6 +66,14 @@ numbers are in [RESULTS.md](RESULTS.md); section numbers below point there.
   rest point of loss-weighted learning matches simulations of the rule. Every control
   graph keeps all PPL1 → AVLP727m paths. A sweep over shared learning rates shows the
   Game A speed-up is a wiring effect, not tuning, and finds nothing else.
+
+![Final exploitability by arm in the four main settings](figures/fig3_main_comparison.png)
+
+What would count as an answer: a difference between the real circuit and its
+degree-preserving rewire that holds at a shared learning rate and survives Holm
+correction would be a wiring effect; confidence intervals tight around zero would be
+evidence of none. The exact-gradient settings give the second. The sampled settings
+give neither firmly.
 
 Other docs: [docs/theory.md](docs/theory.md) (equilibria, exploitability),
 [docs/circuit.md](docs/circuit.md) (how the subgraph was extracted).
