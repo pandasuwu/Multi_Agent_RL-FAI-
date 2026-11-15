@@ -3,15 +3,17 @@
 CS329 Foundations of AI: Multi-Agent Systems, IIT Gandhinagar, 2026. Project by Suhani,
 Mayank Choudhary, Krina Paghadar and Nakshatra Lad.
 
-Question: does building a learning agent out of a real neural circuit change how close
-it gets to equilibrium in a strategic game?
+Question: when independent agents learn the war of attrition from their own fights, what
+decides how close they get to equilibrium: the learning rule, the number of agents, what
+the learner is given, or how its policy network is wired?
 
 The game is the war of attrition. Two players contest a prize, both pay for every
 second the contest lasts, and whoever quits first loses. Male fruit flies fighting over
 food play it, and Ventimiglia et al. 2026 found the circuit that makes them give up:
-PPL1 → V2 MBONs (MBON18/19) → Tk-GAL4^FruM (AVLP727m). We cut that circuit out of the
-MaleCNS v1.0 connectome and used it as the policy network of learning agents, against
-size-matched controls with the same neurons but different wiring.
+PPL1 → V2 MBONs (MBON18/19) → Tk-GAL4^FruM (AVLP727m). That circuit is our wiring
+factor. We cut it out of the MaleCNS v1.0 connectome and used it as the policy network
+of learning agents, against size-matched controls with the same neurons but different
+wiring.
 
 - Agents: 8 independent learners (2 to 16 in §14), each choosing a quitting time.
 - Known and unknown: the equilibrium is known in closed form, but the agents don't know
@@ -26,41 +28,62 @@ size-matched controls with the same neurons but different wiring.
 - Metrics: exact exploitability (how much a best responder could gain), episodes to
   threshold, and welfare against the social optimum (§13).
 
-Short version: we found no effect of the wiring on how close the agents get to
-equilibrium. Two caveats. The games ask little of the network (one constant input in
-Game A, one number in Game B), and in sampled Game B the 10-seed confidence intervals
-are wide enough to hide an effect of a quarter of the loss (§8 and the Summary). Full
-numbers are in [RESULTS.md](RESULTS.md); section numbers below point there.
+Short version: the learning rule, the number of agents, the learning signal and the
+readout each move the outcome. The wiring does not, in the one setting that tests it
+fairly. Full numbers are in [RESULTS.md](RESULTS.md); section numbers below point there.
 
-- With trained edges, the real circuit ends at the same exploitability as a
-  degree-preserving rewire or a random sparse graph, in both games and both training
-  modes (§3–§4). The one clear difference is stability: in Game B at three times its
-  tuned learning rate, the unsigned real circuit converges on 7 of 20 seeds against 15
-  and 16 for its controls.
-- With frozen synapse counts as weights (FlyGM), Game A works and shows no wiring
-  effect. Game B collapses to a single bid on all three graphs, because of the 5-neuron
-  readout: reading out from all 258 neurons fixes it (0.33 → 0.011). Still no wiring
-  effect after that (§9, §12).
-- The readout matters more than the wiring. The wider readout improves every circuit
-  arm in Game B and removes most of the gap to the dense MLP (§12).
-- PPO reaches the threshold up to 4x sooner in Game A; its effect on final accuracy
-  depends on the game (§10).
-- The equilibrium is socially wasteful. Learners that weight losses more than wins quit
+| factor | what we varied | final exploitability | § |
+|---|---|---|---|
+| Learning rule | losses weighted 1, 2, 4, 8 times wins (sampled Game A, mean of 8 arms) | 0.048, 0.102, 0.130, 0.146 (rest point predicted at 0, 0.066, 0.108, 0.130) | §6, §15.2 |
+| Number of agents | 2, 4, 8, 16 (sampled Game A, range over 5 arms) | 0.04–0.08, 0.06–0.11, 0.03–0.07, 0.033–0.035 | §14 |
+| Learning signal | exact payoff gradient vs own sampled fights (connectome arm) | Game A 0.0013 vs 0.045; Game B 0.0082 vs 0.154 | §3 |
+| Readout | 5 output neurons vs all 258 (Game B exact) | trained edges 0.0082 → 0.0039; frozen synapses 0.33 → 0.011 | §12 |
+| Wiring | real circuit vs degree-preserving rewire (Game B exact) | 0.0082 vs 0.0078, difference +0.0004 [−0.0002, 0.0015] | §4 |
+
+- Weighting losses more than wins moves the learners to a different rest point: the
+  equilibrium of a modified game. We derive it (a Lomax quitting law instead of the
+  exponential) and check it against simulations of the learning rule. Exploitability
+  rises with the weight on every arm and sits 0.02–0.05 above the prediction, about the
+  sampling-noise floor (§6, §15.2).
+- The equilibrium is socially wasteful, and learners further from it waste less. In
+  Game A the equilibrium burns almost the whole prize. Loss-weighted learners quit
   earlier, which raises exploitability and nearly triples welfare (0.26 to 0.72 of the
   prize, §13).
-- The number of agents changes the outcome more than wiring does. A fixed pair usually
-  splits roles and hardly fights; from 8 agents up the population settles on the
-  symmetric equilibrium, and at 16 every arm ends at the same exploitability (§14).
+- The number of agents changes what is learned. A fixed pair usually splits roles (the
+  asymmetric equilibrium) and hardly fights. Four agents learn worst. From 8 up the
+  population approaches the symmetric equilibrium, and at 16 every arm ends at the same
+  exploitability (§14).
+- Learning from sampled fights ends well above the exact-gradient result. In Game B no
+  network arm reaches the 0.05 threshold under REINFORCE. PPO gets the dense network and
+  two signed circuits there, and reaches the threshold up to 4x sooner in Game A
+  (§3, §10).
+- The readout matters more than the wiring. Reading the policy from all 258 neurons
+  instead of 5 improves every circuit arm in Game B, removes most of the gap to the
+  dense MLP, and fixes the frozen-synapse (FlyGM) arms, which otherwise collapse to a
+  single bid on all three graphs (§9, §12).
+- Wiring: no effect found on final exploitability, with trained edges or frozen
+  synapses (§3–§4, §9, §12). How much that says depends on the setting:
+  - Game B exact is the fair test: the learners converge and the policy has to depend
+    on the input. The intervals on real-minus-control are 10–21% of the loss.
+  - Game A cannot show a wiring effect on the final policy. Its input is a constant, so
+    the 64 output biases can represent any policy whatever the graph. Wiring can only
+    change the path there, and a small speed-up is what we see (15–20 episodes out of
+    about 217, §11).
+  - Sampled Game B compares learners that have not converged, and its 10-seed intervals
+    are wide enough to hide an effect of a quarter of the loss (§8).
+  - The one clear wiring difference goes against the real circuit: in Game B at three
+    times its tuned learning rate, the unsigned real circuit converges on 7 of 20 seeds
+    against 15 and 16 for its controls (§4).
 - Review checks (§15): population-level Nash, the loss-weighted rest point, input-output
   paths in the controls, and a shared learning-rate sweep. None changes the conclusion.
 
 ![Final exploitability by arm in the four main settings](figures/fig3b_main_four_settings.png)
 
-What would count as an answer: a difference between the real circuit and its
+What would count as a wiring effect: a difference between the real circuit and its
 degree-preserving rewire that holds at a shared learning rate and survives Holm
-correction would be a wiring effect; confidence intervals tight around zero would be
-evidence of none. The exact-gradient settings give the second. The sampled settings
-give neither firmly.
+correction. Confidence intervals tight around zero would be evidence of none. Game B
+exact gives the second. Game A exact gives it too, but would for any wiring. The sampled
+settings give neither firmly.
 
 The project report is [final_report.pdf](final_report.pdf).
 
