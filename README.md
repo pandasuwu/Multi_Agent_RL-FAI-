@@ -1,6 +1,7 @@
 # Fly give-up circuit and the war of attrition
 
-CS329 Foundations of AI: Multi-Agent Systems, IIT Gandhinagar, 2026. Project by Suhani,
+CS329 Foundations of AI: Multi-Agent Systems, IIT Gandhinagar, 2026.   
+Project by Suhani,
 Mayank Choudhary, Krina Paghadar and Nakshatra Lad.
 
 Question: does building a learning agent out of a real neural circuit change how close
@@ -26,7 +27,7 @@ size-matched controls with the same neurons but different wiring.
 - Metrics: exact exploitability (how much a best responder could gain), episodes to
   threshold, and welfare against the social optimum (§13).
 
-Short version: we found no effect of the wiring on how close the agents get to
+We found no effect of the wiring on how close the agents get to
 equilibrium. Two caveats. The games ask little of the network (one constant input in
 Game A, one number in Game B), and in sampled Game B the 10-seed confidence intervals
 are wide enough to hide an effect of a quarter of the loss (§8 and the Summary). Full
