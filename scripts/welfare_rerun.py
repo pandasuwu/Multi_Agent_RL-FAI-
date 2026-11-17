@@ -10,6 +10,11 @@ the retrained run and of the committed one, so any drift between the two is visi
 
     python scripts/welfare_rerun.py --workers 6
     python scripts/welfare_rerun.py --only popsize_game_a_sampled game_a_sampled
+    python scripts/welfare_rerun.py --from-records   # runs that already store welfare
+
+``--from-records`` retrains nothing: it reads the welfare each run record stored when
+it was made (every run from a fresh ``scripts/reproduce_all.py``), so the "rerun" and
+"committed" exploitability columns are the same number.
 
 Per-run results go to ``results/_scratch/welfare_rerun/`` (resumable, not committed)
 and are collected into ``results/tables/welfare_population.csv``, which
@@ -103,6 +108,32 @@ def rerun(path: str) -> dict:
     return row
 
 
+def from_record(path: Path) -> dict:
+    """The same row as ``rerun``, read from a record that stored its own welfare."""
+    with open(path, encoding="utf-8") as fh:
+        rec = json.load(fh)
+    if not rec.get("welfare"):
+        raise SystemExit(f"{path} stores no welfare (made before runs stored it); rerun without --from-records")
+    final = rec["summary"]["final_exploitability"]
+    row = {
+        "experiment": rec["experiment"],
+        "run_id": rec["run_id"],
+        "arm": rec["arm"],
+        "seed": rec["seed"],
+        **{f"welfare_{k}" if k != "welfare" else k: v for k, v in rec["welfare"].items()},
+        "rerun_final_exploitability": final,
+        "committed_final_exploitability": final,
+        "same_graph": True,
+        "torch": torch.__version__,
+        "wall_seconds": 0.0,
+    }
+    out_dir = SCRATCH / rec["experiment"]
+    out_dir.mkdir(parents=True, exist_ok=True)
+    with open(out_dir / f"{rec['run_id']}.json", "w", encoding="utf-8") as fh:
+        json.dump(row, fh)
+    return row
+
+
 def collect() -> pd.DataFrame:
     rows = []
     for path in sorted(SCRATCH.glob("*/*.json")):
@@ -120,9 +151,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--only", nargs="*", default=None, help="experiments to do (default: all sampled ones)")
     parser.add_argument("--workers", type=int, default=6)
+    parser.add_argument("--from-records", action="store_true", help="read stored welfare instead of retraining")
     args = parser.parse_args()
     for exp in args.only or ORDER:
         runs = sorted((RES / exp / "runs").glob("*.json"))
+        if args.from_records:
+            for p in runs:
+                if "oracle" not in p.stem:
+                    from_record(p)
+            n = len(collect().query("experiment == @exp"))
+            print(f"[{exp}] {n} runs read from records", flush=True)
+            continue
         done = {p.stem for p in (SCRATCH / exp).glob("*.json")} if (SCRATCH / exp).exists() else set()
         todo = [str(p) for p in runs if "oracle" not in p.stem and p.stem not in done]
         print(f"[{exp}] {len(todo)} runs to redo on {args.workers} workers", flush=True)
