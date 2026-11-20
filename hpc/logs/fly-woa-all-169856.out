@@ -1,0 +1,1396 @@
+==========================================
+SLURM_CLUSTER_NAME = paramananta
+SLURM_ARRAY_JOB_ID = 
+SLURM_ARRAY_TASK_ID = 
+SLURM_ARRAY_TASK_COUNT = 
+SLURM_ARRAY_TASK_MAX = 
+SLURM_ARRAY_TASK_MIN = 
+SLURM_JOB_ACCOUNT = iitgn
+SLURM_JOB_ID = 169856
+SLURM_JOB_NAME = fly-woa-all
+SLURM_JOB_NODELIST = cn006
+SLURM_JOB_USER = suhani
+SLURM_JOB_UID = 40500
+SLURM_JOB_PARTITION = small
+SLURM_TASK_PID = 25778
+SLURM_SUBMIT_DIR = /home/suhani/Multi_Agent_RL-FAI-
+SLURM_CPUS_ON_NODE = 48
+SLURM_NTASKS = 1
+SLURM_TASK_PID = 25778
+==========================================
+/var/share/slurm/d/job169856/slurm_script: line 37: git: command not found
+job 169856 on cn006, 48 workers (48 heavy), commit 
+........................................................................ [ 62%]
+..................s........................                              [100%]
+114 passed, 1 skipped in 93.41s (0:01:33)
+=== 2026-11-17 20:27:29 commit unknown on cn006 (48 cpus), steps: tune-main, run-main, run-robust, tune-flygm-fast, run-flygm-fast, run-eval1, tune-ppo-a, run-ppo-a, tune-flygm-b-sampled, run-flygm-b-sampled, tune-ppo-b, run-ppo-b, run-robust-ppo, run-robust-flygm, tune-readout-a, run-readout-a, tune-readout-b, run-readout-b, run-popsize, run-review, validate-asymmetric, path-diagnostics, welfare-from-records, analyze, welfare, figures ===
++ scripts/tune_lr.py configs/game_a_exact.yaml configs/game_b_exact.yaml configs/game_a_sampled.yaml configs/game_b_sampled.yaml --workers 48
+[game_a_exact__lr=0.001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_exact__lr=0.001] 14 runs to do on 48 workers
+[game_a_exact__lr=0.001] 1/14 runs, 10s elapsed
+[game_a_exact__lr=0.001] 2/14 runs, 10s elapsed
+[game_a_exact__lr=0.001] 3/14 runs, 14s elapsed
+[game_a_exact__lr=0.001] 4/14 runs, 14s elapsed
+[game_a_exact__lr=0.001] 5/14 runs, 15s elapsed
+[game_a_exact__lr=0.001] 6/14 runs, 15s elapsed
+[game_a_exact__lr=0.001] 7/14 runs, 15s elapsed
+[game_a_exact__lr=0.001] 8/14 runs, 15s elapsed
+[game_a_exact__lr=0.001] 9/14 runs, 15s elapsed
+[game_a_exact__lr=0.001] 10/14 runs, 15s elapsed
+[game_a_exact__lr=0.001] 11/14 runs, 15s elapsed
+[game_a_exact__lr=0.001] 12/14 runs, 15s elapsed
+[game_a_exact__lr=0.001] 13/14 runs, 15s elapsed
+[game_a_exact__lr=0.001] 14/14 runs, 16s elapsed
+[game_a_exact__lr=0.003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_exact__lr=0.003] 14 runs to do on 48 workers
+[game_a_exact__lr=0.003] 1/14 runs, 10s elapsed
+[game_a_exact__lr=0.003] 2/14 runs, 10s elapsed
+[game_a_exact__lr=0.003] 3/14 runs, 14s elapsed
+[game_a_exact__lr=0.003] 4/14 runs, 14s elapsed
+[game_a_exact__lr=0.003] 5/14 runs, 14s elapsed
+[game_a_exact__lr=0.003] 6/14 runs, 15s elapsed
+[game_a_exact__lr=0.003] 7/14 runs, 15s elapsed
+[game_a_exact__lr=0.003] 8/14 runs, 15s elapsed
+[game_a_exact__lr=0.003] 9/14 runs, 15s elapsed
+[game_a_exact__lr=0.003] 10/14 runs, 15s elapsed
+[game_a_exact__lr=0.003] 11/14 runs, 15s elapsed
+[game_a_exact__lr=0.003] 12/14 runs, 15s elapsed
+[game_a_exact__lr=0.003] 13/14 runs, 15s elapsed
+[game_a_exact__lr=0.003] 14/14 runs, 15s elapsed
+[game_a_exact__lr=0.01] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_exact__lr=0.01] 14 runs to do on 48 workers
+[game_a_exact__lr=0.01] 1/14 runs, 10s elapsed
+[game_a_exact__lr=0.01] 2/14 runs, 10s elapsed
+[game_a_exact__lr=0.01] 3/14 runs, 14s elapsed
+[game_a_exact__lr=0.01] 4/14 runs, 14s elapsed
+[game_a_exact__lr=0.01] 5/14 runs, 14s elapsed
+[game_a_exact__lr=0.01] 6/14 runs, 14s elapsed
+[game_a_exact__lr=0.01] 7/14 runs, 14s elapsed
+[game_a_exact__lr=0.01] 8/14 runs, 15s elapsed
+[game_a_exact__lr=0.01] 9/14 runs, 15s elapsed
+[game_a_exact__lr=0.01] 10/14 runs, 15s elapsed
+[game_a_exact__lr=0.01] 11/14 runs, 15s elapsed
+[game_a_exact__lr=0.01] 12/14 runs, 15s elapsed
+[game_a_exact__lr=0.01] 13/14 runs, 15s elapsed
+[game_a_exact__lr=0.01] 14/14 runs, 15s elapsed
+[game_a_exact__lr=0.03] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_exact__lr=0.03] 16 runs to do on 48 workers
+[game_a_exact__lr=0.03] 1/16 runs, 9s elapsed
+[game_a_exact__lr=0.03] 2/16 runs, 9s elapsed
+[game_a_exact__lr=0.03] 3/16 runs, 10s elapsed
+[game_a_exact__lr=0.03] 4/16 runs, 11s elapsed
+[game_a_exact__lr=0.03] 5/16 runs, 14s elapsed
+[game_a_exact__lr=0.03] 6/16 runs, 14s elapsed
+[game_a_exact__lr=0.03] 7/16 runs, 14s elapsed
+[game_a_exact__lr=0.03] 8/16 runs, 14s elapsed
+[game_a_exact__lr=0.03] 9/16 runs, 15s elapsed
+[game_a_exact__lr=0.03] 10/16 runs, 15s elapsed
+[game_a_exact__lr=0.03] 11/16 runs, 15s elapsed
+[game_a_exact__lr=0.03] 12/16 runs, 15s elapsed
+[game_a_exact__lr=0.03] 13/16 runs, 15s elapsed
+[game_a_exact__lr=0.03] 14/16 runs, 15s elapsed
+[game_a_exact__lr=0.03] 15/16 runs, 15s elapsed
+[game_a_exact__lr=0.03] 16/16 runs, 15s elapsed
+[game_a_exact__lr=0.1] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_exact__lr=0.1] 16 runs to do on 48 workers
+[game_a_exact__lr=0.1] 1/16 runs, 9s elapsed
+[game_a_exact__lr=0.1] 2/16 runs, 9s elapsed
+[game_a_exact__lr=0.1] 3/16 runs, 10s elapsed
+[game_a_exact__lr=0.1] 4/16 runs, 11s elapsed
+[game_a_exact__lr=0.1] 5/16 runs, 14s elapsed
+[game_a_exact__lr=0.1] 6/16 runs, 14s elapsed
+[game_a_exact__lr=0.1] 7/16 runs, 14s elapsed
+[game_a_exact__lr=0.1] 8/16 runs, 14s elapsed
+[game_a_exact__lr=0.1] 9/16 runs, 15s elapsed
+[game_a_exact__lr=0.1] 10/16 runs, 15s elapsed
+[game_a_exact__lr=0.1] 11/16 runs, 15s elapsed
+[game_a_exact__lr=0.1] 12/16 runs, 15s elapsed
+[game_a_exact__lr=0.1] 13/16 runs, 15s elapsed
+[game_a_exact__lr=0.1] 14/16 runs, 15s elapsed
+[game_a_exact__lr=0.1] 15/16 runs, 15s elapsed
+[game_a_exact__lr=0.1] 16/16 runs, 16s elapsed
+[game_a_exact__lr=0.3] 2 runs to do on 48 workers
+[game_a_exact__lr=0.3] 1/2 runs, 8s elapsed
+[game_a_exact__lr=0.3] 2/2 runs, 8s elapsed
+[game_a_exact] chosen learning rates: {'tabular': 0.1, 'dense': 0.003, 'connectome': 0.03, 'connectome+sign': 0.03, 'rewired': 0.03, 'rewired+sign': 0.03, 'random_sparse': 0.03, 'random_sparse+sign': 0.03}
+[game_b_exact__lr=0.001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_exact__lr=0.001] 14 runs to do on 48 workers
+[game_b_exact__lr=0.001] 1/14 runs, 11s elapsed
+[game_b_exact__lr=0.001] 2/14 runs, 12s elapsed
+[game_b_exact__lr=0.001] 3/14 runs, 19s elapsed
+[game_b_exact__lr=0.001] 4/14 runs, 19s elapsed
+[game_b_exact__lr=0.001] 5/14 runs, 19s elapsed
+[game_b_exact__lr=0.001] 6/14 runs, 19s elapsed
+[game_b_exact__lr=0.001] 7/14 runs, 19s elapsed
+[game_b_exact__lr=0.001] 8/14 runs, 20s elapsed
+[game_b_exact__lr=0.001] 9/14 runs, 20s elapsed
+[game_b_exact__lr=0.001] 10/14 runs, 20s elapsed
+[game_b_exact__lr=0.001] 11/14 runs, 20s elapsed
+[game_b_exact__lr=0.001] 12/14 runs, 20s elapsed
+[game_b_exact__lr=0.001] 13/14 runs, 20s elapsed
+[game_b_exact__lr=0.001] 14/14 runs, 20s elapsed
+[game_b_exact__lr=0.003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_exact__lr=0.003] 14 runs to do on 48 workers
+[game_b_exact__lr=0.003] 1/14 runs, 12s elapsed
+[game_b_exact__lr=0.003] 2/14 runs, 12s elapsed
+[game_b_exact__lr=0.003] 3/14 runs, 19s elapsed
+[game_b_exact__lr=0.003] 4/14 runs, 19s elapsed
+[game_b_exact__lr=0.003] 5/14 runs, 20s elapsed
+[game_b_exact__lr=0.003] 6/14 runs, 20s elapsed
+[game_b_exact__lr=0.003] 7/14 runs, 20s elapsed
+[game_b_exact__lr=0.003] 8/14 runs, 20s elapsed
+[game_b_exact__lr=0.003] 9/14 runs, 20s elapsed
+[game_b_exact__lr=0.003] 10/14 runs, 20s elapsed
+[game_b_exact__lr=0.003] 11/14 runs, 20s elapsed
+[game_b_exact__lr=0.003] 12/14 runs, 20s elapsed
+[game_b_exact__lr=0.003] 13/14 runs, 20s elapsed
+[game_b_exact__lr=0.003] 14/14 runs, 21s elapsed
+[game_b_exact__lr=0.01] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_exact__lr=0.01] 14 runs to do on 48 workers
+[game_b_exact__lr=0.01] 1/14 runs, 11s elapsed
+[game_b_exact__lr=0.01] 2/14 runs, 12s elapsed
+[game_b_exact__lr=0.01] 3/14 runs, 19s elapsed
+[game_b_exact__lr=0.01] 4/14 runs, 19s elapsed
+[game_b_exact__lr=0.01] 5/14 runs, 19s elapsed
+[game_b_exact__lr=0.01] 6/14 runs, 19s elapsed
+[game_b_exact__lr=0.01] 7/14 runs, 20s elapsed
+[game_b_exact__lr=0.01] 8/14 runs, 20s elapsed
+[game_b_exact__lr=0.01] 9/14 runs, 20s elapsed
+[game_b_exact__lr=0.01] 10/14 runs, 20s elapsed
+[game_b_exact__lr=0.01] 11/14 runs, 20s elapsed
+[game_b_exact__lr=0.01] 12/14 runs, 20s elapsed
+[game_b_exact__lr=0.01] 13/14 runs, 20s elapsed
+[game_b_exact__lr=0.01] 14/14 runs, 20s elapsed
+[game_b_exact__lr=0.03] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_exact__lr=0.03] 16 runs to do on 48 workers
+[game_b_exact__lr=0.03] 1/16 runs, 10s elapsed
+[game_b_exact__lr=0.03] 2/16 runs, 10s elapsed
+[game_b_exact__lr=0.03] 3/16 runs, 12s elapsed
+[game_b_exact__lr=0.03] 4/16 runs, 12s elapsed
+[game_b_exact__lr=0.03] 5/16 runs, 19s elapsed
+[game_b_exact__lr=0.03] 6/16 runs, 19s elapsed
+[game_b_exact__lr=0.03] 7/16 runs, 19s elapsed
+[game_b_exact__lr=0.03] 8/16 runs, 20s elapsed
+[game_b_exact__lr=0.03] 9/16 runs, 20s elapsed
+[game_b_exact__lr=0.03] 10/16 runs, 20s elapsed
+[game_b_exact__lr=0.03] 11/16 runs, 20s elapsed
+[game_b_exact__lr=0.03] 12/16 runs, 20s elapsed
+[game_b_exact__lr=0.03] 13/16 runs, 20s elapsed
+[game_b_exact__lr=0.03] 14/16 runs, 20s elapsed
+[game_b_exact__lr=0.03] 15/16 runs, 20s elapsed
+[game_b_exact__lr=0.03] 16/16 runs, 22s elapsed
+[game_b_exact__lr=0.1] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_exact__lr=0.1] 16 runs to do on 48 workers
+[game_b_exact__lr=0.1] 1/16 runs, 10s elapsed
+[game_b_exact__lr=0.1] 2/16 runs, 10s elapsed
+[game_b_exact__lr=0.1] 3/16 runs, 12s elapsed
+[game_b_exact__lr=0.1] 4/16 runs, 12s elapsed
+[game_b_exact__lr=0.1] 5/16 runs, 19s elapsed
+[game_b_exact__lr=0.1] 6/16 runs, 20s elapsed
+[game_b_exact__lr=0.1] 7/16 runs, 20s elapsed
+[game_b_exact__lr=0.1] 8/16 runs, 20s elapsed
+[game_b_exact__lr=0.1] 9/16 runs, 20s elapsed
+[game_b_exact__lr=0.1] 10/16 runs, 20s elapsed
+[game_b_exact__lr=0.1] 11/16 runs, 20s elapsed
+[game_b_exact__lr=0.1] 12/16 runs, 20s elapsed
+[game_b_exact__lr=0.1] 13/16 runs, 20s elapsed
+[game_b_exact__lr=0.1] 14/16 runs, 20s elapsed
+[game_b_exact__lr=0.1] 15/16 runs, 20s elapsed
+[game_b_exact__lr=0.1] 16/16 runs, 21s elapsed
+[game_b_exact__lr=0.3] 2 runs to do on 48 workers
+[game_b_exact__lr=0.3] 1/2 runs, 10s elapsed
+[game_b_exact__lr=0.3] 2/2 runs, 10s elapsed
+[game_b_exact] chosen learning rates: {'tabular': 0.3, 'dense': 0.01, 'connectome': 0.01, 'connectome+sign': 0.03, 'rewired': 0.01, 'rewired+sign': 0.03, 'random_sparse': 0.03, 'random_sparse+sign': 0.03}
+[game_a_sampled__lr=0.0003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_sampled__lr=0.0003] 14 runs to do on 48 workers
+[game_a_sampled__lr=0.0003] 1/14 runs, 15s elapsed
+[game_a_sampled__lr=0.0003] 2/14 runs, 15s elapsed
+[game_a_sampled__lr=0.0003] 3/14 runs, 34s elapsed
+[game_a_sampled__lr=0.0003] 4/14 runs, 34s elapsed
+[game_a_sampled__lr=0.0003] 5/14 runs, 34s elapsed
+[game_a_sampled__lr=0.0003] 6/14 runs, 34s elapsed
+[game_a_sampled__lr=0.0003] 7/14 runs, 35s elapsed
+[game_a_sampled__lr=0.0003] 8/14 runs, 35s elapsed
+[game_a_sampled__lr=0.0003] 9/14 runs, 36s elapsed
+[game_a_sampled__lr=0.0003] 10/14 runs, 36s elapsed
+[game_a_sampled__lr=0.0003] 11/14 runs, 36s elapsed
+[game_a_sampled__lr=0.0003] 12/14 runs, 36s elapsed
+[game_a_sampled__lr=0.0003] 13/14 runs, 36s elapsed
+[game_a_sampled__lr=0.0003] 14/14 runs, 36s elapsed
+[game_a_sampled__lr=0.001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_sampled__lr=0.001] 14 runs to do on 48 workers
+[game_a_sampled__lr=0.001] 1/14 runs, 15s elapsed
+[game_a_sampled__lr=0.001] 2/14 runs, 15s elapsed
+[game_a_sampled__lr=0.001] 3/14 runs, 34s elapsed
+[game_a_sampled__lr=0.001] 4/14 runs, 34s elapsed
+[game_a_sampled__lr=0.001] 5/14 runs, 35s elapsed
+[game_a_sampled__lr=0.001] 6/14 runs, 35s elapsed
+[game_a_sampled__lr=0.001] 7/14 runs, 35s elapsed
+[game_a_sampled__lr=0.001] 8/14 runs, 36s elapsed
+[game_a_sampled__lr=0.001] 9/14 runs, 36s elapsed
+[game_a_sampled__lr=0.001] 10/14 runs, 36s elapsed
+[game_a_sampled__lr=0.001] 11/14 runs, 36s elapsed
+[game_a_sampled__lr=0.001] 12/14 runs, 36s elapsed
+[game_a_sampled__lr=0.001] 13/14 runs, 36s elapsed
+[game_a_sampled__lr=0.001] 14/14 runs, 36s elapsed
+[game_a_sampled__lr=0.003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_sampled__lr=0.003] 16 runs to do on 48 workers
+[game_a_sampled__lr=0.003] 1/16 runs, 13s elapsed
+[game_a_sampled__lr=0.003] 2/16 runs, 13s elapsed
+[game_a_sampled__lr=0.003] 3/16 runs, 15s elapsed
+[game_a_sampled__lr=0.003] 4/16 runs, 15s elapsed
+[game_a_sampled__lr=0.003] 5/16 runs, 34s elapsed
+[game_a_sampled__lr=0.003] 6/16 runs, 34s elapsed
+[game_a_sampled__lr=0.003] 7/16 runs, 35s elapsed
+[game_a_sampled__lr=0.003] 8/16 runs, 35s elapsed
+[game_a_sampled__lr=0.003] 9/16 runs, 35s elapsed
+[game_a_sampled__lr=0.003] 10/16 runs, 36s elapsed
+[game_a_sampled__lr=0.003] 11/16 runs, 36s elapsed
+[game_a_sampled__lr=0.003] 12/16 runs, 36s elapsed
+[game_a_sampled__lr=0.003] 13/16 runs, 36s elapsed
+[game_a_sampled__lr=0.003] 14/16 runs, 36s elapsed
+[game_a_sampled__lr=0.003] 15/16 runs, 36s elapsed
+[game_a_sampled__lr=0.003] 16/16 runs, 37s elapsed
+[game_a_sampled__lr=0.01] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_sampled__lr=0.01] 16 runs to do on 48 workers
+[game_a_sampled__lr=0.01] 1/16 runs, 13s elapsed
+[game_a_sampled__lr=0.01] 2/16 runs, 13s elapsed
+[game_a_sampled__lr=0.01] 3/16 runs, 15s elapsed
+[game_a_sampled__lr=0.01] 4/16 runs, 16s elapsed
+[game_a_sampled__lr=0.01] 5/16 runs, 34s elapsed
+[game_a_sampled__lr=0.01] 6/16 runs, 34s elapsed
+[game_a_sampled__lr=0.01] 7/16 runs, 35s elapsed
+[game_a_sampled__lr=0.01] 8/16 runs, 35s elapsed
+[game_a_sampled__lr=0.01] 9/16 runs, 35s elapsed
+[game_a_sampled__lr=0.01] 10/16 runs, 35s elapsed
+[game_a_sampled__lr=0.01] 11/16 runs, 36s elapsed
+[game_a_sampled__lr=0.01] 12/16 runs, 36s elapsed
+[game_a_sampled__lr=0.01] 13/16 runs, 36s elapsed
+[game_a_sampled__lr=0.01] 14/16 runs, 36s elapsed
+[game_a_sampled__lr=0.01] 15/16 runs, 36s elapsed
+[game_a_sampled__lr=0.01] 16/16 runs, 37s elapsed
+[game_a_sampled__lr=0.03] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_sampled__lr=0.03] 16 runs to do on 48 workers
+[game_a_sampled__lr=0.03] 1/16 runs, 13s elapsed
+[game_a_sampled__lr=0.03] 2/16 runs, 13s elapsed
+[game_a_sampled__lr=0.03] 3/16 runs, 15s elapsed
+[game_a_sampled__lr=0.03] 4/16 runs, 15s elapsed
+[game_a_sampled__lr=0.03] 5/16 runs, 34s elapsed
+[game_a_sampled__lr=0.03] 6/16 runs, 34s elapsed
+[game_a_sampled__lr=0.03] 7/16 runs, 34s elapsed
+[game_a_sampled__lr=0.03] 8/16 runs, 35s elapsed
+[game_a_sampled__lr=0.03] 9/16 runs, 35s elapsed
+[game_a_sampled__lr=0.03] 10/16 runs, 35s elapsed
+[game_a_sampled__lr=0.03] 11/16 runs, 36s elapsed
+[game_a_sampled__lr=0.03] 12/16 runs, 36s elapsed
+[game_a_sampled__lr=0.03] 13/16 runs, 36s elapsed
+[game_a_sampled__lr=0.03] 14/16 runs, 36s elapsed
+[game_a_sampled__lr=0.03] 15/16 runs, 36s elapsed
+[game_a_sampled__lr=0.03] 16/16 runs, 38s elapsed
+[game_a_sampled] chosen learning rates: {'tabular': 0.03, 'dense': 0.0003, 'connectome': 0.003, 'connectome+sign': 0.003, 'rewired': 0.003, 'rewired+sign': 0.003, 'random_sparse': 0.003, 'random_sparse+sign': 0.003}
+[game_b_sampled__lr=0.0003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_sampled__lr=0.0003] 14 runs to do on 48 workers
+[game_b_sampled__lr=0.0003] 1/14 runs, 16s elapsed
+[game_b_sampled__lr=0.0003] 2/14 runs, 17s elapsed
+[game_b_sampled__lr=0.0003] 3/14 runs, 66s elapsed
+[game_b_sampled__lr=0.0003] 4/14 runs, 70s elapsed
+[game_b_sampled__lr=0.0003] 5/14 runs, 71s elapsed
+[game_b_sampled__lr=0.0003] 6/14 runs, 75s elapsed
+[game_b_sampled__lr=0.0003] 7/14 runs, 76s elapsed
+[game_b_sampled__lr=0.0003] 8/14 runs, 77s elapsed
+[game_b_sampled__lr=0.0003] 9/14 runs, 77s elapsed
+[game_b_sampled__lr=0.0003] 10/14 runs, 79s elapsed
+[game_b_sampled__lr=0.0003] 11/14 runs, 79s elapsed
+[game_b_sampled__lr=0.0003] 12/14 runs, 81s elapsed
+[game_b_sampled__lr=0.0003] 13/14 runs, 82s elapsed
+[game_b_sampled__lr=0.0003] 14/14 runs, 82s elapsed
+[game_b_sampled__lr=0.001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_sampled__lr=0.001] 14 runs to do on 48 workers
+[game_b_sampled__lr=0.001] 1/14 runs, 16s elapsed
+[game_b_sampled__lr=0.001] 2/14 runs, 16s elapsed
+[game_b_sampled__lr=0.001] 3/14 runs, 72s elapsed
+[game_b_sampled__lr=0.001] 4/14 runs, 77s elapsed
+[game_b_sampled__lr=0.001] 5/14 runs, 77s elapsed
+[game_b_sampled__lr=0.001] 6/14 runs, 77s elapsed
+[game_b_sampled__lr=0.001] 7/14 runs, 78s elapsed
+[game_b_sampled__lr=0.001] 8/14 runs, 79s elapsed
+[game_b_sampled__lr=0.001] 9/14 runs, 79s elapsed
+[game_b_sampled__lr=0.001] 10/14 runs, 79s elapsed
+[game_b_sampled__lr=0.001] 11/14 runs, 81s elapsed
+[game_b_sampled__lr=0.001] 12/14 runs, 82s elapsed
+[game_b_sampled__lr=0.001] 13/14 runs, 82s elapsed
+[game_b_sampled__lr=0.001] 14/14 runs, 85s elapsed
+[game_b_sampled__lr=0.003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_sampled__lr=0.003] 16 runs to do on 48 workers
+[game_b_sampled__lr=0.003] 1/16 runs, 14s elapsed
+[game_b_sampled__lr=0.003] 2/16 runs, 15s elapsed
+[game_b_sampled__lr=0.003] 3/16 runs, 17s elapsed
+[game_b_sampled__lr=0.003] 4/16 runs, 17s elapsed
+[game_b_sampled__lr=0.003] 5/16 runs, 65s elapsed
+[game_b_sampled__lr=0.003] 6/16 runs, 66s elapsed
+[game_b_sampled__lr=0.003] 7/16 runs, 71s elapsed
+[game_b_sampled__lr=0.003] 8/16 runs, 73s elapsed
+[game_b_sampled__lr=0.003] 9/16 runs, 74s elapsed
+[game_b_sampled__lr=0.003] 10/16 runs, 75s elapsed
+[game_b_sampled__lr=0.003] 11/16 runs, 77s elapsed
+[game_b_sampled__lr=0.003] 12/16 runs, 78s elapsed
+[game_b_sampled__lr=0.003] 13/16 runs, 78s elapsed
+[game_b_sampled__lr=0.003] 14/16 runs, 78s elapsed
+[game_b_sampled__lr=0.003] 15/16 runs, 81s elapsed
+[game_b_sampled__lr=0.003] 16/16 runs, 81s elapsed
+[game_b_sampled__lr=0.01] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_sampled__lr=0.01] 16 runs to do on 48 workers
+[game_b_sampled__lr=0.01] 1/16 runs, 14s elapsed
+[game_b_sampled__lr=0.01] 2/16 runs, 14s elapsed
+[game_b_sampled__lr=0.01] 3/16 runs, 16s elapsed
+[game_b_sampled__lr=0.01] 4/16 runs, 17s elapsed
+[game_b_sampled__lr=0.01] 5/16 runs, 61s elapsed
+[game_b_sampled__lr=0.01] 6/16 runs, 71s elapsed
+[game_b_sampled__lr=0.01] 7/16 runs, 72s elapsed
+[game_b_sampled__lr=0.01] 8/16 runs, 72s elapsed
+[game_b_sampled__lr=0.01] 9/16 runs, 74s elapsed
+[game_b_sampled__lr=0.01] 10/16 runs, 75s elapsed
+[game_b_sampled__lr=0.01] 11/16 runs, 76s elapsed
+[game_b_sampled__lr=0.01] 12/16 runs, 76s elapsed
+[game_b_sampled__lr=0.01] 13/16 runs, 77s elapsed
+[game_b_sampled__lr=0.01] 14/16 runs, 77s elapsed
+[game_b_sampled__lr=0.01] 15/16 runs, 79s elapsed
+[game_b_sampled__lr=0.01] 16/16 runs, 81s elapsed
+[game_b_sampled__lr=0.03] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_sampled__lr=0.03] 16 runs to do on 48 workers
+[game_b_sampled__lr=0.03] 1/16 runs, 14s elapsed
+[game_b_sampled__lr=0.03] 2/16 runs, 14s elapsed
+[game_b_sampled__lr=0.03] 3/16 runs, 16s elapsed
+[game_b_sampled__lr=0.03] 4/16 runs, 17s elapsed
+[game_b_sampled__lr=0.03] 5/16 runs, 67s elapsed
+[game_b_sampled__lr=0.03] 6/16 runs, 68s elapsed
+[game_b_sampled__lr=0.03] 7/16 runs, 70s elapsed
+[game_b_sampled__lr=0.03] 8/16 runs, 74s elapsed
+[game_b_sampled__lr=0.03] 9/16 runs, 74s elapsed
+[game_b_sampled__lr=0.03] 10/16 runs, 75s elapsed
+[game_b_sampled__lr=0.03] 11/16 runs, 76s elapsed
+[game_b_sampled__lr=0.03] 12/16 runs, 77s elapsed
+[game_b_sampled__lr=0.03] 13/16 runs, 77s elapsed
+[game_b_sampled__lr=0.03] 14/16 runs, 79s elapsed
+[game_b_sampled__lr=0.03] 15/16 runs, 80s elapsed
+[game_b_sampled__lr=0.03] 16/16 runs, 81s elapsed
+[game_b_sampled] chosen learning rates: {'tabular': 0.03, 'dense': 0.003, 'connectome': 0.01, 'connectome+sign': 0.01, 'rewired': 0.003, 'rewired+sign': 0.01, 'random_sparse': 0.01, 'random_sparse+sign': 0.01}
+tune-main: 814 s wall (48 workers)
++ scripts/run_experiment.py configs/game_a_exact.yaml configs/game_b_exact.yaml configs/game_a_sampled.yaml configs/game_b_sampled.yaml --workers 48
+[game_a_exact] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_exact] 180 runs to do on 48 workers
+[game_a_exact] 18/180 runs, 5s elapsed
+[game_a_exact] 36/180 runs, 10s elapsed
+[game_a_exact] 54/180 runs, 13s elapsed
+[game_a_exact] 72/180 runs, 17s elapsed
+[game_a_exact] 90/180 runs, 20s elapsed
+[game_a_exact] 108/180 runs, 22s elapsed
+[game_a_exact] 126/180 runs, 25s elapsed
+[game_a_exact] 144/180 runs, 27s elapsed
+[game_a_exact] 162/180 runs, 31s elapsed
+[game_a_exact] 180/180 runs, 33s elapsed
+[game_b_exact] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_exact] 180 runs to do on 48 workers
+[game_b_exact] 18/180 runs, 5s elapsed
+[game_b_exact] 36/180 runs, 12s elapsed
+[game_b_exact] 54/180 runs, 15s elapsed
+[game_b_exact] 72/180 runs, 25s elapsed
+[game_b_exact] 90/180 runs, 30s elapsed
+[game_b_exact] 108/180 runs, 31s elapsed
+[game_b_exact] 126/180 runs, 42s elapsed
+[game_b_exact] 144/180 runs, 45s elapsed
+[game_b_exact] 162/180 runs, 53s elapsed
+[game_b_exact] 180/180 runs, 56s elapsed
+[game_a_sampled] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_sampled] 330 runs to do on 48 workers
+[game_a_sampled] 33/330 runs, 41s elapsed
+[game_a_sampled] 66/330 runs, 48s elapsed
+[game_a_sampled] 99/330 runs, 72s elapsed
+[game_a_sampled] 132/330 runs, 82s elapsed
+[game_a_sampled] 165/330 runs, 94s elapsed
+[game_a_sampled] 198/330 runs, 120s elapsed
+[game_a_sampled] 231/330 runs, 137s elapsed
+[game_a_sampled] 264/330 runs, 153s elapsed
+[game_a_sampled] 297/330 runs, 176s elapsed
+[game_a_sampled] 330/330 runs, 201s elapsed
+[game_b_sampled] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_b_sampled] 90 runs to do on 48 workers
+[game_b_sampled] 9/90 runs, 6s elapsed
+[game_b_sampled] 18/90 runs, 18s elapsed
+[game_b_sampled] 27/90 runs, 21s elapsed
+[game_b_sampled] 36/90 runs, 113s elapsed
+[game_b_sampled] 45/90 runs, 116s elapsed
+[game_b_sampled] 54/90 runs, 119s elapsed
+[game_b_sampled] 63/90 runs, 121s elapsed
+[game_b_sampled] 72/90 runs, 125s elapsed
+[game_b_sampled] 81/90 runs, 179s elapsed
+[game_b_sampled] 90/90 runs, 186s elapsed
+run-main: 484 s wall (48 workers)
+run-robust: SKIPPED robust_game_a_sampled_shared_lr, every arm tuned to the same rate
++ scripts/run_experiment.py configs/robust_game_b_exact_shared_lr.yaml configs/robust_game_b_sampled_shared_lr.yaml --workers 48
+[robust_game_b_exact_shared_lr] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[robust_game_b_exact_shared_lr] 120 runs to do on 48 workers
+[robust_game_b_exact_shared_lr] 12/120 runs, 23s elapsed
+[robust_game_b_exact_shared_lr] 24/120 runs, 25s elapsed
+[robust_game_b_exact_shared_lr] 36/120 runs, 25s elapsed
+[robust_game_b_exact_shared_lr] 48/120 runs, 27s elapsed
+[robust_game_b_exact_shared_lr] 60/120 runs, 38s elapsed
+[robust_game_b_exact_shared_lr] 72/120 runs, 40s elapsed
+[robust_game_b_exact_shared_lr] 84/120 runs, 40s elapsed
+[robust_game_b_exact_shared_lr] 96/120 runs, 44s elapsed
+[robust_game_b_exact_shared_lr] 108/120 runs, 51s elapsed
+[robust_game_b_exact_shared_lr] 120/120 runs, 53s elapsed
+[robust_game_b_sampled_shared_lr] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[robust_game_b_sampled_shared_lr] 60 runs to do on 48 workers
+[robust_game_b_sampled_shared_lr] 6/60 runs, 108s elapsed
+[robust_game_b_sampled_shared_lr] 12/60 runs, 112s elapsed
+[robust_game_b_sampled_shared_lr] 18/60 runs, 115s elapsed
+[robust_game_b_sampled_shared_lr] 24/60 runs, 117s elapsed
+[robust_game_b_sampled_shared_lr] 30/60 runs, 119s elapsed
+[robust_game_b_sampled_shared_lr] 36/60 runs, 120s elapsed
+[robust_game_b_sampled_shared_lr] 42/60 runs, 123s elapsed
+[robust_game_b_sampled_shared_lr] 48/60 runs, 126s elapsed
+[robust_game_b_sampled_shared_lr] 54/60 runs, 175s elapsed
+[robust_game_b_sampled_shared_lr] 60/60 runs, 183s elapsed
+run-robust: 241 s wall (48 workers)
++ scripts/tune_lr.py configs/flygm_game_a_exact.yaml configs/flygm_game_a_sampled.yaml configs/flygm_game_b_exact.yaml --workers 48
+[flygm_game_a_exact__lr=0.001] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_exact__lr=0.001] 6 runs to do on 48 workers
+[flygm_game_a_exact__lr=0.001] 1/6 runs, 19s elapsed
+[flygm_game_a_exact__lr=0.001] 2/6 runs, 19s elapsed
+[flygm_game_a_exact__lr=0.001] 3/6 runs, 19s elapsed
+[flygm_game_a_exact__lr=0.001] 4/6 runs, 19s elapsed
+[flygm_game_a_exact__lr=0.001] 5/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.001] 6/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.003] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_exact__lr=0.003] 6 runs to do on 48 workers
+[flygm_game_a_exact__lr=0.003] 1/6 runs, 19s elapsed
+[flygm_game_a_exact__lr=0.003] 2/6 runs, 19s elapsed
+[flygm_game_a_exact__lr=0.003] 3/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.003] 4/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.003] 5/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.003] 6/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.01] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_exact__lr=0.01] 6 runs to do on 48 workers
+[flygm_game_a_exact__lr=0.01] 1/6 runs, 19s elapsed
+[flygm_game_a_exact__lr=0.01] 2/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.01] 3/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.01] 4/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.01] 5/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.01] 6/6 runs, 23s elapsed
+[flygm_game_a_exact__lr=0.03] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_exact__lr=0.03] 6 runs to do on 48 workers
+[flygm_game_a_exact__lr=0.03] 1/6 runs, 19s elapsed
+[flygm_game_a_exact__lr=0.03] 2/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.03] 3/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.03] 4/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.03] 5/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.03] 6/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.1] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_exact__lr=0.1] 6 runs to do on 48 workers
+[flygm_game_a_exact__lr=0.1] 1/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.1] 2/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.1] 3/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.1] 4/6 runs, 20s elapsed
+[flygm_game_a_exact__lr=0.1] 5/6 runs, 29s elapsed
+[flygm_game_a_exact__lr=0.1] 6/6 runs, 31s elapsed
+[flygm_game_a_exact] chosen learning rates: {'flygm': 0.03, 'flygm_rewired': 0.03, 'flygm_random_sparse': 0.03}
+[flygm_game_a_sampled__lr=0.0001] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_sampled__lr=0.0001] 6 runs to do on 48 workers
+[flygm_game_a_sampled__lr=0.0001] 1/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.0001] 2/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.0001] 3/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.0001] 4/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.0001] 5/6 runs, 41s elapsed
+[flygm_game_a_sampled__lr=0.0001] 6/6 runs, 53s elapsed
+[flygm_game_a_sampled__lr=0.0003] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_sampled__lr=0.0003] 6 runs to do on 48 workers
+[flygm_game_a_sampled__lr=0.0003] 1/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.0003] 2/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.0003] 3/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.0003] 4/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.0003] 5/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.0003] 6/6 runs, 44s elapsed
+[flygm_game_a_sampled__lr=0.001] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_sampled__lr=0.001] 6 runs to do on 48 workers
+[flygm_game_a_sampled__lr=0.001] 1/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.001] 2/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.001] 3/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.001] 4/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.001] 5/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.001] 6/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.003] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_sampled__lr=0.003] 6 runs to do on 48 workers
+[flygm_game_a_sampled__lr=0.003] 1/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.003] 2/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.003] 3/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.003] 4/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.003] 5/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.003] 6/6 runs, 49s elapsed
+[flygm_game_a_sampled__lr=0.01] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_sampled__lr=0.01] 6 runs to do on 48 workers
+[flygm_game_a_sampled__lr=0.01] 1/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.01] 2/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.01] 3/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.01] 4/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.01] 5/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.01] 6/6 runs, 41s elapsed
+[flygm_game_a_sampled__lr=0.03] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_sampled__lr=0.03] 6 runs to do on 48 workers
+[flygm_game_a_sampled__lr=0.03] 1/6 runs, 38s elapsed
+[flygm_game_a_sampled__lr=0.03] 2/6 runs, 39s elapsed
+[flygm_game_a_sampled__lr=0.03] 3/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.03] 4/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.03] 5/6 runs, 40s elapsed
+[flygm_game_a_sampled__lr=0.03] 6/6 runs, 50s elapsed
+[flygm_game_a_sampled] chosen learning rates: {'flygm': 0.003, 'flygm_rewired': 0.003, 'flygm_random_sparse': 0.003}
+[flygm_game_b_exact__lr=0.001] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_exact__lr=0.001] 6 runs to do on 48 workers
+[flygm_game_b_exact__lr=0.001] 1/6 runs, 201s elapsed
+[flygm_game_b_exact__lr=0.001] 2/6 runs, 220s elapsed
+[flygm_game_b_exact__lr=0.001] 3/6 runs, 264s elapsed
+[flygm_game_b_exact__lr=0.001] 4/6 runs, 290s elapsed
+[flygm_game_b_exact__lr=0.001] 5/6 runs, 290s elapsed
+[flygm_game_b_exact__lr=0.001] 6/6 runs, 291s elapsed
+[flygm_game_b_exact__lr=0.003] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_exact__lr=0.003] 6 runs to do on 48 workers
+[flygm_game_b_exact__lr=0.003] 1/6 runs, 199s elapsed
+[flygm_game_b_exact__lr=0.003] 2/6 runs, 205s elapsed
+[flygm_game_b_exact__lr=0.003] 3/6 runs, 219s elapsed
+[flygm_game_b_exact__lr=0.003] 4/6 runs, 223s elapsed
+[flygm_game_b_exact__lr=0.003] 5/6 runs, 264s elapsed
+[flygm_game_b_exact__lr=0.003] 6/6 runs, 289s elapsed
+[flygm_game_b_exact__lr=0.01] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_exact__lr=0.01] 6 runs to do on 48 workers
+[flygm_game_b_exact__lr=0.01] 1/6 runs, 214s elapsed
+[flygm_game_b_exact__lr=0.01] 2/6 runs, 272s elapsed
+[flygm_game_b_exact__lr=0.01] 3/6 runs, 298s elapsed
+[flygm_game_b_exact__lr=0.01] 4/6 runs, 303s elapsed
+[flygm_game_b_exact__lr=0.01] 5/6 runs, 310s elapsed
+[flygm_game_b_exact__lr=0.01] 6/6 runs, 342s elapsed
+[flygm_game_b_exact__lr=0.03] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_exact__lr=0.03] 6 runs to do on 48 workers
+[flygm_game_b_exact__lr=0.03] 1/6 runs, 206s elapsed
+[flygm_game_b_exact__lr=0.03] 2/6 runs, 209s elapsed
+[flygm_game_b_exact__lr=0.03] 3/6 runs, 212s elapsed
+[flygm_game_b_exact__lr=0.03] 4/6 runs, 218s elapsed
+[flygm_game_b_exact__lr=0.03] 5/6 runs, 297s elapsed
+[flygm_game_b_exact__lr=0.03] 6/6 runs, 376s elapsed
+[flygm_game_b_exact__lr=0.1] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_exact__lr=0.1] 6 runs to do on 48 workers
+[flygm_game_b_exact__lr=0.1] 1/6 runs, 217s elapsed
+[flygm_game_b_exact__lr=0.1] 2/6 runs, 217s elapsed
+[flygm_game_b_exact__lr=0.1] 3/6 runs, 218s elapsed
+[flygm_game_b_exact__lr=0.1] 4/6 runs, 221s elapsed
+[flygm_game_b_exact__lr=0.1] 5/6 runs, 243s elapsed
+[flygm_game_b_exact__lr=0.1] 6/6 runs, 747s elapsed
+[flygm_game_b_exact] chosen learning rates: {'flygm': 0.01, 'flygm_rewired': 0.01, 'flygm_random_sparse': 0.003}
+tune-flygm-fast: 2447 s wall (48 workers)
++ scripts/run_experiment.py configs/flygm_game_a_exact.yaml configs/flygm_game_a_sampled.yaml configs/flygm_game_b_exact.yaml --workers 48
+[flygm_game_a_exact] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_exact] 80 runs to do on 48 workers
+[flygm_game_a_exact] 8/80 runs, 5s elapsed
+[flygm_game_a_exact] 16/80 runs, 5s elapsed
+[flygm_game_a_exact] 24/80 runs, 22s elapsed
+[flygm_game_a_exact] 32/80 runs, 23s elapsed
+[flygm_game_a_exact] 40/80 runs, 23s elapsed
+[flygm_game_a_exact] 48/80 runs, 24s elapsed
+[flygm_game_a_exact] 56/80 runs, 24s elapsed
+[flygm_game_a_exact] 64/80 runs, 24s elapsed
+[flygm_game_a_exact] 72/80 runs, 35s elapsed
+[flygm_game_a_exact] 80/80 runs, 38s elapsed
+[flygm_game_a_sampled] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_a_sampled] 40 runs to do on 48 workers
+[flygm_game_a_sampled] 4/40 runs, 6s elapsed
+[flygm_game_a_sampled] 8/40 runs, 6s elapsed
+[flygm_game_a_sampled] 12/40 runs, 46s elapsed
+[flygm_game_a_sampled] 16/40 runs, 47s elapsed
+[flygm_game_a_sampled] 20/40 runs, 47s elapsed
+[flygm_game_a_sampled] 24/40 runs, 47s elapsed
+[flygm_game_a_sampled] 28/40 runs, 47s elapsed
+[flygm_game_a_sampled] 32/40 runs, 48s elapsed
+[flygm_game_a_sampled] 36/40 runs, 48s elapsed
+[flygm_game_a_sampled] 40/40 runs, 59s elapsed
+[flygm_game_b_exact] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_exact] 80 runs to do on 48 workers
+[flygm_game_b_exact] 8/80 runs, 5s elapsed
+[flygm_game_b_exact] 16/80 runs, 6s elapsed
+[flygm_game_b_exact] 24/80 runs, 433s elapsed
+[flygm_game_b_exact] 32/80 runs, 445s elapsed
+[flygm_game_b_exact] 40/80 runs, 455s elapsed
+[flygm_game_b_exact] 48/80 runs, 543s elapsed
+[flygm_game_b_exact] 56/80 runs, 547s elapsed
+[flygm_game_b_exact] 64/80 runs, 554s elapsed
+[flygm_game_b_exact] 72/80 runs, 688s elapsed
+[flygm_game_b_exact] 80/80 runs, 718s elapsed
+run-flygm-fast: 821 s wall (48 workers)
++ scripts/run_experiment.py configs/game_a_exact_eval1.yaml --workers 48
+[game_a_exact_eval1] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[game_a_exact_eval1] 180 runs to do on 48 workers
+[game_a_exact_eval1] 18/180 runs, 5s elapsed
+[game_a_exact_eval1] 36/180 runs, 12s elapsed
+[game_a_exact_eval1] 54/180 runs, 14s elapsed
+[game_a_exact_eval1] 72/180 runs, 21s elapsed
+[game_a_exact_eval1] 90/180 runs, 24s elapsed
+[game_a_exact_eval1] 108/180 runs, 25s elapsed
+[game_a_exact_eval1] 126/180 runs, 32s elapsed
+[game_a_exact_eval1] 144/180 runs, 35s elapsed
+[game_a_exact_eval1] 162/180 runs, 41s elapsed
+[game_a_exact_eval1] 180/180 runs, 43s elapsed
+run-eval1: 55 s wall (48 workers)
++ scripts/tune_lr.py configs/ppo_game_a_sampled.yaml --workers 48
+[ppo_game_a_sampled__lr=0.0001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610}
+[ppo_game_a_sampled__lr=0.0001] 20 runs to do on 48 workers
+[ppo_game_a_sampled__lr=0.0001] 2/20 runs, 32s elapsed
+[ppo_game_a_sampled__lr=0.0001] 4/20 runs, 124s elapsed
+[ppo_game_a_sampled__lr=0.0001] 6/20 runs, 125s elapsed
+[ppo_game_a_sampled__lr=0.0001] 8/20 runs, 126s elapsed
+[ppo_game_a_sampled__lr=0.0001] 10/20 runs, 131s elapsed
+[ppo_game_a_sampled__lr=0.0001] 12/20 runs, 131s elapsed
+[ppo_game_a_sampled__lr=0.0001] 14/20 runs, 132s elapsed
+[ppo_game_a_sampled__lr=0.0001] 16/20 runs, 151s elapsed
+[ppo_game_a_sampled__lr=0.0001] 18/20 runs, 154s elapsed
+[ppo_game_a_sampled__lr=0.0001] 20/20 runs, 164s elapsed
+[ppo_game_a_sampled__lr=0.0003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610}
+[ppo_game_a_sampled__lr=0.0003] 20 runs to do on 48 workers
+[ppo_game_a_sampled__lr=0.0003] 2/20 runs, 33s elapsed
+[ppo_game_a_sampled__lr=0.0003] 4/20 runs, 124s elapsed
+[ppo_game_a_sampled__lr=0.0003] 6/20 runs, 124s elapsed
+[ppo_game_a_sampled__lr=0.0003] 8/20 runs, 125s elapsed
+[ppo_game_a_sampled__lr=0.0003] 10/20 runs, 130s elapsed
+[ppo_game_a_sampled__lr=0.0003] 12/20 runs, 131s elapsed
+[ppo_game_a_sampled__lr=0.0003] 14/20 runs, 133s elapsed
+[ppo_game_a_sampled__lr=0.0003] 16/20 runs, 151s elapsed
+[ppo_game_a_sampled__lr=0.0003] 18/20 runs, 159s elapsed
+[ppo_game_a_sampled__lr=0.0003] 20/20 runs, 161s elapsed
+[ppo_game_a_sampled__lr=0.001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610}
+[ppo_game_a_sampled__lr=0.001] 20 runs to do on 48 workers
+[ppo_game_a_sampled__lr=0.001] 2/20 runs, 32s elapsed
+[ppo_game_a_sampled__lr=0.001] 4/20 runs, 123s elapsed
+[ppo_game_a_sampled__lr=0.001] 6/20 runs, 127s elapsed
+[ppo_game_a_sampled__lr=0.001] 8/20 runs, 127s elapsed
+[ppo_game_a_sampled__lr=0.001] 10/20 runs, 128s elapsed
+[ppo_game_a_sampled__lr=0.001] 12/20 runs, 129s elapsed
+[ppo_game_a_sampled__lr=0.001] 14/20 runs, 136s elapsed
+[ppo_game_a_sampled__lr=0.001] 16/20 runs, 149s elapsed
+[ppo_game_a_sampled__lr=0.001] 18/20 runs, 160s elapsed
+[ppo_game_a_sampled__lr=0.001] 20/20 runs, 162s elapsed
+[ppo_game_a_sampled__lr=0.003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610}
+[ppo_game_a_sampled__lr=0.003] 22 runs to do on 48 workers
+[ppo_game_a_sampled__lr=0.003] 2/22 runs, 25s elapsed
+[ppo_game_a_sampled__lr=0.003] 4/22 runs, 32s elapsed
+[ppo_game_a_sampled__lr=0.003] 6/22 runs, 124s elapsed
+[ppo_game_a_sampled__lr=0.003] 8/22 runs, 125s elapsed
+[ppo_game_a_sampled__lr=0.003] 10/22 runs, 131s elapsed
+[ppo_game_a_sampled__lr=0.003] 12/22 runs, 131s elapsed
+[ppo_game_a_sampled__lr=0.003] 14/22 runs, 131s elapsed
+[ppo_game_a_sampled__lr=0.003] 16/22 runs, 133s elapsed
+[ppo_game_a_sampled__lr=0.003] 18/22 runs, 149s elapsed
+[ppo_game_a_sampled__lr=0.003] 20/22 runs, 157s elapsed
+[ppo_game_a_sampled__lr=0.003] 22/22 runs, 158s elapsed
+[ppo_game_a_sampled__lr=0.01] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610}
+[ppo_game_a_sampled__lr=0.01] 22 runs to do on 48 workers
+[ppo_game_a_sampled__lr=0.01] 2/22 runs, 25s elapsed
+[ppo_game_a_sampled__lr=0.01] 4/22 runs, 32s elapsed
+[ppo_game_a_sampled__lr=0.01] 6/22 runs, 123s elapsed
+[ppo_game_a_sampled__lr=0.01] 8/22 runs, 124s elapsed
+[ppo_game_a_sampled__lr=0.01] 10/22 runs, 125s elapsed
+[ppo_game_a_sampled__lr=0.01] 12/22 runs, 130s elapsed
+[ppo_game_a_sampled__lr=0.01] 14/22 runs, 132s elapsed
+[ppo_game_a_sampled__lr=0.01] 16/22 runs, 132s elapsed
+[ppo_game_a_sampled__lr=0.01] 18/22 runs, 154s elapsed
+[ppo_game_a_sampled__lr=0.01] 20/22 runs, 162s elapsed
+[ppo_game_a_sampled__lr=0.01] 22/22 runs, 252s elapsed
+[ppo_game_a_sampled__lr=0.03] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610}
+[ppo_game_a_sampled__lr=0.03] 22 runs to do on 48 workers
+[ppo_game_a_sampled__lr=0.03] 2/22 runs, 27s elapsed
+[ppo_game_a_sampled__lr=0.03] 4/22 runs, 33s elapsed
+[ppo_game_a_sampled__lr=0.03] 6/22 runs, 124s elapsed
+[ppo_game_a_sampled__lr=0.03] 8/22 runs, 124s elapsed
+[ppo_game_a_sampled__lr=0.03] 10/22 runs, 125s elapsed
+[ppo_game_a_sampled__lr=0.03] 12/22 runs, 130s elapsed
+[ppo_game_a_sampled__lr=0.03] 14/22 runs, 131s elapsed
+[ppo_game_a_sampled__lr=0.03] 16/22 runs, 131s elapsed
+[ppo_game_a_sampled__lr=0.03] 18/22 runs, 162s elapsed
+[ppo_game_a_sampled__lr=0.03] 20/22 runs, 194s elapsed
+[ppo_game_a_sampled__lr=0.03] 22/22 runs, 211s elapsed
+[ppo_game_a_sampled] chosen learning rates: {'tabular': 0.01, 'dense': 0.0001, 'connectome': 0.001, 'connectome+sign': 0.001, 'rewired': 0.003, 'rewired+sign': 0.001, 'random_sparse': 0.001, 'random_sparse+sign': 0.001, 'flygm': 0.003, 'flygm_rewired': 0.001, 'flygm_random_sparse': 0.001}
+tune-ppo-a: 1116 s wall (48 workers)
++ scripts/run_experiment.py configs/ppo_game_a_sampled.yaml --workers 48
+[ppo_game_a_sampled] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610}
+[ppo_game_a_sampled] 120 runs to do on 48 workers
+[ppo_game_a_sampled] 12/120 runs, 27s elapsed
+[ppo_game_a_sampled] 24/120 runs, 37s elapsed
+[ppo_game_a_sampled] 36/120 runs, 137s elapsed
+[ppo_game_a_sampled] 48/120 runs, 145s elapsed
+[ppo_game_a_sampled] 60/120 runs, 155s elapsed
+[ppo_game_a_sampled] 72/120 runs, 165s elapsed
+[ppo_game_a_sampled] 84/120 runs, 276s elapsed
+[ppo_game_a_sampled] 96/120 runs, 327s elapsed
+[ppo_game_a_sampled] 108/120 runs, 332s elapsed
+[ppo_game_a_sampled] 120/120 runs, 344s elapsed
+run-ppo-a: 348 s wall (48 workers)
++ scripts/tune_lr.py configs/flygm_game_b_sampled.yaml --workers 48
+[flygm_game_b_sampled__lr=0.0001] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_sampled__lr=0.0001] 6 runs to do on 48 workers
+[flygm_game_b_sampled__lr=0.0001] 1/6 runs, 485s elapsed
+[flygm_game_b_sampled__lr=0.0001] 2/6 runs, 486s elapsed
+[flygm_game_b_sampled__lr=0.0001] 3/6 runs, 489s elapsed
+[flygm_game_b_sampled__lr=0.0001] 4/6 runs, 489s elapsed
+[flygm_game_b_sampled__lr=0.0001] 5/6 runs, 492s elapsed
+[flygm_game_b_sampled__lr=0.0001] 6/6 runs, 492s elapsed
+[flygm_game_b_sampled__lr=0.0003] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_sampled__lr=0.0003] 6 runs to do on 48 workers
+[flygm_game_b_sampled__lr=0.0003] 1/6 runs, 481s elapsed
+[flygm_game_b_sampled__lr=0.0003] 2/6 runs, 481s elapsed
+[flygm_game_b_sampled__lr=0.0003] 3/6 runs, 481s elapsed
+[flygm_game_b_sampled__lr=0.0003] 4/6 runs, 486s elapsed
+[flygm_game_b_sampled__lr=0.0003] 5/6 runs, 488s elapsed
+[flygm_game_b_sampled__lr=0.0003] 6/6 runs, 489s elapsed
+[flygm_game_b_sampled__lr=0.001] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_sampled__lr=0.001] 6 runs to do on 48 workers
+[flygm_game_b_sampled__lr=0.001] 1/6 runs, 480s elapsed
+[flygm_game_b_sampled__lr=0.001] 2/6 runs, 484s elapsed
+[flygm_game_b_sampled__lr=0.001] 3/6 runs, 484s elapsed
+[flygm_game_b_sampled__lr=0.001] 4/6 runs, 489s elapsed
+[flygm_game_b_sampled__lr=0.001] 5/6 runs, 489s elapsed
+[flygm_game_b_sampled__lr=0.001] 6/6 runs, 493s elapsed
+[flygm_game_b_sampled__lr=0.003] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_sampled__lr=0.003] 6 runs to do on 48 workers
+[flygm_game_b_sampled__lr=0.003] 1/6 runs, 480s elapsed
+[flygm_game_b_sampled__lr=0.003] 2/6 runs, 480s elapsed
+[flygm_game_b_sampled__lr=0.003] 3/6 runs, 483s elapsed
+[flygm_game_b_sampled__lr=0.003] 4/6 runs, 489s elapsed
+[flygm_game_b_sampled__lr=0.003] 5/6 runs, 489s elapsed
+[flygm_game_b_sampled__lr=0.003] 6/6 runs, 490s elapsed
+[flygm_game_b_sampled__lr=0.01] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_sampled__lr=0.01] 6 runs to do on 48 workers
+[flygm_game_b_sampled__lr=0.01] 1/6 runs, 480s elapsed
+[flygm_game_b_sampled__lr=0.01] 2/6 runs, 481s elapsed
+[flygm_game_b_sampled__lr=0.01] 3/6 runs, 486s elapsed
+[flygm_game_b_sampled__lr=0.01] 4/6 runs, 489s elapsed
+[flygm_game_b_sampled__lr=0.01] 5/6 runs, 491s elapsed
+[flygm_game_b_sampled__lr=0.01] 6/6 runs, 496s elapsed
+[flygm_game_b_sampled__lr=0.03] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_sampled__lr=0.03] 6 runs to do on 48 workers
+[flygm_game_b_sampled__lr=0.03] 1/6 runs, 483s elapsed
+[flygm_game_b_sampled__lr=0.03] 2/6 runs, 484s elapsed
+[flygm_game_b_sampled__lr=0.03] 3/6 runs, 484s elapsed
+[flygm_game_b_sampled__lr=0.03] 4/6 runs, 487s elapsed
+[flygm_game_b_sampled__lr=0.03] 5/6 runs, 491s elapsed
+[flygm_game_b_sampled__lr=0.03] 6/6 runs, 494s elapsed
+[flygm_game_b_sampled] chosen learning rates: {'flygm': 0.03, 'flygm_rewired': 0.03, 'flygm_random_sparse': 0.01}
+tune-flygm-b-sampled: 2961 s wall (48 workers)
++ scripts/run_experiment.py configs/flygm_game_b_sampled.yaml --workers 48
+[flygm_game_b_sampled] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[flygm_game_b_sampled] 40 runs to do on 48 workers
+[flygm_game_b_sampled] 4/40 runs, 6s elapsed
+[flygm_game_b_sampled] 8/40 runs, 6s elapsed
+[flygm_game_b_sampled] 12/40 runs, 2116s elapsed
+[flygm_game_b_sampled] 16/40 runs, 2145s elapsed
+[flygm_game_b_sampled] 20/40 runs, 2153s elapsed
+[flygm_game_b_sampled] 24/40 runs, 2168s elapsed
+[flygm_game_b_sampled] 28/40 runs, 2175s elapsed
+[flygm_game_b_sampled] 32/40 runs, 2188s elapsed
+[flygm_game_b_sampled] 36/40 runs, 2210s elapsed
+[flygm_game_b_sampled] 40/40 runs, 2493s elapsed
+run-flygm-b-sampled: 2497 s wall (48 workers)
++ scripts/tune_lr.py configs/ppo_game_b_sampled.yaml --workers 48
+[ppo_game_b_sampled__lr=0.0001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[ppo_game_b_sampled__lr=0.0001] 14 runs to do on 48 workers
+[ppo_game_b_sampled__lr=0.0001] 1/14 runs, 18s elapsed
+[ppo_game_b_sampled__lr=0.0001] 2/14 runs, 18s elapsed
+[ppo_game_b_sampled__lr=0.0001] 3/14 runs, 91s elapsed
+[ppo_game_b_sampled__lr=0.0001] 4/14 runs, 92s elapsed
+[ppo_game_b_sampled__lr=0.0001] 5/14 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.0001] 6/14 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.0001] 7/14 runs, 94s elapsed
+[ppo_game_b_sampled__lr=0.0001] 8/14 runs, 94s elapsed
+[ppo_game_b_sampled__lr=0.0001] 9/14 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.0001] 10/14 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.0001] 11/14 runs, 96s elapsed
+[ppo_game_b_sampled__lr=0.0001] 12/14 runs, 96s elapsed
+[ppo_game_b_sampled__lr=0.0001] 13/14 runs, 97s elapsed
+[ppo_game_b_sampled__lr=0.0001] 14/14 runs, 97s elapsed
+[ppo_game_b_sampled__lr=0.0003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[ppo_game_b_sampled__lr=0.0003] 14 runs to do on 48 workers
+[ppo_game_b_sampled__lr=0.0003] 1/14 runs, 18s elapsed
+[ppo_game_b_sampled__lr=0.0003] 2/14 runs, 19s elapsed
+[ppo_game_b_sampled__lr=0.0003] 3/14 runs, 90s elapsed
+[ppo_game_b_sampled__lr=0.0003] 4/14 runs, 91s elapsed
+[ppo_game_b_sampled__lr=0.0003] 5/14 runs, 92s elapsed
+[ppo_game_b_sampled__lr=0.0003] 6/14 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.0003] 7/14 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.0003] 8/14 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.0003] 9/14 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.0003] 10/14 runs, 96s elapsed
+[ppo_game_b_sampled__lr=0.0003] 11/14 runs, 96s elapsed
+[ppo_game_b_sampled__lr=0.0003] 12/14 runs, 96s elapsed
+[ppo_game_b_sampled__lr=0.0003] 13/14 runs, 97s elapsed
+[ppo_game_b_sampled__lr=0.0003] 14/14 runs, 99s elapsed
+[ppo_game_b_sampled__lr=0.001] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[ppo_game_b_sampled__lr=0.001] 14 runs to do on 48 workers
+[ppo_game_b_sampled__lr=0.001] 1/14 runs, 18s elapsed
+[ppo_game_b_sampled__lr=0.001] 2/14 runs, 18s elapsed
+[ppo_game_b_sampled__lr=0.001] 3/14 runs, 91s elapsed
+[ppo_game_b_sampled__lr=0.001] 4/14 runs, 92s elapsed
+[ppo_game_b_sampled__lr=0.001] 5/14 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.001] 6/14 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.001] 7/14 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.001] 8/14 runs, 94s elapsed
+[ppo_game_b_sampled__lr=0.001] 9/14 runs, 94s elapsed
+[ppo_game_b_sampled__lr=0.001] 10/14 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.001] 11/14 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.001] 12/14 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.001] 13/14 runs, 96s elapsed
+[ppo_game_b_sampled__lr=0.001] 14/14 runs, 98s elapsed
+[ppo_game_b_sampled__lr=0.003] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[ppo_game_b_sampled__lr=0.003] 16 runs to do on 48 workers
+[ppo_game_b_sampled__lr=0.003] 1/16 runs, 14s elapsed
+[ppo_game_b_sampled__lr=0.003] 2/16 runs, 14s elapsed
+[ppo_game_b_sampled__lr=0.003] 3/16 runs, 18s elapsed
+[ppo_game_b_sampled__lr=0.003] 4/16 runs, 18s elapsed
+[ppo_game_b_sampled__lr=0.003] 5/16 runs, 87s elapsed
+[ppo_game_b_sampled__lr=0.003] 6/16 runs, 92s elapsed
+[ppo_game_b_sampled__lr=0.003] 7/16 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.003] 8/16 runs, 94s elapsed
+[ppo_game_b_sampled__lr=0.003] 9/16 runs, 94s elapsed
+[ppo_game_b_sampled__lr=0.003] 10/16 runs, 94s elapsed
+[ppo_game_b_sampled__lr=0.003] 11/16 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.003] 12/16 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.003] 13/16 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.003] 14/16 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.003] 15/16 runs, 96s elapsed
+[ppo_game_b_sampled__lr=0.003] 16/16 runs, 97s elapsed
+[ppo_game_b_sampled__lr=0.01] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[ppo_game_b_sampled__lr=0.01] 16 runs to do on 48 workers
+[ppo_game_b_sampled__lr=0.01] 1/16 runs, 14s elapsed
+[ppo_game_b_sampled__lr=0.01] 2/16 runs, 15s elapsed
+[ppo_game_b_sampled__lr=0.01] 3/16 runs, 18s elapsed
+[ppo_game_b_sampled__lr=0.01] 4/16 runs, 18s elapsed
+[ppo_game_b_sampled__lr=0.01] 5/16 runs, 88s elapsed
+[ppo_game_b_sampled__lr=0.01] 6/16 runs, 90s elapsed
+[ppo_game_b_sampled__lr=0.01] 7/16 runs, 90s elapsed
+[ppo_game_b_sampled__lr=0.01] 8/16 runs, 91s elapsed
+[ppo_game_b_sampled__lr=0.01] 9/16 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.01] 10/16 runs, 94s elapsed
+[ppo_game_b_sampled__lr=0.01] 11/16 runs, 94s elapsed
+[ppo_game_b_sampled__lr=0.01] 12/16 runs, 96s elapsed
+[ppo_game_b_sampled__lr=0.01] 13/16 runs, 96s elapsed
+[ppo_game_b_sampled__lr=0.01] 14/16 runs, 97s elapsed
+[ppo_game_b_sampled__lr=0.01] 15/16 runs, 97s elapsed
+[ppo_game_b_sampled__lr=0.01] 16/16 runs, 97s elapsed
+[ppo_game_b_sampled__lr=0.03] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[ppo_game_b_sampled__lr=0.03] 16 runs to do on 48 workers
+[ppo_game_b_sampled__lr=0.03] 1/16 runs, 15s elapsed
+[ppo_game_b_sampled__lr=0.03] 2/16 runs, 15s elapsed
+[ppo_game_b_sampled__lr=0.03] 3/16 runs, 18s elapsed
+[ppo_game_b_sampled__lr=0.03] 4/16 runs, 18s elapsed
+[ppo_game_b_sampled__lr=0.03] 5/16 runs, 92s elapsed
+[ppo_game_b_sampled__lr=0.03] 6/16 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.03] 7/16 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.03] 8/16 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.03] 9/16 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.03] 10/16 runs, 93s elapsed
+[ppo_game_b_sampled__lr=0.03] 11/16 runs, 94s elapsed
+[ppo_game_b_sampled__lr=0.03] 12/16 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.03] 13/16 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.03] 14/16 runs, 95s elapsed
+[ppo_game_b_sampled__lr=0.03] 15/16 runs, 96s elapsed
+[ppo_game_b_sampled__lr=0.03] 16/16 runs, 97s elapsed
+[ppo_game_b_sampled] chosen learning rates: {'tabular': 0.03, 'dense': 0.003, 'connectome': 0.01, 'connectome+sign': 0.01, 'rewired': 0.01, 'rewired+sign': 0.03, 'random_sparse': 0.01, 'random_sparse+sign': 0.01}
+tune-ppo-b: 592 s wall (48 workers)
++ scripts/run_experiment.py configs/ppo_game_b_sampled.yaml --workers 48
+[ppo_game_b_sampled] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[ppo_game_b_sampled] 90 runs to do on 48 workers
+[ppo_game_b_sampled] 9/90 runs, 6s elapsed
+[ppo_game_b_sampled] 18/90 runs, 37s elapsed
+[ppo_game_b_sampled] 27/90 runs, 49s elapsed
+[ppo_game_b_sampled] 36/90 runs, 443s elapsed
+[ppo_game_b_sampled] 45/90 runs, 448s elapsed
+[ppo_game_b_sampled] 54/90 runs, 464s elapsed
+[ppo_game_b_sampled] 63/90 runs, 482s elapsed
+[ppo_game_b_sampled] 72/90 runs, 488s elapsed
+[ppo_game_b_sampled] 81/90 runs, 717s elapsed
+[ppo_game_b_sampled] 90/90 runs, 734s elapsed
+run-ppo-b: 738 s wall (48 workers)
++ scripts/run_experiment.py configs/robust_ppo_game_a_sampled_shared_lr.yaml configs/robust_ppo_game_b_sampled_shared_lr.yaml --workers 48
+[robust_ppo_game_a_sampled_shared_lr] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[robust_ppo_game_a_sampled_shared_lr] 90 runs to do on 48 workers
+[robust_ppo_game_a_sampled_shared_lr] 9/90 runs, 136s elapsed
+[robust_ppo_game_a_sampled_shared_lr] 18/90 runs, 137s elapsed
+[robust_ppo_game_a_sampled_shared_lr] 27/90 runs, 140s elapsed
+[robust_ppo_game_a_sampled_shared_lr] 36/90 runs, 146s elapsed
+[robust_ppo_game_a_sampled_shared_lr] 45/90 runs, 146s elapsed
+[robust_ppo_game_a_sampled_shared_lr] 54/90 runs, 275s elapsed
+[robust_ppo_game_a_sampled_shared_lr] 63/90 runs, 323s elapsed
+[robust_ppo_game_a_sampled_shared_lr] 72/90 runs, 328s elapsed
+[robust_ppo_game_a_sampled_shared_lr] 81/90 runs, 332s elapsed
+[robust_ppo_game_a_sampled_shared_lr] 90/90 runs, 337s elapsed
+[robust_ppo_game_b_sampled_shared_lr] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[robust_ppo_game_b_sampled_shared_lr] 60 runs to do on 48 workers
+[robust_ppo_game_b_sampled_shared_lr] 6/60 runs, 449s elapsed
+[robust_ppo_game_b_sampled_shared_lr] 12/60 runs, 453s elapsed
+[robust_ppo_game_b_sampled_shared_lr] 18/60 runs, 455s elapsed
+[robust_ppo_game_b_sampled_shared_lr] 24/60 runs, 458s elapsed
+[robust_ppo_game_b_sampled_shared_lr] 30/60 runs, 461s elapsed
+[robust_ppo_game_b_sampled_shared_lr] 36/60 runs, 465s elapsed
+[robust_ppo_game_b_sampled_shared_lr] 42/60 runs, 469s elapsed
+[robust_ppo_game_b_sampled_shared_lr] 48/60 runs, 479s elapsed
+[robust_ppo_game_b_sampled_shared_lr] 54/60 runs, 718s elapsed
+[robust_ppo_game_b_sampled_shared_lr] 60/60 runs, 722s elapsed
+run-robust-ppo: 1064 s wall (48 workers)
+run-robust-flygm: SKIPPED robust_flygm_game_a_sampled_shared_lr, every arm tuned to the same rate
++ scripts/run_experiment.py configs/robust_flygm_game_b_exact_shared_lr.yaml configs/robust_flygm_game_b_sampled_shared_lr.yaml --workers 48
+[robust_flygm_game_b_exact_shared_lr] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[robust_flygm_game_b_exact_shared_lr] 60 runs to do on 48 workers
+[robust_flygm_game_b_exact_shared_lr] 6/60 runs, 426s elapsed
+[robust_flygm_game_b_exact_shared_lr] 12/60 runs, 437s elapsed
+[robust_flygm_game_b_exact_shared_lr] 18/60 runs, 451s elapsed
+[robust_flygm_game_b_exact_shared_lr] 24/60 runs, 544s elapsed
+[robust_flygm_game_b_exact_shared_lr] 30/60 runs, 550s elapsed
+[robust_flygm_game_b_exact_shared_lr] 36/60 runs, 554s elapsed
+[robust_flygm_game_b_exact_shared_lr] 42/60 runs, 559s elapsed
+[robust_flygm_game_b_exact_shared_lr] 48/60 runs, 670s elapsed
+[robust_flygm_game_b_exact_shared_lr] 54/60 runs, 698s elapsed
+[robust_flygm_game_b_exact_shared_lr] 60/60 runs, 732s elapsed
+[robust_flygm_game_b_sampled_shared_lr] trainable parameters per agent: {'flygm': 5638, 'flygm_rewired': 5638, 'flygm_random_sparse': 5638, 'connectome(budget)': 5610, 'dense(budget)': 5584}
+[robust_flygm_game_b_sampled_shared_lr] 30 runs to do on 48 workers
+[robust_flygm_game_b_sampled_shared_lr] 3/30 runs, 2100s elapsed
+[robust_flygm_game_b_sampled_shared_lr] 6/30 runs, 2115s elapsed
+[robust_flygm_game_b_sampled_shared_lr] 9/30 runs, 2139s elapsed
+[robust_flygm_game_b_sampled_shared_lr] 12/30 runs, 2150s elapsed
+[robust_flygm_game_b_sampled_shared_lr] 15/30 runs, 2163s elapsed
+[robust_flygm_game_b_sampled_shared_lr] 18/30 runs, 2169s elapsed
+[robust_flygm_game_b_sampled_shared_lr] 21/30 runs, 2188s elapsed
+[robust_flygm_game_b_sampled_shared_lr] 24/30 runs, 2205s elapsed
+[robust_flygm_game_b_sampled_shared_lr] 27/30 runs, 2371s elapsed
+[robust_flygm_game_b_sampled_shared_lr] 30/30 runs, 2501s elapsed
+run-robust-flygm: 3239 s wall (48 workers)
++ scripts/tune_lr.py configs/readout_game_a_exact.yaml configs/wgain_game_a_exact.yaml --workers 48
+[readout_game_a_exact__lr=0.001] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_a_exact__lr=0.001] 20 runs to do on 48 workers
+[readout_game_a_exact__lr=0.001] 2/20 runs, 10s elapsed
+[readout_game_a_exact__lr=0.001] 4/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.001] 6/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.001] 8/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.001] 10/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.001] 12/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.001] 14/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.001] 16/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.001] 18/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.001] 20/20 runs, 23s elapsed
+[readout_game_a_exact__lr=0.003] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_a_exact__lr=0.003] 20 runs to do on 48 workers
+[readout_game_a_exact__lr=0.003] 2/20 runs, 10s elapsed
+[readout_game_a_exact__lr=0.003] 4/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.003] 6/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.003] 8/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.003] 10/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.003] 12/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.003] 14/20 runs, 16s elapsed
+[readout_game_a_exact__lr=0.003] 16/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.003] 18/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.003] 20/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.01] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_a_exact__lr=0.01] 20 runs to do on 48 workers
+[readout_game_a_exact__lr=0.01] 2/20 runs, 10s elapsed
+[readout_game_a_exact__lr=0.01] 4/20 runs, 14s elapsed
+[readout_game_a_exact__lr=0.01] 6/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.01] 8/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.01] 10/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.01] 12/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.01] 14/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.01] 16/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.01] 18/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.01] 20/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.03] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_a_exact__lr=0.03] 20 runs to do on 48 workers
+[readout_game_a_exact__lr=0.03] 2/20 runs, 10s elapsed
+[readout_game_a_exact__lr=0.03] 4/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.03] 6/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.03] 8/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.03] 10/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.03] 12/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.03] 14/20 runs, 16s elapsed
+[readout_game_a_exact__lr=0.03] 16/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.03] 18/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.03] 20/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.1] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_a_exact__lr=0.1] 20 runs to do on 48 workers
+[readout_game_a_exact__lr=0.1] 2/20 runs, 10s elapsed
+[readout_game_a_exact__lr=0.1] 4/20 runs, 14s elapsed
+[readout_game_a_exact__lr=0.1] 6/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.1] 8/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.1] 10/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.1] 12/20 runs, 15s elapsed
+[readout_game_a_exact__lr=0.1] 14/20 runs, 17s elapsed
+[readout_game_a_exact__lr=0.1] 16/20 runs, 21s elapsed
+[readout_game_a_exact__lr=0.1] 18/20 runs, 22s elapsed
+[readout_game_a_exact__lr=0.1] 20/20 runs, 22s elapsed
+[readout_game_a_exact] chosen learning rates: {'dense': 0.003, 'connectome': 0.003, 'connectome+sign': 0.003, 'rewired': 0.003, 'rewired+sign': 0.003, 'random_sparse': 0.003, 'random_sparse+sign': 0.003, 'flygm': 0.003, 'flygm_rewired': 0.003, 'flygm_random_sparse': 0.003}
+[wgain_game_a_exact__lr=0.001] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_a_exact__lr=0.001] 6 runs to do on 48 workers
+[wgain_game_a_exact__lr=0.001] 1/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.001] 2/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.001] 3/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.001] 4/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.001] 5/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.001] 6/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.003] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_a_exact__lr=0.003] 6 runs to do on 48 workers
+[wgain_game_a_exact__lr=0.003] 1/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.003] 2/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.003] 3/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.003] 4/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.003] 5/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.003] 6/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.01] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_a_exact__lr=0.01] 6 runs to do on 48 workers
+[wgain_game_a_exact__lr=0.01] 1/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.01] 2/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.01] 3/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.01] 4/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.01] 5/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.01] 6/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.03] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_a_exact__lr=0.03] 6 runs to do on 48 workers
+[wgain_game_a_exact__lr=0.03] 1/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.03] 2/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.03] 3/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.03] 4/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.03] 5/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.03] 6/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.1] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_a_exact__lr=0.1] 6 runs to do on 48 workers
+[wgain_game_a_exact__lr=0.1] 1/6 runs, 20s elapsed
+[wgain_game_a_exact__lr=0.1] 2/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.1] 3/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.1] 4/6 runs, 21s elapsed
+[wgain_game_a_exact__lr=0.1] 5/6 runs, 22s elapsed
+[wgain_game_a_exact__lr=0.1] 6/6 runs, 22s elapsed
+[wgain_game_a_exact] chosen learning rates: {'flygm': 0.03, 'flygm_rewired': 0.03, 'flygm_random_sparse': 0.03}
+tune-readout-a: 232 s wall (48 workers)
++ scripts/run_experiment.py configs/readout_game_a_exact.yaml configs/wgain_game_a_exact.yaml --workers 48
+[readout_game_a_exact] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_a_exact] 220 runs to do on 48 workers
+[readout_game_a_exact] 22/220 runs, 11s elapsed
+[readout_game_a_exact] 44/220 runs, 17s elapsed
+[readout_game_a_exact] 66/220 runs, 18s elapsed
+[readout_game_a_exact] 88/220 runs, 21s elapsed
+[readout_game_a_exact] 110/220 runs, 25s elapsed
+[readout_game_a_exact] 132/220 runs, 27s elapsed
+[readout_game_a_exact] 154/220 runs, 33s elapsed
+[readout_game_a_exact] 176/220 runs, 41s elapsed
+[readout_game_a_exact] 198/220 runs, 47s elapsed
+[readout_game_a_exact] 220/220 runs, 53s elapsed
+[wgain_game_a_exact] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_a_exact] 80 runs to do on 48 workers
+[wgain_game_a_exact] 8/80 runs, 6s elapsed
+[wgain_game_a_exact] 16/80 runs, 6s elapsed
+[wgain_game_a_exact] 24/80 runs, 24s elapsed
+[wgain_game_a_exact] 32/80 runs, 25s elapsed
+[wgain_game_a_exact] 40/80 runs, 25s elapsed
+[wgain_game_a_exact] 48/80 runs, 26s elapsed
+[wgain_game_a_exact] 56/80 runs, 26s elapsed
+[wgain_game_a_exact] 64/80 runs, 26s elapsed
+[wgain_game_a_exact] 72/80 runs, 37s elapsed
+[wgain_game_a_exact] 80/80 runs, 39s elapsed
+run-readout-a: 98 s wall (48 workers)
++ scripts/tune_lr.py configs/readout_game_b_exact.yaml configs/wgain_game_b_exact.yaml --workers 48
+[readout_game_b_exact__lr=0.001] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_b_exact__lr=0.001] 20 runs to do on 48 workers
+[readout_game_b_exact__lr=0.001] 2/20 runs, 12s elapsed
+[readout_game_b_exact__lr=0.001] 4/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.001] 6/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.001] 8/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.001] 10/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.001] 12/20 runs, 22s elapsed
+[readout_game_b_exact__lr=0.001] 14/20 runs, 22s elapsed
+[readout_game_b_exact__lr=0.001] 16/20 runs, 187s elapsed
+[readout_game_b_exact__lr=0.001] 18/20 runs, 288s elapsed
+[readout_game_b_exact__lr=0.001] 20/20 runs, 301s elapsed
+[readout_game_b_exact__lr=0.003] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_b_exact__lr=0.003] 20 runs to do on 48 workers
+[readout_game_b_exact__lr=0.003] 2/20 runs, 12s elapsed
+[readout_game_b_exact__lr=0.003] 4/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.003] 6/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.003] 8/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.003] 10/20 runs, 22s elapsed
+[readout_game_b_exact__lr=0.003] 12/20 runs, 22s elapsed
+[readout_game_b_exact__lr=0.003] 14/20 runs, 23s elapsed
+[readout_game_b_exact__lr=0.003] 16/20 runs, 200s elapsed
+[readout_game_b_exact__lr=0.003] 18/20 runs, 299s elapsed
+[readout_game_b_exact__lr=0.003] 20/20 runs, 307s elapsed
+[readout_game_b_exact__lr=0.01] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_b_exact__lr=0.01] 20 runs to do on 48 workers
+[readout_game_b_exact__lr=0.01] 2/20 runs, 12s elapsed
+[readout_game_b_exact__lr=0.01] 4/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.01] 6/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.01] 8/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.01] 10/20 runs, 22s elapsed
+[readout_game_b_exact__lr=0.01] 12/20 runs, 22s elapsed
+[readout_game_b_exact__lr=0.01] 14/20 runs, 22s elapsed
+[readout_game_b_exact__lr=0.01] 16/20 runs, 208s elapsed
+[readout_game_b_exact__lr=0.01] 18/20 runs, 212s elapsed
+[readout_game_b_exact__lr=0.01] 20/20 runs, 507s elapsed
+[readout_game_b_exact__lr=0.03] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_b_exact__lr=0.03] 20 runs to do on 48 workers
+[readout_game_b_exact__lr=0.03] 2/20 runs, 14s elapsed
+[readout_game_b_exact__lr=0.03] 4/20 runs, 20s elapsed
+[readout_game_b_exact__lr=0.03] 6/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.03] 8/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.03] 10/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.03] 12/20 runs, 22s elapsed
+[readout_game_b_exact__lr=0.03] 14/20 runs, 183s elapsed
+[readout_game_b_exact__lr=0.03] 16/20 runs, 203s elapsed
+[readout_game_b_exact__lr=0.03] 18/20 runs, 215s elapsed
+[readout_game_b_exact__lr=0.03] 20/20 runs, 299s elapsed
+[readout_game_b_exact__lr=0.1] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_b_exact__lr=0.1] 20 runs to do on 48 workers
+[readout_game_b_exact__lr=0.1] 2/20 runs, 14s elapsed
+[readout_game_b_exact__lr=0.1] 4/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.1] 6/20 runs, 21s elapsed
+[readout_game_b_exact__lr=0.1] 8/20 runs, 22s elapsed
+[readout_game_b_exact__lr=0.1] 10/20 runs, 22s elapsed
+[readout_game_b_exact__lr=0.1] 12/20 runs, 22s elapsed
+[readout_game_b_exact__lr=0.1] 14/20 runs, 23s elapsed
+[readout_game_b_exact__lr=0.1] 16/20 runs, 196s elapsed
+[readout_game_b_exact__lr=0.1] 18/20 runs, 210s elapsed
+[readout_game_b_exact__lr=0.1] 20/20 runs, 423s elapsed
+[readout_game_b_exact] chosen learning rates: {'dense': 0.01, 'connectome': 0.003, 'connectome+sign': 0.003, 'rewired': 0.003, 'rewired+sign': 0.003, 'random_sparse': 0.003, 'random_sparse+sign': 0.003, 'flygm': 0.003, 'flygm_rewired': 0.003, 'flygm_random_sparse': 0.003}
+[wgain_game_b_exact__lr=0.001] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_b_exact__lr=0.001] 6 runs to do on 48 workers
+[wgain_game_b_exact__lr=0.001] 1/6 runs, 267s elapsed
+[wgain_game_b_exact__lr=0.001] 2/6 runs, 319s elapsed
+[wgain_game_b_exact__lr=0.001] 3/6 runs, 346s elapsed
+[wgain_game_b_exact__lr=0.001] 4/6 runs, 351s elapsed
+[wgain_game_b_exact__lr=0.001] 5/6 runs, 355s elapsed
+[wgain_game_b_exact__lr=0.001] 6/6 runs, 356s elapsed
+[wgain_game_b_exact__lr=0.003] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_b_exact__lr=0.003] 6 runs to do on 48 workers
+[wgain_game_b_exact__lr=0.003] 1/6 runs, 275s elapsed
+[wgain_game_b_exact__lr=0.003] 2/6 runs, 347s elapsed
+[wgain_game_b_exact__lr=0.003] 3/6 runs, 350s elapsed
+[wgain_game_b_exact__lr=0.003] 4/6 runs, 350s elapsed
+[wgain_game_b_exact__lr=0.003] 5/6 runs, 351s elapsed
+[wgain_game_b_exact__lr=0.003] 6/6 runs, 357s elapsed
+[wgain_game_b_exact__lr=0.01] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_b_exact__lr=0.01] 6 runs to do on 48 workers
+[wgain_game_b_exact__lr=0.01] 1/6 runs, 254s elapsed
+[wgain_game_b_exact__lr=0.01] 2/6 runs, 264s elapsed
+[wgain_game_b_exact__lr=0.01] 3/6 runs, 344s elapsed
+[wgain_game_b_exact__lr=0.01] 4/6 runs, 349s elapsed
+[wgain_game_b_exact__lr=0.01] 5/6 runs, 351s elapsed
+[wgain_game_b_exact__lr=0.01] 6/6 runs, 352s elapsed
+[wgain_game_b_exact__lr=0.03] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_b_exact__lr=0.03] 6 runs to do on 48 workers
+[wgain_game_b_exact__lr=0.03] 1/6 runs, 266s elapsed
+[wgain_game_b_exact__lr=0.03] 2/6 runs, 273s elapsed
+[wgain_game_b_exact__lr=0.03] 3/6 runs, 346s elapsed
+[wgain_game_b_exact__lr=0.03] 4/6 runs, 346s elapsed
+[wgain_game_b_exact__lr=0.03] 5/6 runs, 353s elapsed
+[wgain_game_b_exact__lr=0.03] 6/6 runs, 814s elapsed
+[wgain_game_b_exact__lr=0.1] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_b_exact__lr=0.1] 6 runs to do on 48 workers
+[wgain_game_b_exact__lr=0.1] 1/6 runs, 264s elapsed
+[wgain_game_b_exact__lr=0.1] 2/6 runs, 266s elapsed
+[wgain_game_b_exact__lr=0.1] 3/6 runs, 342s elapsed
+[wgain_game_b_exact__lr=0.1] 4/6 runs, 343s elapsed
+[wgain_game_b_exact__lr=0.1] 5/6 runs, 392s elapsed
+[wgain_game_b_exact__lr=0.1] 6/6 runs, 491s elapsed
+[wgain_game_b_exact] chosen learning rates: {'flygm': 0.01, 'flygm_rewired': 0.003, 'flygm_random_sparse': 0.01}
+tune-readout-b: 4218 s wall (48 workers)
++ scripts/run_experiment.py configs/readout_game_b_exact.yaml configs/wgain_game_b_exact.yaml --workers 48
+[readout_game_b_exact] trainable parameters per agent: {'dense': 6598, 'connectome': 6578, 'connectome+sign': 6578, 'rewired': 6578, 'rewired+sign': 6578, 'random_sparse': 6578, 'random_sparse+sign': 6578, 'flygm': 6606, 'flygm_rewired': 6606, 'flygm_random_sparse': 6606, 'connectome(budget)': 6578}
+[readout_game_b_exact] 220 runs to do on 48 workers
+[readout_game_b_exact] 22/220 runs, 13s elapsed
+[readout_game_b_exact] 44/220 runs, 25s elapsed
+[readout_game_b_exact] 66/220 runs, 26s elapsed
+[readout_game_b_exact] 88/220 runs, 30s elapsed
+[readout_game_b_exact] 110/220 runs, 41s elapsed
+[readout_game_b_exact] 132/220 runs, 45s elapsed
+[readout_game_b_exact] 154/220 runs, 58s elapsed
+[readout_game_b_exact] 176/220 runs, 567s elapsed
+[readout_game_b_exact] 198/220 runs, 592s elapsed
+[readout_game_b_exact] 220/220 runs, 876s elapsed
+[wgain_game_b_exact] trainable parameters per agent: {'flygm': 6567, 'flygm_rewired': 6567, 'flygm_random_sparse': 6567, 'connectome(budget)': 6578, 'dense(budget)': 6598}
+[wgain_game_b_exact] 80 runs to do on 48 workers
+[wgain_game_b_exact] 8/80 runs, 6s elapsed
+[wgain_game_b_exact] 16/80 runs, 6s elapsed
+[wgain_game_b_exact] 24/80 runs, 497s elapsed
+[wgain_game_b_exact] 32/80 runs, 519s elapsed
+[wgain_game_b_exact] 40/80 runs, 643s elapsed
+[wgain_game_b_exact] 48/80 runs, 647s elapsed
+[wgain_game_b_exact] 56/80 runs, 650s elapsed
+[wgain_game_b_exact] 64/80 runs, 654s elapsed
+[wgain_game_b_exact] 72/80 runs, 829s elapsed
+[wgain_game_b_exact] 80/80 runs, 883s elapsed
+run-readout-b: 1765 s wall (48 workers)
+run-popsize: SKIPPED popsize_game_a_sampled, every arm tuned to the same rate
+run-popsize: 0 s wall (48 workers)
+run-review: SKIPPED popnash_game_a_sampled, every arm tuned to the same rate
++ scripts/run_experiment.py configs/lrsweep_game_a_exact.yaml configs/lrsweep_game_b_exact.yaml --workers 48
+[lrsweep_game_a_exact] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[lrsweep_game_a_exact] 350 runs to do on 48 workers
+[lrsweep_game_a_exact] 35/350 runs, 17s elapsed
+[lrsweep_game_a_exact] 70/350 runs, 23s elapsed
+[lrsweep_game_a_exact] 105/350 runs, 26s elapsed
+[lrsweep_game_a_exact] 140/350 runs, 31s elapsed
+[lrsweep_game_a_exact] 175/350 runs, 37s elapsed
+[lrsweep_game_a_exact] 210/350 runs, 39s elapsed
+[lrsweep_game_a_exact] 245/350 runs, 46s elapsed
+[lrsweep_game_a_exact] 280/350 runs, 50s elapsed
+[lrsweep_game_a_exact] 315/350 runs, 55s elapsed
+[lrsweep_game_a_exact] 350/350 runs, 61s elapsed
+[lrsweep_game_b_exact] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[lrsweep_game_b_exact] 350 runs to do on 48 workers
+[lrsweep_game_b_exact] 35/350 runs, 25s elapsed
+[lrsweep_game_b_exact] 70/350 runs, 37s elapsed
+[lrsweep_game_b_exact] 105/350 runs, 44s elapsed
+[lrsweep_game_b_exact] 140/350 runs, 54s elapsed
+[lrsweep_game_b_exact] 175/350 runs, 67s elapsed
+[lrsweep_game_b_exact] 210/350 runs, 73s elapsed
+[lrsweep_game_b_exact] 245/350 runs, 84s elapsed
+[lrsweep_game_b_exact] 280/350 runs, 94s elapsed
+[lrsweep_game_b_exact] 315/350 runs, 104s elapsed
+[lrsweep_game_b_exact] 350/350 runs, 114s elapsed
+run-review: 183 s wall (48 workers)
++ scripts/validate_asymmetric.py
+rho=1: b closed 0.000 grid 0.059 MC 0.058; expl fixed 0.000 MC 0.022; TV(MC avg, fixed) 0.124 vs TV(MC avg, eq) 0.124
+rho=2: b closed 0.125 grid 0.182 MC 0.188; expl fixed 0.066 MC 0.076; TV(MC avg, fixed) 0.145 vs TV(MC avg, eq) 0.204
+rho=4: b closed 0.188 grid 0.241 MC 0.231; expl fixed 0.108 MC 0.130; TV(MC avg, fixed) 0.235 vs TV(MC avg, eq) 0.364
+rho=8: b closed 0.219 grid 0.270 MC 0.286; expl fixed 0.130 MC 0.163; TV(MC avg, fixed) 0.292 vs TV(MC avg, eq) 0.469
+validate-asymmetric: 366 s wall (48 workers)
++ scripts/path_diagnostics.py
+                                           0         1              2
+graph                             connectome   rewired  random_sparse
+n_graphs                                   1        20             20
+outputs_reachable_in_time_min              5         5              5
+outputs_reachable_in_time_median         5.0       5.0            5.0
+outputs_reachable_in_time_max              5         5              5
+pairs_reachable_in_time_min               80        80             80
+pairs_reachable_in_time_median          80.0      80.0           80.0
+pairs_reachable_in_time_max               80        80             80
+shortest_min_min                         2.0       1.0            1.0
+shortest_min_median                      2.0       1.0            1.0
+shortest_min_max                         2.0       1.0            1.0
+shortest_median_min                      3.0       2.0            2.0
+shortest_median_median                   3.0       2.0            2.0
+shortest_median_max                      3.0       2.0            2.0
+log10_walks_in_time_min              5.75748  6.219397       5.817413
+log10_walks_in_time_median           5.75748    6.2473       5.926103
+log10_walks_in_time_max              5.75748  6.283446       6.033819
+reach_one_hop_hidden_min                  97       150            173
+reach_one_hop_hidden_median             97.0     161.5          184.0
+reach_one_hop_hidden_max                  97       169            197
+all_outputs_reachable_in_time           True      True           True
+                     experiment                arm  connectivity  n  spearman_rho        p   p_holm
+  robust_game_b_exact_shared_lr            rewired walks_in_time 20     -0.529323 0.016394 0.491823
+             ppo_game_b_sampled       rewired+sign walks_in_time 10      0.672727 0.033041 0.958195
+           readout_game_b_exact      flygm_rewired walks_in_time 20     -0.430075 0.058396 1.000000
+                 game_b_sampled random_sparse+sign walks_in_time 10      0.612121 0.059972 1.000000
+robust_game_b_sampled_shared_lr random_sparse+sign walks_in_time 10      0.612121 0.059972 1.000000
+robust_game_b_sampled_shared_lr       rewired+sign walks_in_time 10     -0.466667 0.173939 1.000000
+                 game_b_sampled       rewired+sign walks_in_time 10     -0.466667 0.173939 1.000000
+             ppo_game_b_sampled random_sparse+sign walks_in_time 10     -0.406061 0.244282 1.000000
+  robust_game_b_exact_shared_lr      random_sparse walks_in_time 20     -0.263158 0.262287 1.000000
+                   game_b_exact      random_sparse walks_in_time 20     -0.263158 0.262287 1.000000
+           readout_game_b_exact            rewired walks_in_time 20      0.249624 0.288513 1.000000
+           readout_game_b_exact       rewired+sign walks_in_time 20      0.237594 0.313131 1.000000
+path-diagnostics: 10 s wall (48 workers)
++ scripts/welfare_rerun.py --from-records --workers 48
+Traceback (most recent call last):
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/scope.py", line 231, in resolve
+    return self.resolvers[key]
+           ~~~~~~~~~~~~~~^^^^^
+  File "/home/apps/python/Python-3.12.8/lib/python3.12/collections/__init__.py", line 1015, in __getitem__
+    return self.__missing__(key)            # support subclasses that define __missing__
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/apps/python/Python-3.12.8/lib/python3.12/collections/__init__.py", line 1007, in __missing__
+    raise KeyError(key)
+KeyError: 'experiment'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/scope.py", line 242, in resolve
+    return self.temps[key]
+           ~~~~~~~~~~^^^^^
+KeyError: 'experiment'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/suhani/Multi_Agent_RL-FAI-/scripts/welfare_rerun.py", line 182, in <module>
+    main()
+  File "/home/suhani/Multi_Agent_RL-FAI-/scripts/welfare_rerun.py", line 162, in main
+    n = len(collect().query("experiment == @exp"))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/frame.py", line 4828, in query
+    res = self.eval(expr, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/frame.py", line 4954, in eval
+    return _eval(expr, inplace=inplace, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/eval.py", line 339, in eval
+    parsed_expr = Expr(expr, engine=engine, parser=parser, env=env)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 809, in __init__
+    self.terms = self.parse()
+                 ^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 828, in parse
+    return self._visitor.visit(self.expr)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 413, in visit
+    return visitor(node, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 419, in visit_Module
+    return self.visit(expr, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 413, in visit
+    return visitor(node, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 422, in visit_Expr
+    return self.visit(node.value, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 413, in visit
+    return visitor(node, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 719, in visit_Compare
+    return self.visit(binop)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 413, in visit
+    return visitor(node, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 535, in visit_BinOp
+    op, op_class, left, right = self._maybe_transform_eq_ne(node)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 453, in _maybe_transform_eq_ne
+    left = self.visit(node.left, side="left")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 413, in visit
+    return visitor(node, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/expr.py", line 545, in visit_Name
+    return self.term_type(node.id, self.env, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/ops.py", line 91, in __init__
+    self._value = self._resolve_name()
+                  ^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/ops.py", line 115, in _resolve_name
+    res = self.env.resolve(local_name, is_local=is_local)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/.venv/lib/python3.12/site-packages/pandas/core/computation/scope.py", line 244, in resolve
+    raise UndefinedVariableError(key, is_local) from err
+pandas.errors.UndefinedVariableError: name 'experiment' is not defined
+Traceback (most recent call last):
+  File "/home/suhani/Multi_Agent_RL-FAI-/scripts/reproduce_all.py", line 220, in <module>
+    main()
+  File "/home/suhani/Multi_Agent_RL-FAI-/scripts/reproduce_all.py", line 197, in main
+    run([f"scripts/{configs[0]}", *configs[1:], *extra])
+  File "/home/suhani/Multi_Agent_RL-FAI-/scripts/reproduce_all.py", line 98, in run
+    subprocess.run([PY, *args], cwd=ROOT, check=True, env={**os.environ, **CHILD_ENV})
+  File "/home/apps/python/Python-3.12.8/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/home/suhani/Multi_Agent_RL-FAI-/.venv/bin/python', 'scripts/welfare_rerun.py', '--from-records', '--workers', '48']' returned non-zero exit status 1.

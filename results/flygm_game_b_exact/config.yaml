@@ -49,7 +49,7 @@ stats:
   confidence: 0.95
 lr:
   flygm: 0.01
-  flygm_random_sparse: 0.01
+  flygm_random_sparse: 0.003
   flygm_rewired: 0.01
 tuning:
   seeds:

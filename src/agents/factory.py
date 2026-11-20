@@ -20,7 +20,24 @@ from .policies import (
     readout_param_count,
 )
 
-CIRCUIT_ARMS = ("connectome", "rewired", "random_sparse")
+# rewired_block: degree-preserving rewire that also keeps the edge count between every
+# pair of cell groups (PPL1, MBON, path neurons, one-hop partners, AVLP727m)
+# connectome_shortcut / rewired_noshortcut: the real graph with direct PPL1 -> AVLP727m
+# edges added, and a degree-preserving rewire with them forbidden (the real circuit has
+# none). connectome_signshuffle: real graph, excitatory/inhibitory labels shuffled.
+CIRCUIT_ARMS = (
+    "connectome",
+    "rewired",
+    "random_sparse",
+    "rewired_block",
+    "connectome_shortcut",
+    "rewired_noshortcut",
+    "connectome_signshuffle",
+    # E/I shuffles that leave unsigned neurons unconstrained: across all signed neurons,
+    # and within each cell group
+    "connectome_signshuffle_signed",
+    "connectome_signshuffle_stage",
+)
 # FlyGM arms: same three graphs, but the synapses are frozen and the neurons train
 # (src/agents/flygm.py). Each one maps to the graph its weights come from.
 FLYGM_GRAPH = {"flygm": "connectome", "flygm_rewired": "rewired", "flygm_random_sparse": "random_sparse"}
@@ -28,7 +45,12 @@ FLYGM_ARMS = tuple(FLYGM_GRAPH)
 GRAPH_ARMS = (*CIRCUIT_ARMS, *FLYGM_ARMS)  # arms that need a CircuitSpec
 NETWORK_ARMS = ("dense", *CIRCUIT_ARMS, *FLYGM_ARMS)
 ALL_ARMS = ("oracle", "tabular", *NETWORK_ARMS)
-D_IN = 1  # context feature: V/c in Game A, the private value v in Game B
+D_IN = 1  # context feature: V/c in Game A, the private value v in Game B (Game C: see input_dim)
+
+
+def input_dim(game: Game) -> int:
+    """Number of input features per context: 1 in Games A and B, ``game.input_dim`` in C."""
+    return int(getattr(game, "input_dim", D_IN))
 
 
 def graph_name(arm_name: str) -> str:
@@ -72,17 +94,21 @@ def readout_settings(net_cfg: dict[str, Any], key: str = "readout") -> tuple[str
     return str(nodes), int(net_cfg.get("readout_rank", 0)) if nodes == "all" else 0
 
 
-def circuit_param_count(spec: CircuitSpec, n_bins: int, readout_nodes: str = "output", readout_rank: int = 0) -> int:
+def circuit_param_count(
+    spec: CircuitSpec, n_bins: int, readout_nodes: str = "output", readout_rank: int = 0, d_in: int = D_IN
+) -> int:
     """Trainable parameters of one :class:`SparseCircuitPolicy` agent."""
     return (
-        D_IN * len(spec.input_nodes)
+        d_in * len(spec.input_nodes)
         + len(spec.edges)
         + spec.n_neurons
         + readout_param_count(spec.n_neurons, len(spec.output_nodes), n_bins, readout_nodes, readout_rank)
     )
 
 
-def flygm_hidden_width(net_cfg: dict[str, Any], target_params: int | None, n_bins: int, spec: CircuitSpec) -> int:
+def flygm_hidden_width(
+    net_cfg: dict[str, Any], target_params: int | None, n_bins: int, spec: CircuitSpec, d_in: int = D_IN
+) -> int:
     """Width of ``f_psi``: explicit, or solved to match ``target_params``."""
     fly = net_cfg["flygm"]
     width = fly["hidden_width"]
@@ -92,7 +118,7 @@ def flygm_hidden_width(net_cfg: dict[str, Any], target_params: int | None, n_bin
         width = match_flygm_width(
             target_params,
             spec.n_neurons,
-            D_IN,
+            d_in,
             len(spec.input_nodes),
             len(spec.output_nodes),
             n_bins,
@@ -104,14 +130,14 @@ def flygm_hidden_width(net_cfg: dict[str, Any], target_params: int | None, n_bin
     return int(width)
 
 
-def dense_hidden_sizes(net_cfg: dict[str, Any], target_params: int | None, n_bins: int) -> list[int]:
+def dense_hidden_sizes(net_cfg: dict[str, Any], target_params: int | None, n_bins: int, d_in: int = D_IN) -> list[int]:
     """Hidden widths of the dense arm: explicit, or matched to ``target_params``."""
     layers = int(net_cfg["dense_hidden_layers"])
     width = net_cfg["dense_width"]
     if width == "matched":
         if target_params is None:
             raise ValueError("dense_width 'matched' needs the circuit parameter budget")
-        width = match_dense_width(target_params, D_IN, layers, n_bins)
+        width = match_dense_width(target_params, d_in, layers, n_bins)
     return [int(width)] * layers
 
 
@@ -127,12 +153,13 @@ def build_policy(
     """Instantiate the policy of ``arm`` (not the oracle, which has no parameters)."""
     gen = torch.Generator().manual_seed(seed)
     n_bins = game.grid.n_bins
+    d_in = input_dim(game)
     name = arm["name"]
     if name == "tabular":
         return TabularPolicy(n_agents, n_contexts(game), n_bins)
     if name == "dense":
-        hidden = dense_hidden_sizes(net_cfg, budget, n_bins)
-        return DenseMLP(n_agents, D_IN, hidden, n_bins, net_cfg["activation"], gen)
+        hidden = dense_hidden_sizes(net_cfg, budget, n_bins, d_in)
+        return DenseMLP(n_agents, d_in, hidden, n_bins, net_cfg["activation"], gen)
     if name in FLYGM_ARMS:
         if circuit is None:
             raise ValueError(f"arm {name!r} needs a circuit")
@@ -141,7 +168,7 @@ def build_policy(
         fly = net_cfg["flygm"]
         return FlyGMPolicy(
             n_agents=n_agents,
-            d_in=D_IN,
+            d_in=d_in,
             n_neurons=circuit.n_neurons,
             edges=circuit.edges,
             synapses=circuit.synapses,
@@ -152,7 +179,7 @@ def build_policy(
             unroll_steps=int(net_cfg["unroll_steps"]),
             activation=net_cfg["activation"],
             descriptor_dim=int(fly["descriptor_dim"]),
-            hidden_width=flygm_hidden_width(net_cfg, budget, n_bins, circuit),
+            hidden_width=flygm_hidden_width(net_cfg, budget, n_bins, circuit, d_in),
             hidden_layers=int(fly["hidden_layers"]),
             unsigned_sign=float(fly["unsigned_sign"]),
             eta_init_std=float(fly["eta_init_std"]),
@@ -166,7 +193,7 @@ def build_policy(
             raise ValueError(f"arm {name!r} needs a circuit")
         return SparseCircuitPolicy(
             n_agents=n_agents,
-            d_in=D_IN,
+            d_in=d_in,
             n_neurons=circuit.n_neurons,
             edges=circuit.edges,
             input_nodes=circuit.input_nodes,
@@ -181,6 +208,7 @@ def build_policy(
             sparse_max_batch=int(net_cfg["sparse_max_batch"]),
             readout_nodes=readout_settings(net_cfg)[0],
             readout_rank=readout_settings(net_cfg)[1],
+            readout_norm=str(net_cfg.get("readout_norm", "none")),
         )
     raise ValueError(f"unknown arm {name!r}")
 
@@ -215,4 +243,5 @@ __all__ = [
     "flygm_param_count",
     "graph_name",
     "readout_settings",
+    "input_dim",
 ]

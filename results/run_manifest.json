@@ -1,0 +1,305 @@
+{
+  "commit": "unknown",
+  "host": "cn020",
+  "platform": "Linux-3.10.0-1160.el7.x86_64-x86_64-with-glibc2.17",
+  "cpu_count": 48,
+  "python": "3.12.8",
+  "slurm_job_id": "171308",
+  "workers": 48,
+  "heavy_workers": 48,
+  "tuning": true,
+  "resume": true,
+  "started": "2026-11-20 14:20:30",
+  "steps": {
+    "tune-main": {
+      "seconds": 813.6,
+      "workers": 48,
+      "configs": [
+        "game_a_exact",
+        "game_b_exact",
+        "game_a_sampled",
+        "game_b_sampled"
+      ]
+    },
+    "run-main": {
+      "seconds": 484.3,
+      "workers": 48,
+      "configs": [
+        "game_a_exact",
+        "game_b_exact",
+        "game_a_sampled",
+        "game_b_sampled"
+      ]
+    },
+    "run-robust": {
+      "seconds": 77.9,
+      "workers": 48,
+      "configs": [
+        "robust_game_a_sampled_shared_lr",
+        "robust_game_b_exact_shared_lr",
+        "robust_game_b_sampled_shared_lr"
+      ]
+    },
+    "tune-flygm-fast": {
+      "seconds": 2446.6,
+      "workers": 48,
+      "configs": [
+        "flygm_game_a_exact",
+        "flygm_game_a_sampled",
+        "flygm_game_b_exact"
+      ]
+    },
+    "run-flygm-fast": {
+      "seconds": 821.0,
+      "workers": 48,
+      "configs": [
+        "flygm_game_a_exact",
+        "flygm_game_a_sampled",
+        "flygm_game_b_exact"
+      ]
+    },
+    "run-eval1": {
+      "seconds": 55.2,
+      "workers": 48,
+      "configs": [
+        "game_a_exact_eval1"
+      ]
+    },
+    "tune-ppo-a": {
+      "seconds": 1116.5,
+      "workers": 48,
+      "configs": [
+        "ppo_game_a_sampled"
+      ]
+    },
+    "run-ppo-a": {
+      "seconds": 347.8,
+      "workers": 48,
+      "configs": [
+        "ppo_game_a_sampled"
+      ]
+    },
+    "tune-flygm-b-sampled": {
+      "seconds": 2960.7,
+      "workers": 48,
+      "configs": [
+        "flygm_game_b_sampled"
+      ]
+    },
+    "run-flygm-b-sampled": {
+      "seconds": 2496.9,
+      "workers": 48,
+      "configs": [
+        "flygm_game_b_sampled"
+      ]
+    },
+    "tune-ppo-b": {
+      "seconds": 592.2,
+      "workers": 48,
+      "configs": [
+        "ppo_game_b_sampled"
+      ]
+    },
+    "run-ppo-b": {
+      "seconds": 738.4,
+      "workers": 48,
+      "configs": [
+        "ppo_game_b_sampled"
+      ]
+    },
+    "run-robust-ppo": {
+      "seconds": 1064.1,
+      "workers": 48,
+      "configs": [
+        "robust_ppo_game_a_sampled_shared_lr",
+        "robust_ppo_game_b_sampled_shared_lr"
+      ]
+    },
+    "run-robust-flygm": {
+      "seconds": 3239.1,
+      "workers": 48,
+      "configs": [
+        "robust_flygm_game_b_exact_shared_lr",
+        "robust_flygm_game_b_sampled_shared_lr"
+      ]
+    },
+    "tune-readout-a": {
+      "seconds": 232.1,
+      "workers": 48,
+      "configs": [
+        "readout_game_a_exact",
+        "wgain_game_a_exact"
+      ]
+    },
+    "run-readout-a": {
+      "seconds": 98.5,
+      "workers": 48,
+      "configs": [
+        "readout_game_a_exact",
+        "wgain_game_a_exact"
+      ]
+    },
+    "tune-readout-b": {
+      "seconds": 4217.6,
+      "workers": 48,
+      "configs": [
+        "readout_game_b_exact",
+        "wgain_game_b_exact"
+      ]
+    },
+    "run-readout-b": {
+      "seconds": 1765.1,
+      "workers": 48,
+      "configs": [
+        "readout_game_b_exact",
+        "wgain_game_b_exact"
+      ]
+    },
+    "run-popsize": {
+      "seconds": 118.6,
+      "workers": 48,
+      "configs": [
+        "popsize_game_a_sampled"
+      ]
+    },
+    "run-review": {
+      "seconds": 85.2,
+      "workers": 48,
+      "configs": [
+        "popnash_game_a_sampled",
+        "lrsweep_game_a_exact",
+        "lrsweep_game_b_exact"
+      ]
+    },
+    "validate-asymmetric": {
+      "seconds": 365.9,
+      "workers": 48,
+      "configs": [
+        "validate_asymmetric.py"
+      ]
+    },
+    "path-diagnostics": {
+      "seconds": 9.7,
+      "workers": 48,
+      "configs": [
+        "path_diagnostics.py"
+      ]
+    },
+    "welfare-from-records": {
+      "seconds": 15.9,
+      "workers": 48,
+      "configs": [
+        "welfare_rerun.py",
+        "--from-records"
+      ]
+    },
+    "analyze": {
+      "seconds": 36.1,
+      "workers": 48,
+      "configs": [
+        "analyze.py"
+      ]
+    },
+    "welfare": {
+      "seconds": 18.1,
+      "workers": 48,
+      "configs": [
+        "welfare.py"
+      ]
+    },
+    "figures": {
+      "seconds": 31.9,
+      "workers": 48,
+      "configs": [
+        "make_figures.py"
+      ]
+    },
+    "run-scale-sensitivity": {
+      "seconds": 669.7,
+      "workers": 48,
+      "configs": [
+        "scalenorm_game_a_exact",
+        "scalenorm_game_b_exact",
+        "scalenorm_game_b_sampled",
+        "sensitivity_syn3_game_b_exact",
+        "sensitivity_syn10_game_b_exact"
+      ]
+    },
+    "run-unroll-seeds20": {
+      "seconds": 677.5,
+      "workers": 48,
+      "configs": [
+        "unroll_game_b_exact",
+        "seeds20_game_b_sampled"
+      ]
+    },
+    "tune-gamec": {
+      "seconds": 3289.1,
+      "workers": 48,
+      "configs": [
+        "gamec_exact",
+        "gamec_pop_exact",
+        "gamec_sampled",
+        "gamec_pop_sampled"
+      ]
+    },
+    "run-gamec": {
+      "seconds": 1839.9,
+      "workers": 48,
+      "configs": [
+        "gamec_exact",
+        "gamec_pop_exact",
+        "gamec_sampled",
+        "gamec_pop_sampled"
+      ]
+    },
+    "run-gamec-checks": {
+      "seconds": 5334.0,
+      "workers": 48,
+      "configs": [
+        "gamec_shared_exact",
+        "gamec_pop_shared_exact",
+        "gamec_readout_all_exact",
+        "gamec_unroll_exact",
+        "gamec_robust_sampled",
+        "gamec_pop_robust_sampled"
+      ]
+    },
+    "run-block-long": {
+      "seconds": 11244.0,
+      "workers": 48,
+      "configs": [
+        "block_gamec_sampled",
+        "block_gamec_pop_sampled",
+        "block_gamec_exact",
+        "block_game_b_sampled",
+        "long_gamec_sampled",
+        "long_gamec_pop_sampled"
+      ]
+    },
+    "run-shortcut": {
+      "seconds": 7244.0,
+      "workers": 48,
+      "configs": [
+        "shortcut_gamec_sampled",
+        "shortcut_gamec_pop_sampled",
+        "shortcut_game_b_sampled",
+        "dose_gamec_sampled",
+        "dose_game_b_sampled"
+      ]
+    },
+    "run-signs": {
+      "seconds": 2513.6,
+      "workers": 48,
+      "configs": [
+        "signs_gamec_sampled",
+        "signs_gamec_pop_sampled",
+        "signs_game_b_sampled"
+      ]
+    }
+  },
+  "torch": "2.6.0+cpu",
+  "numpy": "2.0.2",
+  "total_minutes": 41.9,
+  "finished": "2026-11-20 15:02:24"
+}

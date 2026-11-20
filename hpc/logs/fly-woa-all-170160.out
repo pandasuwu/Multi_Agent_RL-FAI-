@@ -1,0 +1,524 @@
+==========================================
+SLURM_CLUSTER_NAME = paramananta
+SLURM_ARRAY_JOB_ID = 
+SLURM_ARRAY_TASK_ID = 
+SLURM_ARRAY_TASK_COUNT = 
+SLURM_ARRAY_TASK_MAX = 
+SLURM_ARRAY_TASK_MIN = 
+SLURM_JOB_ACCOUNT = iitgn
+SLURM_JOB_ID = 170160
+SLURM_JOB_NAME = fly-woa-all
+SLURM_JOB_NODELIST = cn006
+SLURM_JOB_USER = suhani
+SLURM_JOB_UID = 40500
+SLURM_JOB_PARTITION = small
+SLURM_TASK_PID = 11499
+SLURM_SUBMIT_DIR = /home/suhani/Multi_Agent_RL-FAI-
+SLURM_CPUS_ON_NODE = 48
+SLURM_NTASKS = 1
+SLURM_TASK_PID = 11499
+==========================================
+job 170160 on cn006, 48 workers (48 heavy), commit unknown
+........................................................................ [ 49%]
+.........................................s.............................. [ 99%]
+.                                                                        [100%]
+144 passed, 1 skipped in 137.71s (0:02:17)
+=== 2026-11-19 14:44:19 commit unknown on cn006 (48 cpus), steps: run-unroll-seeds20, tune-gamec, run-gamec, run-gamec-checks ===
++ scripts/run_experiment.py configs/unroll_game_b_exact.yaml configs/seeds20_game_b_sampled.yaml --workers 48
+[unroll_game_b_exact] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[unroll_game_b_exact] 240 runs to do on 48 workers
+[unroll_game_b_exact] 24/240 runs, 23s elapsed
+[unroll_game_b_exact] 48/240 runs, 26s elapsed
+[unroll_game_b_exact] 72/240 runs, 36s elapsed
+[unroll_game_b_exact] 96/240 runs, 40s elapsed
+[unroll_game_b_exact] 120/240 runs, 49s elapsed
+[unroll_game_b_exact] 144/240 runs, 61s elapsed
+[unroll_game_b_exact] 168/240 runs, 67s elapsed
+[unroll_game_b_exact] 192/240 runs, 82s elapsed
+[unroll_game_b_exact] 216/240 runs, 85s elapsed
+[unroll_game_b_exact] 240/240 runs, 98s elapsed
+[seeds20_game_b_sampled] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[seeds20_game_b_sampled] 240 runs to do on 48 workers
+[seeds20_game_b_sampled] 24/240 runs, 119s elapsed
+[seeds20_game_b_sampled] 48/240 runs, 128s elapsed
+[seeds20_game_b_sampled] 72/240 runs, 227s elapsed
+[seeds20_game_b_sampled] 96/240 runs, 248s elapsed
+[seeds20_game_b_sampled] 120/240 runs, 333s elapsed
+[seeds20_game_b_sampled] 144/240 runs, 368s elapsed
+[seeds20_game_b_sampled] 168/240 runs, 440s elapsed
+[seeds20_game_b_sampled] 192/240 runs, 484s elapsed
+[seeds20_game_b_sampled] 216/240 runs, 541s elapsed
+[seeds20_game_b_sampled] 240/240 runs, 572s elapsed
+run-unroll-seeds20: 677 s wall (48 workers)
++ scripts/tune_lr.py configs/gamec_exact.yaml configs/gamec_pop_exact.yaml configs/gamec_sampled.yaml configs/gamec_pop_sampled.yaml --workers 48
+[gamec_exact__lr=0.001] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_exact__lr=0.001] 21 runs to do on 48 workers
+[gamec_exact__lr=0.001] 2/21 runs, 14s elapsed
+[gamec_exact__lr=0.001] 4/21 runs, 32s elapsed
+[gamec_exact__lr=0.001] 6/21 runs, 32s elapsed
+[gamec_exact__lr=0.001] 8/21 runs, 32s elapsed
+[gamec_exact__lr=0.001] 10/21 runs, 33s elapsed
+[gamec_exact__lr=0.001] 12/21 runs, 33s elapsed
+[gamec_exact__lr=0.001] 14/21 runs, 33s elapsed
+[gamec_exact__lr=0.001] 16/21 runs, 33s elapsed
+[gamec_exact__lr=0.001] 18/21 runs, 34s elapsed
+[gamec_exact__lr=0.001] 20/21 runs, 34s elapsed
+[gamec_exact__lr=0.001] 21/21 runs, 35s elapsed
+[gamec_exact__lr=0.003] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_exact__lr=0.003] 21 runs to do on 48 workers
+[gamec_exact__lr=0.003] 2/21 runs, 15s elapsed
+[gamec_exact__lr=0.003] 4/21 runs, 32s elapsed
+[gamec_exact__lr=0.003] 6/21 runs, 32s elapsed
+[gamec_exact__lr=0.003] 8/21 runs, 33s elapsed
+[gamec_exact__lr=0.003] 10/21 runs, 33s elapsed
+[gamec_exact__lr=0.003] 12/21 runs, 33s elapsed
+[gamec_exact__lr=0.003] 14/21 runs, 33s elapsed
+[gamec_exact__lr=0.003] 16/21 runs, 33s elapsed
+[gamec_exact__lr=0.003] 18/21 runs, 34s elapsed
+[gamec_exact__lr=0.003] 20/21 runs, 34s elapsed
+[gamec_exact__lr=0.003] 21/21 runs, 34s elapsed
+[gamec_exact__lr=0.01] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_exact__lr=0.01] 21 runs to do on 48 workers
+[gamec_exact__lr=0.01] 2/21 runs, 15s elapsed
+[gamec_exact__lr=0.01] 4/21 runs, 32s elapsed
+[gamec_exact__lr=0.01] 6/21 runs, 32s elapsed
+[gamec_exact__lr=0.01] 8/21 runs, 32s elapsed
+[gamec_exact__lr=0.01] 10/21 runs, 32s elapsed
+[gamec_exact__lr=0.01] 12/21 runs, 33s elapsed
+[gamec_exact__lr=0.01] 14/21 runs, 33s elapsed
+[gamec_exact__lr=0.01] 16/21 runs, 33s elapsed
+[gamec_exact__lr=0.01] 18/21 runs, 33s elapsed
+[gamec_exact__lr=0.01] 20/21 runs, 34s elapsed
+[gamec_exact__lr=0.01] 21/21 runs, 35s elapsed
+[gamec_exact__lr=0.03] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_exact__lr=0.03] 24 runs to do on 48 workers
+[gamec_exact__lr=0.03] 2/24 runs, 12s elapsed
+[gamec_exact__lr=0.03] 4/24 runs, 15s elapsed
+[gamec_exact__lr=0.03] 6/24 runs, 15s elapsed
+[gamec_exact__lr=0.03] 8/24 runs, 32s elapsed
+[gamec_exact__lr=0.03] 10/24 runs, 32s elapsed
+[gamec_exact__lr=0.03] 12/24 runs, 33s elapsed
+[gamec_exact__lr=0.03] 14/24 runs, 33s elapsed
+[gamec_exact__lr=0.03] 16/24 runs, 33s elapsed
+[gamec_exact__lr=0.03] 18/24 runs, 33s elapsed
+[gamec_exact__lr=0.03] 20/24 runs, 33s elapsed
+[gamec_exact__lr=0.03] 22/24 runs, 34s elapsed
+[gamec_exact__lr=0.03] 24/24 runs, 35s elapsed
+[gamec_exact__lr=0.1] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_exact__lr=0.1] 24 runs to do on 48 workers
+[gamec_exact__lr=0.1] 2/24 runs, 12s elapsed
+[gamec_exact__lr=0.1] 4/24 runs, 15s elapsed
+[gamec_exact__lr=0.1] 6/24 runs, 17s elapsed
+[gamec_exact__lr=0.1] 8/24 runs, 32s elapsed
+[gamec_exact__lr=0.1] 10/24 runs, 33s elapsed
+[gamec_exact__lr=0.1] 12/24 runs, 33s elapsed
+[gamec_exact__lr=0.1] 14/24 runs, 33s elapsed
+[gamec_exact__lr=0.1] 16/24 runs, 33s elapsed
+[gamec_exact__lr=0.1] 18/24 runs, 34s elapsed
+[gamec_exact__lr=0.1] 20/24 runs, 34s elapsed
+[gamec_exact__lr=0.1] 22/24 runs, 34s elapsed
+[gamec_exact__lr=0.1] 24/24 runs, 36s elapsed
+[gamec_exact__lr=0.3] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_exact__lr=0.3] 24 runs to do on 48 workers
+[gamec_exact__lr=0.3] 2/24 runs, 12s elapsed
+[gamec_exact__lr=0.3] 4/24 runs, 17s elapsed
+[gamec_exact__lr=0.3] 6/24 runs, 20s elapsed
+[gamec_exact__lr=0.3] 8/24 runs, 33s elapsed
+[gamec_exact__lr=0.3] 10/24 runs, 33s elapsed
+[gamec_exact__lr=0.3] 12/24 runs, 33s elapsed
+[gamec_exact__lr=0.3] 14/24 runs, 33s elapsed
+[gamec_exact__lr=0.3] 16/24 runs, 34s elapsed
+[gamec_exact__lr=0.3] 18/24 runs, 34s elapsed
+[gamec_exact__lr=0.3] 20/24 runs, 34s elapsed
+[gamec_exact__lr=0.3] 22/24 runs, 35s elapsed
+[gamec_exact__lr=0.3] 24/24 runs, 37s elapsed
+[gamec_exact__lr=1] 3 runs to do on 48 workers
+[gamec_exact__lr=1] 1/3 runs, 12s elapsed
+[gamec_exact__lr=1] 2/3 runs, 12s elapsed
+[gamec_exact__lr=1] 3/3 runs, 12s elapsed
+[gamec_exact] chosen learning rates: {'tabular': 1.0, 'dense': 0.01, 'connectome': 0.01, 'connectome+sign': 0.03, 'rewired': 0.01, 'rewired+sign': 0.03, 'random_sparse': 0.01, 'random_sparse+sign': 0.03}
+[gamec_pop_exact__lr=0.001] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_exact__lr=0.001] 21 runs to do on 48 workers
+[gamec_pop_exact__lr=0.001] 2/21 runs, 15s elapsed
+[gamec_pop_exact__lr=0.001] 4/21 runs, 32s elapsed
+[gamec_pop_exact__lr=0.001] 6/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.001] 8/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.001] 10/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.001] 12/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.001] 14/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.001] 16/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.001] 18/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.001] 20/21 runs, 34s elapsed
+[gamec_pop_exact__lr=0.001] 21/21 runs, 34s elapsed
+[gamec_pop_exact__lr=0.003] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_exact__lr=0.003] 21 runs to do on 48 workers
+[gamec_pop_exact__lr=0.003] 2/21 runs, 15s elapsed
+[gamec_pop_exact__lr=0.003] 4/21 runs, 32s elapsed
+[gamec_pop_exact__lr=0.003] 6/21 runs, 32s elapsed
+[gamec_pop_exact__lr=0.003] 8/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.003] 10/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.003] 12/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.003] 14/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.003] 16/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.003] 18/21 runs, 34s elapsed
+[gamec_pop_exact__lr=0.003] 20/21 runs, 34s elapsed
+[gamec_pop_exact__lr=0.003] 21/21 runs, 36s elapsed
+[gamec_pop_exact__lr=0.01] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_exact__lr=0.01] 21 runs to do on 48 workers
+[gamec_pop_exact__lr=0.01] 2/21 runs, 15s elapsed
+[gamec_pop_exact__lr=0.01] 4/21 runs, 32s elapsed
+[gamec_pop_exact__lr=0.01] 6/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.01] 8/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.01] 10/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.01] 12/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.01] 14/21 runs, 33s elapsed
+[gamec_pop_exact__lr=0.01] 16/21 runs, 34s elapsed
+[gamec_pop_exact__lr=0.01] 18/21 runs, 34s elapsed
+[gamec_pop_exact__lr=0.01] 20/21 runs, 34s elapsed
+[gamec_pop_exact__lr=0.01] 21/21 runs, 34s elapsed
+[gamec_pop_exact__lr=0.03] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_exact__lr=0.03] 24 runs to do on 48 workers
+[gamec_pop_exact__lr=0.03] 2/24 runs, 12s elapsed
+[gamec_pop_exact__lr=0.03] 4/24 runs, 15s elapsed
+[gamec_pop_exact__lr=0.03] 6/24 runs, 15s elapsed
+[gamec_pop_exact__lr=0.03] 8/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.03] 10/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.03] 12/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.03] 14/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.03] 16/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.03] 18/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.03] 20/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.03] 22/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.03] 24/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.1] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_exact__lr=0.1] 24 runs to do on 48 workers
+[gamec_pop_exact__lr=0.1] 2/24 runs, 12s elapsed
+[gamec_pop_exact__lr=0.1] 4/24 runs, 15s elapsed
+[gamec_pop_exact__lr=0.1] 6/24 runs, 18s elapsed
+[gamec_pop_exact__lr=0.1] 8/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.1] 10/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.1] 12/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.1] 14/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.1] 16/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.1] 18/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.1] 20/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.1] 22/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.1] 24/24 runs, 37s elapsed
+[gamec_pop_exact__lr=0.3] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_exact__lr=0.3] 24 runs to do on 48 workers
+[gamec_pop_exact__lr=0.3] 2/24 runs, 12s elapsed
+[gamec_pop_exact__lr=0.3] 4/24 runs, 15s elapsed
+[gamec_pop_exact__lr=0.3] 6/24 runs, 22s elapsed
+[gamec_pop_exact__lr=0.3] 8/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.3] 10/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.3] 12/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.3] 14/24 runs, 33s elapsed
+[gamec_pop_exact__lr=0.3] 16/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.3] 18/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.3] 20/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.3] 22/24 runs, 34s elapsed
+[gamec_pop_exact__lr=0.3] 24/24 runs, 39s elapsed
+[gamec_pop_exact__lr=1] 3 runs to do on 48 workers
+[gamec_pop_exact__lr=1] 1/3 runs, 12s elapsed
+[gamec_pop_exact__lr=1] 2/3 runs, 12s elapsed
+[gamec_pop_exact__lr=1] 3/3 runs, 12s elapsed
+[gamec_pop_exact] chosen learning rates: {'tabular': 1.0, 'dense': 0.01, 'connectome': 0.01, 'connectome+sign': 0.03, 'rewired': 0.01, 'rewired+sign': 0.03, 'random_sparse': 0.01, 'random_sparse+sign': 0.03}
+[gamec_sampled__lr=0.0001] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_sampled__lr=0.0001] 21 runs to do on 48 workers
+[gamec_sampled__lr=0.0001] 2/21 runs, 25s elapsed
+[gamec_sampled__lr=0.0001] 4/21 runs, 188s elapsed
+[gamec_sampled__lr=0.0001] 6/21 runs, 204s elapsed
+[gamec_sampled__lr=0.0001] 8/21 runs, 208s elapsed
+[gamec_sampled__lr=0.0001] 10/21 runs, 211s elapsed
+[gamec_sampled__lr=0.0001] 12/21 runs, 213s elapsed
+[gamec_sampled__lr=0.0001] 14/21 runs, 215s elapsed
+[gamec_sampled__lr=0.0001] 16/21 runs, 218s elapsed
+[gamec_sampled__lr=0.0001] 18/21 runs, 219s elapsed
+[gamec_sampled__lr=0.0001] 20/21 runs, 221s elapsed
+[gamec_sampled__lr=0.0001] 21/21 runs, 226s elapsed
+[gamec_sampled__lr=0.0003] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_sampled__lr=0.0003] 21 runs to do on 48 workers
+[gamec_sampled__lr=0.0003] 2/21 runs, 25s elapsed
+[gamec_sampled__lr=0.0003] 4/21 runs, 167s elapsed
+[gamec_sampled__lr=0.0003] 6/21 runs, 201s elapsed
+[gamec_sampled__lr=0.0003] 8/21 runs, 208s elapsed
+[gamec_sampled__lr=0.0003] 10/21 runs, 213s elapsed
+[gamec_sampled__lr=0.0003] 12/21 runs, 214s elapsed
+[gamec_sampled__lr=0.0003] 14/21 runs, 215s elapsed
+[gamec_sampled__lr=0.0003] 16/21 runs, 217s elapsed
+[gamec_sampled__lr=0.0003] 18/21 runs, 218s elapsed
+[gamec_sampled__lr=0.0003] 20/21 runs, 222s elapsed
+[gamec_sampled__lr=0.0003] 21/21 runs, 222s elapsed
+[gamec_sampled__lr=0.001] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_sampled__lr=0.001] 21 runs to do on 48 workers
+[gamec_sampled__lr=0.001] 2/21 runs, 25s elapsed
+[gamec_sampled__lr=0.001] 4/21 runs, 186s elapsed
+[gamec_sampled__lr=0.001] 6/21 runs, 205s elapsed
+[gamec_sampled__lr=0.001] 8/21 runs, 210s elapsed
+[gamec_sampled__lr=0.001] 10/21 runs, 211s elapsed
+[gamec_sampled__lr=0.001] 12/21 runs, 215s elapsed
+[gamec_sampled__lr=0.001] 14/21 runs, 217s elapsed
+[gamec_sampled__lr=0.001] 16/21 runs, 218s elapsed
+[gamec_sampled__lr=0.001] 18/21 runs, 218s elapsed
+[gamec_sampled__lr=0.001] 20/21 runs, 219s elapsed
+[gamec_sampled__lr=0.001] 21/21 runs, 225s elapsed
+[gamec_sampled__lr=0.003] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_sampled__lr=0.003] 24 runs to do on 48 workers
+[gamec_sampled__lr=0.003] 2/24 runs, 22s elapsed
+[gamec_sampled__lr=0.003] 4/24 runs, 24s elapsed
+[gamec_sampled__lr=0.003] 6/24 runs, 25s elapsed
+[gamec_sampled__lr=0.003] 8/24 runs, 205s elapsed
+[gamec_sampled__lr=0.003] 10/24 runs, 206s elapsed
+[gamec_sampled__lr=0.003] 12/24 runs, 207s elapsed
+[gamec_sampled__lr=0.003] 14/24 runs, 212s elapsed
+[gamec_sampled__lr=0.003] 16/24 runs, 214s elapsed
+[gamec_sampled__lr=0.003] 18/24 runs, 216s elapsed
+[gamec_sampled__lr=0.003] 20/24 runs, 219s elapsed
+[gamec_sampled__lr=0.003] 22/24 runs, 220s elapsed
+[gamec_sampled__lr=0.003] 24/24 runs, 224s elapsed
+[gamec_sampled__lr=0.01] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_sampled__lr=0.01] 24 runs to do on 48 workers
+[gamec_sampled__lr=0.01] 2/24 runs, 22s elapsed
+[gamec_sampled__lr=0.01] 4/24 runs, 25s elapsed
+[gamec_sampled__lr=0.01] 6/24 runs, 28s elapsed
+[gamec_sampled__lr=0.01] 8/24 runs, 163s elapsed
+[gamec_sampled__lr=0.01] 10/24 runs, 198s elapsed
+[gamec_sampled__lr=0.01] 12/24 runs, 199s elapsed
+[gamec_sampled__lr=0.01] 14/24 runs, 203s elapsed
+[gamec_sampled__lr=0.01] 16/24 runs, 213s elapsed
+[gamec_sampled__lr=0.01] 18/24 runs, 215s elapsed
+[gamec_sampled__lr=0.01] 20/24 runs, 216s elapsed
+[gamec_sampled__lr=0.01] 22/24 runs, 220s elapsed
+[gamec_sampled__lr=0.01] 24/24 runs, 226s elapsed
+[gamec_sampled__lr=0.03] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_sampled__lr=0.03] 24 runs to do on 48 workers
+[gamec_sampled__lr=0.03] 2/24 runs, 21s elapsed
+[gamec_sampled__lr=0.03] 4/24 runs, 25s elapsed
+[gamec_sampled__lr=0.03] 6/24 runs, 27s elapsed
+[gamec_sampled__lr=0.03] 8/24 runs, 167s elapsed
+[gamec_sampled__lr=0.03] 10/24 runs, 187s elapsed
+[gamec_sampled__lr=0.03] 12/24 runs, 202s elapsed
+[gamec_sampled__lr=0.03] 14/24 runs, 207s elapsed
+[gamec_sampled__lr=0.03] 16/24 runs, 214s elapsed
+[gamec_sampled__lr=0.03] 18/24 runs, 216s elapsed
+[gamec_sampled__lr=0.03] 20/24 runs, 218s elapsed
+[gamec_sampled__lr=0.03] 22/24 runs, 220s elapsed
+[gamec_sampled__lr=0.03] 24/24 runs, 260s elapsed
+[gamec_sampled__lr=0.1] 3 runs to do on 48 workers
+[gamec_sampled__lr=0.1] 1/3 runs, 19s elapsed
+[gamec_sampled__lr=0.1] 2/3 runs, 20s elapsed
+[gamec_sampled__lr=0.1] 3/3 runs, 22s elapsed
+[gamec_sampled] chosen learning rates: {'tabular': 0.03, 'dense': 0.003, 'connectome': 0.01, 'connectome+sign': 0.003, 'rewired': 0.003, 'rewired+sign': 0.003, 'random_sparse': 0.003, 'random_sparse+sign': 0.003}
+[gamec_pop_sampled__lr=0.0001] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_sampled__lr=0.0001] 21 runs to do on 48 workers
+[gamec_pop_sampled__lr=0.0001] 2/21 runs, 26s elapsed
+[gamec_pop_sampled__lr=0.0001] 4/21 runs, 201s elapsed
+[gamec_pop_sampled__lr=0.0001] 6/21 runs, 212s elapsed
+[gamec_pop_sampled__lr=0.0001] 8/21 runs, 212s elapsed
+[gamec_pop_sampled__lr=0.0001] 10/21 runs, 214s elapsed
+[gamec_pop_sampled__lr=0.0001] 12/21 runs, 216s elapsed
+[gamec_pop_sampled__lr=0.0001] 14/21 runs, 218s elapsed
+[gamec_pop_sampled__lr=0.0001] 16/21 runs, 218s elapsed
+[gamec_pop_sampled__lr=0.0001] 18/21 runs, 219s elapsed
+[gamec_pop_sampled__lr=0.0001] 20/21 runs, 226s elapsed
+[gamec_pop_sampled__lr=0.0001] 21/21 runs, 229s elapsed
+[gamec_pop_sampled__lr=0.0003] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_sampled__lr=0.0003] 21 runs to do on 48 workers
+[gamec_pop_sampled__lr=0.0003] 2/21 runs, 26s elapsed
+[gamec_pop_sampled__lr=0.0003] 4/21 runs, 197s elapsed
+[gamec_pop_sampled__lr=0.0003] 6/21 runs, 212s elapsed
+[gamec_pop_sampled__lr=0.0003] 8/21 runs, 212s elapsed
+[gamec_pop_sampled__lr=0.0003] 10/21 runs, 214s elapsed
+[gamec_pop_sampled__lr=0.0003] 12/21 runs, 215s elapsed
+[gamec_pop_sampled__lr=0.0003] 14/21 runs, 219s elapsed
+[gamec_pop_sampled__lr=0.0003] 16/21 runs, 221s elapsed
+[gamec_pop_sampled__lr=0.0003] 18/21 runs, 222s elapsed
+[gamec_pop_sampled__lr=0.0003] 20/21 runs, 223s elapsed
+[gamec_pop_sampled__lr=0.0003] 21/21 runs, 227s elapsed
+[gamec_pop_sampled__lr=0.001] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_sampled__lr=0.001] 21 runs to do on 48 workers
+[gamec_pop_sampled__lr=0.001] 2/21 runs, 26s elapsed
+[gamec_pop_sampled__lr=0.001] 4/21 runs, 181s elapsed
+[gamec_pop_sampled__lr=0.001] 6/21 runs, 205s elapsed
+[gamec_pop_sampled__lr=0.001] 8/21 runs, 212s elapsed
+[gamec_pop_sampled__lr=0.001] 10/21 runs, 214s elapsed
+[gamec_pop_sampled__lr=0.001] 12/21 runs, 217s elapsed
+[gamec_pop_sampled__lr=0.001] 14/21 runs, 217s elapsed
+[gamec_pop_sampled__lr=0.001] 16/21 runs, 217s elapsed
+[gamec_pop_sampled__lr=0.001] 18/21 runs, 218s elapsed
+[gamec_pop_sampled__lr=0.001] 20/21 runs, 219s elapsed
+[gamec_pop_sampled__lr=0.001] 21/21 runs, 220s elapsed
+[gamec_pop_sampled__lr=0.003] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_sampled__lr=0.003] 24 runs to do on 48 workers
+[gamec_pop_sampled__lr=0.003] 2/24 runs, 21s elapsed
+[gamec_pop_sampled__lr=0.003] 4/24 runs, 26s elapsed
+[gamec_pop_sampled__lr=0.003] 6/24 runs, 26s elapsed
+[gamec_pop_sampled__lr=0.003] 8/24 runs, 214s elapsed
+[gamec_pop_sampled__lr=0.003] 10/24 runs, 214s elapsed
+[gamec_pop_sampled__lr=0.003] 12/24 runs, 215s elapsed
+[gamec_pop_sampled__lr=0.003] 14/24 runs, 216s elapsed
+[gamec_pop_sampled__lr=0.003] 16/24 runs, 217s elapsed
+[gamec_pop_sampled__lr=0.003] 18/24 runs, 218s elapsed
+[gamec_pop_sampled__lr=0.003] 20/24 runs, 219s elapsed
+[gamec_pop_sampled__lr=0.003] 22/24 runs, 221s elapsed
+[gamec_pop_sampled__lr=0.003] 24/24 runs, 224s elapsed
+[gamec_pop_sampled__lr=0.01] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_sampled__lr=0.01] 24 runs to do on 48 workers
+[gamec_pop_sampled__lr=0.01] 2/24 runs, 22s elapsed
+[gamec_pop_sampled__lr=0.01] 4/24 runs, 26s elapsed
+[gamec_pop_sampled__lr=0.01] 6/24 runs, 27s elapsed
+[gamec_pop_sampled__lr=0.01] 8/24 runs, 207s elapsed
+[gamec_pop_sampled__lr=0.01] 10/24 runs, 210s elapsed
+[gamec_pop_sampled__lr=0.01] 12/24 runs, 214s elapsed
+[gamec_pop_sampled__lr=0.01] 14/24 runs, 216s elapsed
+[gamec_pop_sampled__lr=0.01] 16/24 runs, 217s elapsed
+[gamec_pop_sampled__lr=0.01] 18/24 runs, 218s elapsed
+[gamec_pop_sampled__lr=0.01] 20/24 runs, 218s elapsed
+[gamec_pop_sampled__lr=0.01] 22/24 runs, 221s elapsed
+[gamec_pop_sampled__lr=0.01] 24/24 runs, 225s elapsed
+[gamec_pop_sampled__lr=0.03] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_sampled__lr=0.03] 24 runs to do on 48 workers
+[gamec_pop_sampled__lr=0.03] 2/24 runs, 22s elapsed
+[gamec_pop_sampled__lr=0.03] 4/24 runs, 26s elapsed
+[gamec_pop_sampled__lr=0.03] 6/24 runs, 28s elapsed
+[gamec_pop_sampled__lr=0.03] 8/24 runs, 193s elapsed
+[gamec_pop_sampled__lr=0.03] 10/24 runs, 209s elapsed
+[gamec_pop_sampled__lr=0.03] 12/24 runs, 211s elapsed
+[gamec_pop_sampled__lr=0.03] 14/24 runs, 215s elapsed
+[gamec_pop_sampled__lr=0.03] 16/24 runs, 217s elapsed
+[gamec_pop_sampled__lr=0.03] 18/24 runs, 218s elapsed
+[gamec_pop_sampled__lr=0.03] 20/24 runs, 222s elapsed
+[gamec_pop_sampled__lr=0.03] 22/24 runs, 246s elapsed
+[gamec_pop_sampled__lr=0.03] 24/24 runs, 265s elapsed
+[gamec_pop_sampled__lr=0.1] 3 runs to do on 48 workers
+[gamec_pop_sampled__lr=0.1] 1/3 runs, 19s elapsed
+[gamec_pop_sampled__lr=0.1] 2/3 runs, 20s elapsed
+[gamec_pop_sampled__lr=0.1] 3/3 runs, 21s elapsed
+[gamec_pop_sampled] chosen learning rates: {'tabular': 0.03, 'dense': 0.003, 'connectome': 0.03, 'connectome+sign': 0.003, 'rewired': 0.003, 'rewired+sign': 0.003, 'random_sparse': 0.01, 'random_sparse+sign': 0.003}
+tune-gamec: 3289 s wall (48 workers)
++ scripts/run_experiment.py configs/gamec_exact.yaml configs/gamec_pop_exact.yaml configs/gamec_sampled.yaml configs/gamec_pop_sampled.yaml --workers 48
+[gamec_exact] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_exact] 180 runs to do on 48 workers
+[gamec_exact] 18/180 runs, 6s elapsed
+[gamec_exact] 36/180 runs, 14s elapsed
+[gamec_exact] 54/180 runs, 18s elapsed
+[gamec_exact] 72/180 runs, 43s elapsed
+[gamec_exact] 90/180 runs, 48s elapsed
+[gamec_exact] 108/180 runs, 53s elapsed
+[gamec_exact] 126/180 runs, 76s elapsed
+[gamec_exact] 144/180 runs, 79s elapsed
+[gamec_exact] 162/180 runs, 98s elapsed
+[gamec_exact] 180/180 runs, 103s elapsed
+[gamec_pop_exact] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_exact] 180 runs to do on 48 workers
+[gamec_pop_exact] 18/180 runs, 6s elapsed
+[gamec_pop_exact] 36/180 runs, 14s elapsed
+[gamec_pop_exact] 54/180 runs, 18s elapsed
+[gamec_pop_exact] 72/180 runs, 43s elapsed
+[gamec_pop_exact] 90/180 runs, 48s elapsed
+[gamec_pop_exact] 108/180 runs, 54s elapsed
+[gamec_pop_exact] 126/180 runs, 76s elapsed
+[gamec_pop_exact] 144/180 runs, 79s elapsed
+[gamec_pop_exact] 162/180 runs, 98s elapsed
+[gamec_pop_exact] 180/180 runs, 104s elapsed
+[gamec_sampled] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_sampled] 180 runs to do on 48 workers
+[gamec_sampled] 18/180 runs, 6s elapsed
+[gamec_sampled] 36/180 runs, 24s elapsed
+[gamec_sampled] 54/180 runs, 30s elapsed
+[gamec_sampled] 72/180 runs, 294s elapsed
+[gamec_sampled] 90/180 runs, 309s elapsed
+[gamec_sampled] 108/180 runs, 327s elapsed
+[gamec_sampled] 126/180 runs, 584s elapsed
+[gamec_sampled] 144/180 runs, 594s elapsed
+[gamec_sampled] 162/180 runs, 766s elapsed
+[gamec_sampled] 180/180 runs, 808s elapsed
+[gamec_pop_sampled] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_sampled] 180 runs to do on 48 workers
+[gamec_pop_sampled] 18/180 runs, 6s elapsed
+[gamec_pop_sampled] 36/180 runs, 25s elapsed
+[gamec_pop_sampled] 54/180 runs, 31s elapsed
+[gamec_pop_sampled] 72/180 runs, 295s elapsed
+[gamec_pop_sampled] 90/180 runs, 314s elapsed
+[gamec_pop_sampled] 108/180 runs, 358s elapsed
+[gamec_pop_sampled] 126/180 runs, 585s elapsed
+[gamec_pop_sampled] 144/180 runs, 602s elapsed
+[gamec_pop_sampled] 162/180 runs, 781s elapsed
+[gamec_pop_sampled] 180/180 runs, 814s elapsed
+run-gamec: 1840 s wall (48 workers)
++ scripts/run_experiment.py configs/gamec_shared_exact.yaml configs/gamec_pop_shared_exact.yaml configs/gamec_readout_all_exact.yaml configs/gamec_unroll_exact.yaml configs/gamec_robust_sampled.yaml configs/gamec_pop_robust_sampled.yaml --workers 48
+[gamec_shared_exact] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_shared_exact] 840 runs to do on 48 workers
+[gamec_shared_exact] 84/840 runs, 72s elapsed
+[gamec_shared_exact] 168/840 runs, 115s elapsed
+[gamec_shared_exact] 252/840 runs, 166s elapsed
+[gamec_shared_exact] 336/840 runs, 209s elapsed
+[gamec_shared_exact] 420/840 runs, 258s elapsed
+[gamec_shared_exact] 504/840 runs, 310s elapsed
+[gamec_shared_exact] 588/840 runs, 361s elapsed
+[gamec_shared_exact] 672/840 runs, 403s elapsed
+[gamec_shared_exact] 756/840 runs, 455s elapsed
+[gamec_shared_exact] 840/840 runs, 505s elapsed
+[gamec_pop_shared_exact] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_shared_exact] 840 runs to do on 48 workers
+[gamec_pop_shared_exact] 84/840 runs, 72s elapsed
+[gamec_pop_shared_exact] 168/840 runs, 116s elapsed
+[gamec_pop_shared_exact] 252/840 runs, 165s elapsed
+[gamec_pop_shared_exact] 336/840 runs, 210s elapsed
+[gamec_pop_shared_exact] 420/840 runs, 259s elapsed
+[gamec_pop_shared_exact] 504/840 runs, 311s elapsed
+[gamec_pop_shared_exact] 588/840 runs, 362s elapsed
+[gamec_pop_shared_exact] 672/840 runs, 405s elapsed
+[gamec_pop_shared_exact] 756/840 runs, 458s elapsed
+[gamec_pop_shared_exact] 840/840 runs, 508s elapsed
+[gamec_readout_all_exact] trainable parameters per agent: {'dense': 6652, 'connectome': 6594, 'connectome+sign': 6594, 'rewired': 6594, 'rewired+sign': 6594, 'random_sparse': 6594, 'random_sparse+sign': 6594, 'connectome(budget)': 6594}
+[gamec_readout_all_exact] 420 runs to do on 48 workers
+[gamec_readout_all_exact] 42/420 runs, 42s elapsed
+[gamec_readout_all_exact] 84/420 runs, 74s elapsed
+[gamec_readout_all_exact] 126/420 runs, 88s elapsed
+[gamec_readout_all_exact] 168/420 runs, 118s elapsed
+[gamec_readout_all_exact] 210/420 runs, 146s elapsed
+[gamec_readout_all_exact] 252/420 runs, 170s elapsed
+[gamec_readout_all_exact] 294/420 runs, 199s elapsed
+[gamec_readout_all_exact] 336/420 runs, 235s elapsed
+[gamec_readout_all_exact] 378/420 runs, 271s elapsed
+[gamec_readout_all_exact] 420/420 runs, 1159s elapsed
+[gamec_unroll_exact] trainable parameters per agent: {'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_unroll_exact] 360 runs to do on 48 workers
+[gamec_unroll_exact] 36/360 runs, 35s elapsed
+[gamec_unroll_exact] 72/360 runs, 59s elapsed
+[gamec_unroll_exact] 108/360 runs, 82s elapsed
+[gamec_unroll_exact] 144/360 runs, 97s elapsed
+[gamec_unroll_exact] 180/360 runs, 121s elapsed
+[gamec_unroll_exact] 216/360 runs, 145s elapsed
+[gamec_unroll_exact] 252/360 runs, 179s elapsed
+[gamec_unroll_exact] 288/360 runs, 208s elapsed
+[gamec_unroll_exact] 324/360 runs, 226s elapsed
+[gamec_unroll_exact] 360/360 runs, 252s elapsed
+[gamec_robust_sampled] trainable parameters per agent: {'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[gamec_robust_sampled] 240 runs to do on 48 workers
+[gamec_robust_sampled] 24/240 runs, 287s elapsed
+[gamec_robust_sampled] 48/240 runs, 304s elapsed
+[gamec_robust_sampled] 72/240 runs, 563s elapsed
+[gamec_robust_sampled] 96/240 runs, 598s elapsed
+[gamec_robust_sampled] 120/240 runs, 840s elapsed
+[gamec_robust_sampled] 144/240 runs, 889s elapsed
+[gamec_robust_sampled] 168/240 runs, 1111s elapsed
+[gamec_robust_sampled] 192/240 runs, 1179s elapsed
+[gamec_robust_sampled] 216/240 runs, 1382s elapsed
+[gamec_robust_sampled] 240/240 runs, 1435s elapsed
+[gamec_pop_robust_sampled] trainable parameters per agent: {'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[gamec_pop_robust_sampled] 240 runs to do on 48 workers
+[gamec_pop_robust_sampled] 24/240 runs, 293s elapsed
+[gamec_pop_robust_sampled] 48/240 runs, 306s elapsed
+[gamec_pop_robust_sampled] 72/240 runs, 577s elapsed
+[gamec_pop_robust_sampled] 96/240 runs, 601s elapsed
+[gamec_pop_robust_sampled] 120/240 runs, 859s elapsed
+[gamec_pop_robust_sampled] 144/240 runs, 888s elapsed
+[gamec_pop_robust_sampled] 168/240 runs, 1136s elapsed
+[gamec_pop_robust_sampled] 192/240 runs, 1174s elapsed
+[gamec_pop_robust_sampled] 216/240 runs, 1410s elapsed
+[gamec_pop_robust_sampled] 240/240 runs, 1448s elapsed
+run-gamec-checks: 5334 s wall (48 workers)
+=== total 185.7 min wall ===
+compare_to_committed: git not found (cluster compute node?); run it where git is

@@ -35,6 +35,7 @@ from ..agents.factory import (
     build_policy,
     circuit_param_count,
     graph_name,
+    input_dim,
     readout_settings,
 )
 from ..config import REPO_ROOT, config_hash, deep_merge
@@ -124,7 +125,10 @@ def parameter_budget(cfg: dict[str, Any]) -> int | None:
     if not any(needs_budget(cfg, a["name"]) for a in cfg["arms"]):
         return None
     spec = circuit_for(cfg, {"name": "connectome"}, 0)
-    return circuit_param_count(spec, int(cfg["game"]["n_bins"]), *readout_settings(cfg["network"], "budget_readout"))
+    d_in = input_dim(build_game(cfg["game"]))
+    return circuit_param_count(
+        spec, int(cfg["game"]["n_bins"]), *readout_settings(cfg["network"], "budget_readout"), d_in=d_in
+    )
 
 
 def check_parameter_matching(cfg: dict[str, Any]) -> dict[str, int]:
@@ -141,7 +145,8 @@ def check_parameter_matching(cfg: dict[str, Any]) -> dict[str, int]:
     if counts:
         # always compare against the connectome arm's count, even in FlyGM-only configs
         counts["connectome(budget)"] = budget if budget is not None else circuit_param_count(
-            circuit_for(cfg, {"name": "connectome"}, 0), int(cfg["game"]["n_bins"]), *readout_settings(cfg["network"])
+            circuit_for(cfg, {"name": "connectome"}, 0), int(cfg["game"]["n_bins"]), *readout_settings(cfg["network"]),
+            d_in=input_dim(game),
         )
         # and against dense
         if budget is not None and "dense" not in counts and cfg["network"]["dense_width"] == "matched":
@@ -197,7 +202,10 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
             welfare=out.welfare,
             # arm-specific diagnostics (FlyGM: unsigned_sign used, spectral radius
             # before scaling, input-to-output gain of the frozen W)
-            diagnostics=dict(getattr(policy, "diagnostics", {}) or {}),
+            diagnostics={
+                **dict(getattr(policy, "diagnostics", {}) or {}),
+                **(policy.readout_stats() if hasattr(policy, "readout_stats") else {}),
+            },
         )
     record["summary"]["wall_seconds"] = time.perf_counter() - started
     out_dir = Path(job["out_dir"]) / "runs"

@@ -1,0 +1,41 @@
+# Game C (second review, Nov 2026): each fly's value is computed from two private
+# cues, v = hunger x food (Ventimiglia et al. 2026: the give-up rate shifts with both).
+# The network gets hunger and food as two separate inputs to the 16 PPL1 neurons, so
+# unlike Game A (constant input) and Game B (handed v itself) it must multiply them
+# before it can bid: ignoring food costs 6.7x the grid floor and the best additive
+# use of the cues 11x (tests/test_game_c.py). Exact self-play, every arm, 20 seeds.
+base: base.yaml
+experiment: gamec_exact
+game:
+  name: C
+  cost_rate: 1.0
+  t_max: 20.0           # largest BNE bid (v = 3.9 x 2.0) is 17.9
+  n_bins: 64
+  hunger_rate: 1.0
+  food_levels: [0.5, 1.0, 1.5, 2.0]
+  n_hunger: 25          # 25 hunger quantiles x 4 food levels = 100 equally likely types
+  input_code: cues      # inputs: standardised hunger, standardised food
+arms:
+  - {name: oracle}
+  - {name: tabular}
+  - {name: dense}
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+seeds: {start: 0, count: 20}
+training:
+  mode: exact
+  steps: 6000           # 1.5x Game B: the task is harder
+  eval_every: 50
+metrics:
+  threshold: 0.01       # as in Games A and B exact; the oracle's grid floor is 0.0086, learners reach ~0.006 (pilot)
+tuning:
+  seeds: {start: 1000, count: 3}   # 3 tuning seeds (2 in the earlier games)
+  lr_grid:
+    exact:
+      tabular: [0.03, 0.1, 0.3, 1.0]
+      network: [0.001, 0.003, 0.01, 0.03, 0.1, 0.3]
+lr_from: {file: tuned_lr.yaml, experiment: gamec_exact}

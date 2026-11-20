@@ -24,6 +24,7 @@ from torch import nn
 from torch.nn import functional as F
 
 ACTIVATIONS = {"tanh": torch.tanh, "relu": F.relu}
+READOUT_NORMS = ("none", "ema_rms")
 
 
 class Policy(nn.Module):
@@ -111,14 +112,30 @@ class GraphReadoutMixin:
     starts from the uniform policy. In the low-rank case ``readout_in`` is random
     (``N(0, 1/n_neurons)``): with both factors at zero neither would get a gradient.
     The parameters live on the policy itself, so names and state dicts of the
-    default readout are what they always were."""
+    default readout are what they always were.
+
+    Every arm also tracks the size (RMS) of the readout input ``z``, at the first
+    training step and as a running average (``readout_stats``). With
+    ``norm = "ema_rms"`` the readout divides ``z`` by that running RMS, so the readout
+    input has unit size on every graph. Adam's step on the readout weights is about
+    ``lr`` whatever the gradient, so the change in the logits per step scales with the
+    size of ``z``; this option removes that difference between graphs and is the test
+    of whether a "wiring effect" is only a step-size effect. The running average is a
+    buffer (no gradient), updated only in training passes, so evaluation does not
+    depend on the batch. ``norm = "none"`` (the default) leaves the function and every
+    earlier result unchanged."""
 
     def _init_readout(
         self, n_agents: int, n_neurons: int, n_out: int, n_bins: int, nodes: str, rank: int,
-        generator: torch.Generator,
+        generator: torch.Generator, norm: str = "none", norm_momentum: float = 0.01,
     ) -> None:
         if nodes not in READOUTS:
             raise ValueError(f"readout must be one of {READOUTS}, got {nodes!r}")
+        if norm not in READOUT_NORMS:
+            raise ValueError(f"readout_norm must be one of {READOUT_NORMS}, got {norm!r}")
+        self.readout_norm, self.readout_norm_momentum = norm, float(norm_momentum)
+        self.register_buffer("z_rms_first", torch.zeros(n_agents, 1, 1))
+        self.register_buffer("z_rms_ema", torch.zeros(n_agents, 1, 1))
         self.readout_nodes = nodes
         width = n_out
         if nodes == "all":
@@ -137,7 +154,25 @@ class GraphReadoutMixin:
             z = torch.bmm(h, self.readout_in)
         else:
             z = h.index_select(2, self.output_nodes)
+        if torch.is_grad_enabled():  # training pass: track the size of z
+            with torch.no_grad():
+                rms = z.pow(2).mean(dim=(1, 2), keepdim=True).sqrt()
+                if not bool((self.z_rms_first > 0).any()):
+                    self.z_rms_first.copy_(rms)
+                    self.z_rms_ema.copy_(rms)
+                else:
+                    self.z_rms_ema.lerp_(rms, self.readout_norm_momentum)
+        if self.readout_norm == "ema_rms":
+            scale = torch.where(self.z_rms_ema > 0, self.z_rms_ema, torch.ones_like(self.z_rms_ema))
+            z = z / scale.clamp_min(1e-6)
         return torch.baddbmm(self.readout_bias, z, self.readout)
+
+    def readout_stats(self) -> dict[str, float]:
+        """Mean over agents of the readout-input RMS at the first step and at the end."""
+        return {
+            "readout_rms_first": float(self.z_rms_first.mean()),
+            "readout_rms_final": float(self.z_rms_ema.mean()),
+        }
 
 
 def dense_param_count(d_in: int, hidden: list[int], n_bins: int) -> int:
@@ -191,6 +226,7 @@ class SparseCircuitPolicy(GraphReadoutMixin, Policy):
         sparse_max_batch: int = 8,
         readout_nodes: str = "output",
         readout_rank: int = 0,
+        readout_norm: str = "none",
     ) -> None:
         super().__init__()
         self.n_agents, self.n_bins, self.n_neurons = n_agents, n_bins, n_neurons
@@ -229,7 +265,9 @@ class SparseCircuitPolicy(GraphReadoutMixin, Policy):
         self.bias = nn.Parameter(torch.zeros(n_agents, 1, n_neurons))
         # Built last, so the default readout draws nothing from the generator and every
         # earlier initialisation is bit-identical with or without the low-rank option.
-        self._init_readout(n_agents, n_neurons, len(output_nodes), n_bins, readout_nodes, readout_rank, generator)
+        self._init_readout(
+            n_agents, n_neurons, len(output_nodes), n_bins, readout_nodes, readout_rank, generator, readout_norm
+        )
 
     def edge_weights(self) -> torch.Tensor:
         if not self.sign_constrained:

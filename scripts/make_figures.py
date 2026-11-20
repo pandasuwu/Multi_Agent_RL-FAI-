@@ -19,7 +19,17 @@ from matplotlib.ticker import FuncFormatter, NullFormatter  # noqa: E402
 
 from src.config import load_config  # noqa: E402
 from src.games import GameA, TimeGrid, exponential_survival  # noqa: E402
-from src.plotting import INK, INK_2, apply_style, arm_style, plot_curves, save, sort_arms  # noqa: E402
+from src.metrics.stats import bootstrap_mean_ci  # noqa: E402
+from src.plotting import (  # noqa: E402
+    DERIVED_MARKER,
+    INK,
+    INK_2,
+    apply_style,
+    arm_style,
+    plot_curves,
+    save,
+    sort_arms,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 RES = ROOT / "results"
@@ -623,6 +633,132 @@ def fig_population_nash() -> None:
     save(fig, str(FIG / "fig13_population_nash"))
 
 
+def _sens_rows(per: pd.DataFrame, exp: str, norm: str = "none") -> pd.DataFrame:
+    return per[(per["experiment"] == exp) & (per["readout_norm"].fillna("none") == norm)]
+
+
+def _derived_dots(ax: plt.Axes, t: pd.DataFrame, arms: list[str]) -> None:
+    """Dot + 95% CI per arm, one row each; marker shape names the derived controls."""
+    for y, arm in enumerate(arms):
+        row = t[t["arm"] == arm]
+        if row.empty:
+            continue
+        r = row.iloc[0]
+        m = "final_exploitability"
+        err = [[r[m] - r[f"{m}_lo"]], [r[f"{m}_hi"] - r[m]]]
+        shape = DERIVED_MARKER.get(arm.split("+")[0], "o")
+        ax.errorbar(r[m], y, xerr=err, fmt=shape, ms=8, capsize=3, lw=1.6, **_marker(arm))
+    ax.set_yticks(range(len(arms)))
+    ax.set_yticklabels([arm_style(a)["label"] for a in arms])
+    ax.set_ylim(len(arms) - 0.5, -0.5)
+    ax.grid(axis="y", visible=False)
+
+
+SHORTCUT_ARMS_UNSIGNED = [
+    # no direct PPL1 -> AVLP727m edge
+    "connectome",
+    "rewired_block",
+    "rewired_noshortcut",
+    # direct edges present
+    "connectome_shortcut",
+    "rewired",
+    "random_sparse",
+]
+
+
+def fig_shortcut_mechanism() -> None:
+    """Sampled Game C (cues), natural readout scale, shared rate, 20 seeds.
+
+    (a) Every graph, unsigned: the three with no direct input -> output edge learn worst.
+    (b, c) Dose-response: the real circuit with k direct edges, Game C and Game B."""
+    tables = _tables()
+    if tables is None or "shortcut_dose" not in tables or "scale_sensitivity_per_arm" not in tables:
+        return
+    per = tables["scale_sensitivity_per_arm"]
+    a = pd.concat([_sens_rows(per, "block_gamec_sampled"), _sens_rows(per, "shortcut_gamec_sampled")])
+    a = a.drop_duplicates("arm")
+    if a.empty:
+        return
+    fig, axes = plt.subplots(1, 3, figsize=(14.5, 3.9), gridspec_kw={"width_ratios": [1.25, 1, 1]})
+    ax = axes[0]
+    _derived_dots(ax, a, SHORTCUT_ARMS_UNSIGNED)
+    ax.axhline(2.5, color=INK_2, lw=0.8, ls=":")
+    ax.text(0.99, 0.98, "no PPL1 \u2192 AVLP727m edge", transform=ax.transAxes, ha="right", va="top",
+            fontsize=8, color=INK_2)
+    ax.text(0.99, 0.02, "direct edges present", transform=ax.transAxes, ha="right", va="bottom", fontsize=8,
+            color=INK_2)
+    ax.set(title="(a) Game C, sampled: every graph", xlabel="final utility loss")
+    rng = np.random.default_rng(0)
+    for ax, exp, title, ref_exp in (
+        (axes[1], "dose_gamec_sampled", "(b) Game C, sampled", "shortcut_gamec_sampled"),
+        (axes[2], "dose_game_b_sampled", "(c) Game B, sampled", "shortcut_game_b_sampled"),
+    ):
+        d = RES / exp / "summary.csv"
+        if not d.exists():
+            continue
+        df = pd.read_csv(d)
+        ks = sorted(df["shortcut_edges"].unique())
+        xs = np.arange(len(ks))
+        for arm in ("connectome_shortcut", "connectome_shortcut+sign"):
+            st = arm_style(arm)
+            mean, lo, hi = [], [], []
+            for k in ks:
+                v = df[(df.arm == arm) & (df.shortcut_edges == k)]["final_exploitability"].to_numpy(float)
+                ci = bootstrap_mean_ci(v, N_BOOT, 0.95, rng)
+                mean.append(ci.mean), lo.append(ci.lo), hi.append(ci.hi)
+            label = "real circuit + k shortcuts" + (", signed" if arm.endswith("+sign") else "")
+            ax.plot(xs, mean, marker="^", ms=7, color=st["color"], ls=st["linestyle"],
+                    mfc="white" if arm.endswith("+sign") else st["color"], mew=1.8, label=label)
+            ax.fill_between(xs, lo, hi, color=st["color"], alpha=0.15, lw=0)
+            ref = _sens_rows(per, ref_exp)
+            base = "rewired+sign" if arm.endswith("+sign") else "rewired"
+            r = ref[ref["arm"] == base]
+            if len(r):
+                ax.axhline(r["final_exploitability"].iloc[0], color=arm_style(base)["color"],
+                           ls=arm_style(base)["linestyle"], lw=1.2,
+                           label="rewire (~7 direct edges)" + (", signed" if arm.endswith("+sign") else ""))
+        ax.set_xticks(xs)
+        ax.set_xticklabels([str(k) for k in ks])
+        ax.set(title=title, xlabel="direct PPL1 \u2192 AVLP727m edges added (k)", ylabel="final utility loss")
+    axes[1].legend(loc="upper right", fontsize=7.5)
+    fig.suptitle("Mean and 95% bootstrap CI over 20 seeds, shared learning rate, natural readout scale",
+                 fontsize=10, color=INK_2)
+    fig.tight_layout()
+    save(fig, str(FIG / "fig14_shortcut_mechanism"))
+
+
+SIGN_ARMS = [
+    "connectome+sign",
+    "connectome_signshuffle_signed+sign",
+    "connectome_signshuffle_stage+sign",
+    "connectome_signshuffle+sign",
+]
+
+
+def fig_sign_shuffle() -> None:
+    """Real vs shuffled excitatory/inhibitory labels, sign-constrained, natural scale.
+    The all-neuron shuffle also moves the sign-0 neurons, so it sign-constrains most of
+    the dopaminergic PPL1 inputs; the two other shuffles leave them free."""
+    tables = _tables()
+    if tables is None or "scale_sensitivity_per_arm" not in tables:
+        return
+    per = tables["scale_sensitivity_per_arm"]
+    panels = [("signs_gamec_sampled", "Game C, sampled, cues"),
+              ("signs_gamec_pop_sampled", "Game C, sampled, population code"),
+              ("signs_game_b_sampled", "Game B, sampled")]
+    panels = [p for p in panels if len(_sens_rows(per, p[0]))]
+    if not panels:
+        return
+    fig, axes = plt.subplots(1, len(panels), figsize=(4.6 * len(panels), 3.0), sharey=True, squeeze=False)
+    for ax, (exp, title) in zip(axes[0], panels):
+        _derived_dots(ax, _sens_rows(per, exp), SIGN_ARMS)
+        ax.set(title=title, xlabel="final utility loss")
+    fig.suptitle("Mean and 95% bootstrap CI over 20 seeds; the bottom row also sign-constrains the dopaminergic inputs",
+                 fontsize=10, color=INK_2)
+    fig.tight_layout()
+    save(fig, str(FIG / "fig15_sign_shuffle"))
+
+
 FIGURES = [
     fig_tabular_convergence,
     fig_convergence_all_arms,
@@ -637,6 +773,8 @@ FIGURES = [
     fig_population_size,
     fig_lr_sweep,
     fig_population_nash,
+    fig_shortcut_mechanism,
+    fig_sign_shuffle,
 ]
 
 

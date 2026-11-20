@@ -37,7 +37,8 @@ CHILD_ENV = {
 
 # FlyGM Game B is memory-bound: on the laptop (8 cores) 14 workers gave half the
 # throughput of 6. On a 4-core cloud box 4 was best for this and 5 for run-ppo-b-flygm.
-HEAVY_WORKERS = 6
+# On a cluster node with more memory bandwidth, raise the cap with HEAVY_WORKERS=<n>.
+HEAVY_WORKERS = int(os.environ.get("HEAVY_WORKERS", "6"))
 FLYGM_PPO_WORKERS = 9
 
 # name -> (script, configs, worker cap or None). "tune" steps pick learning rates on

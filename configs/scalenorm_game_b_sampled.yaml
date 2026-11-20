@@ -1,0 +1,17 @@
+# Activation-scale check for sampled Game B (see scalenorm_game_a_exact.yaml), where
+# the rerun found the signed real circuit worse than its signed controls at a shared
+# rate. Circuit arms at the shared rate 0.01, readout input as is vs RMS-normalised.
+base: game_b_sampled.yaml
+experiment: scalenorm_game_b_sampled
+arms:
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+lr_from: null
+lr: {default: 0.01}
+sweep:
+  training.shared_lr: [0.01]
+  network.readout_norm: [none, ema_rms]

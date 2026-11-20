@@ -1,0 +1,5 @@
+experiment,arm,slope_per_log2_1pk,slope_lo,slope_hi,p_paired,n_seeds
+dose_gamec_sampled,connectome_shortcut,-0.0175001,-0.0222287,-0.0127714,5e-05,20
+dose_gamec_sampled,connectome_shortcut+sign,-0.00280279,-0.00431537,-0.00129021,0.0016,20
+dose_game_b_sampled,connectome_shortcut,-0.0116944,-0.0187693,-0.00461954,0.00245,20
+dose_game_b_sampled,connectome_shortcut+sign,-0.00447741,-0.00715303,-0.00180178,0.00075,20

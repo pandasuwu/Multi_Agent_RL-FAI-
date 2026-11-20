@@ -46,7 +46,7 @@ lr:
   random_sparse+sign: 0.03
   rewired: 0.03
   rewired+sign: 0.03
-  tabular: 0.1
+  tabular: 0.3
 tuning:
   seeds:
     start: 1000

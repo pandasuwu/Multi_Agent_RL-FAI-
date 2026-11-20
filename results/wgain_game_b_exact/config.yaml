@@ -54,7 +54,7 @@ stats:
 lr:
   flygm: 0.01
   flygm_random_sparse: 0.01
-  flygm_rewired: 0.01
+  flygm_rewired: 0.003
 tuning:
   seeds:
     start: 1000

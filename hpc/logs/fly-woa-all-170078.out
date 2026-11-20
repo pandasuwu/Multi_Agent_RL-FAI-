@@ -1,0 +1,146 @@
+==========================================
+SLURM_CLUSTER_NAME = paramananta
+SLURM_ARRAY_JOB_ID = 
+SLURM_ARRAY_TASK_ID = 
+SLURM_ARRAY_TASK_COUNT = 
+SLURM_ARRAY_TASK_MAX = 
+SLURM_ARRAY_TASK_MIN = 
+SLURM_JOB_ACCOUNT = iitgn
+SLURM_JOB_ID = 170078
+SLURM_JOB_NAME = fly-woa-all
+SLURM_JOB_NODELIST = cn006
+SLURM_JOB_USER = suhani
+SLURM_JOB_UID = 40500
+SLURM_JOB_PARTITION = small
+SLURM_TASK_PID = 12643
+SLURM_SUBMIT_DIR = /home/suhani/Multi_Agent_RL-FAI-
+SLURM_CPUS_ON_NODE = 48
+SLURM_NTASKS = 1
+SLURM_TASK_PID = 12643
+==========================================
+job 170078 on cn006, 48 workers (48 heavy), commit unknown
+........................................................................ [ 62%]
+..................s........................                              [100%]
+114 passed, 1 skipped in 98.81s (0:01:38)
+=== 2026-11-18 23:20:11 commit unknown on cn006 (48 cpus), steps: run-robust, run-popsize, run-review, welfare-from-records, analyze, welfare, figures ===
++ scripts/run_experiment.py configs/robust_game_a_sampled_shared_lr.yaml configs/robust_game_b_exact_shared_lr.yaml configs/robust_game_b_sampled_shared_lr.yaml --workers 48
+[robust_game_a_sampled_shared_lr] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[robust_game_a_sampled_shared_lr] 60 runs to do on 48 workers
+[robust_game_a_sampled_shared_lr] 6/60 runs, 40s elapsed
+[robust_game_a_sampled_shared_lr] 12/60 runs, 41s elapsed
+[robust_game_a_sampled_shared_lr] 18/60 runs, 42s elapsed
+[robust_game_a_sampled_shared_lr] 24/60 runs, 42s elapsed
+[robust_game_a_sampled_shared_lr] 30/60 runs, 42s elapsed
+[robust_game_a_sampled_shared_lr] 36/60 runs, 42s elapsed
+[robust_game_a_sampled_shared_lr] 42/60 runs, 43s elapsed
+[robust_game_a_sampled_shared_lr] 48/60 runs, 45s elapsed
+[robust_game_a_sampled_shared_lr] 54/60 runs, 68s elapsed
+[robust_game_a_sampled_shared_lr] 60/60 runs, 70s elapsed
+[robust_game_b_exact_shared_lr] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[robust_game_b_exact_shared_lr] 0 runs to do on 48 workers
+[robust_game_b_sampled_shared_lr] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[robust_game_b_sampled_shared_lr] 0 runs to do on 48 workers
+run-robust: 78 s wall (48 workers)
++ scripts/run_experiment.py configs/popsize_game_a_sampled.yaml --workers 48
+[popsize_game_a_sampled] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'rewired': 5610, 'random_sparse': 5610, 'connectome(budget)': 5610}
+[popsize_game_a_sampled] 200 runs to do on 48 workers
+[popsize_game_a_sampled] 20/200 runs, 15s elapsed
+[popsize_game_a_sampled] 40/200 runs, 24s elapsed
+[popsize_game_a_sampled] 60/200 runs, 32s elapsed
+[popsize_game_a_sampled] 80/200 runs, 39s elapsed
+[popsize_game_a_sampled] 100/200 runs, 47s elapsed
+[popsize_game_a_sampled] 120/200 runs, 57s elapsed
+[popsize_game_a_sampled] 140/200 runs, 70s elapsed
+[popsize_game_a_sampled] 160/200 runs, 74s elapsed
+[popsize_game_a_sampled] 180/200 runs, 110s elapsed
+[popsize_game_a_sampled] 200/200 runs, 115s elapsed
+run-popsize: 119 s wall (48 workers)
++ scripts/run_experiment.py configs/popnash_game_a_sampled.yaml configs/lrsweep_game_a_exact.yaml configs/lrsweep_game_b_exact.yaml --workers 48
+[popnash_game_a_sampled] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[popnash_game_a_sampled] 80 runs to do on 48 workers
+[popnash_game_a_sampled] 8/80 runs, 16s elapsed
+[popnash_game_a_sampled] 16/80 runs, 18s elapsed
+[popnash_game_a_sampled] 24/80 runs, 41s elapsed
+[popnash_game_a_sampled] 32/80 runs, 41s elapsed
+[popnash_game_a_sampled] 40/80 runs, 43s elapsed
+[popnash_game_a_sampled] 48/80 runs, 43s elapsed
+[popnash_game_a_sampled] 56/80 runs, 49s elapsed
+[popnash_game_a_sampled] 64/80 runs, 49s elapsed
+[popnash_game_a_sampled] 72/80 runs, 70s elapsed
+[popnash_game_a_sampled] 80/80 runs, 71s elapsed
+[lrsweep_game_a_exact] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[lrsweep_game_a_exact] 0 runs to do on 48 workers
+[lrsweep_game_b_exact] trainable parameters per agent: {'dense': 5584, 'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[lrsweep_game_b_exact] 0 runs to do on 48 workers
+run-review: 85 s wall (48 workers)
++ scripts/welfare_rerun.py --from-records --workers 48
+[popsize_game_a_sampled] 200 runs read from records
+[robust_game_a_sampled_shared_lr] 60 runs read from records
+[popnash_game_a_sampled] 80 runs read from records
+[game_a_sampled] 320 runs read from records
+[game_b_sampled] 80 runs read from records
+[robust_game_b_sampled_shared_lr] 60 runs read from records
+[flygm_game_a_sampled] 30 runs read from records
+[robust_ppo_game_a_sampled_shared_lr] 90 runs read from records
+[robust_ppo_game_b_sampled_shared_lr] 60 runs read from records
+[ppo_game_a_sampled] 110 runs read from records
+[ppo_game_b_sampled] 80 runs read from records
+[flygm_game_b_sampled] 30 runs read from records
+welfare-from-records: 16 s wall (48 workers)
++ scripts/analyze.py
+per_arm: 121 rows
+pairwise: 930 rows
+asym_per_arm: 32 rows
+asym_effects: 96 rows
+asym_pairwise: 144 rows
+game_b_deciles: 590 rows
+cross_experiment: 207 rows
+flygm_diagnostics: 24 rows
+eval_resolution: 8 rows
+wiring_familywide: 114 rows
+game_b_value_dependence: 74 rows
+readout_per_arm: 30 rows
+readout_pairwise: 240 rows
+readout_cross: 192 rows
+readout_flygm_diagnostics: 12 rows
+population_nash: 99 rows
+population_nash_pairwise: 81 rows
+lr_sweep: 70 rows
+lr_sweep_pairwise: 225 rows
+analyze: 36 s wall (48 workers)
++ scripts/welfare.py
+welfare_per_run: 3470 rows, welfare: 217 rows, welfare_contrasts: 34 rows
+welfare: 18 s wall (48 workers)
++ scripts/make_figures.py
+done fig_tabular_convergence
+done fig_convergence_all_arms
+done fig_main_comparison
+done fig_main_four_settings
+done fig_asymmetric_sweep
+done fig_survival_by_arm
+done fig_game_b_bids
+done fig_flygm_vs_trained_edges
+done fig_reinforce_vs_ppo
+done fig_welfare
+done fig_population_size
+done fig_lr_sweep
+done fig_population_nash
+figures: 32 s wall (48 workers)
+=== total 6.4 min wall ===
+Traceback (most recent call last):
+  File "/home/suhani/Multi_Agent_RL-FAI-/scripts/compare_to_committed.py", line 79, in <module>
+    main()
+  File "/home/suhani/Multi_Agent_RL-FAI-/scripts/compare_to_committed.py", line 52, in main
+    old = committed(args.ref, rel)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/suhani/Multi_Agent_RL-FAI-/scripts/compare_to_committed.py", line 28, in committed
+    out = subprocess.run(["git", "show", f"{ref}:{rel}"], cwd=ROOT, capture_output=True)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/apps/python/Python-3.12.8/lib/python3.12/subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/apps/python/Python-3.12.8/lib/python3.12/subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "/home/apps/python/Python-3.12.8/lib/python3.12/subprocess.py", line 1955, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'git'

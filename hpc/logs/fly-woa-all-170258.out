@@ -1,0 +1,102 @@
+==========================================
+SLURM_CLUSTER_NAME = paramananta
+SLURM_ARRAY_JOB_ID = 
+SLURM_ARRAY_TASK_ID = 
+SLURM_ARRAY_TASK_COUNT = 
+SLURM_ARRAY_TASK_MAX = 
+SLURM_ARRAY_TASK_MIN = 
+SLURM_JOB_ACCOUNT = iitgn
+SLURM_JOB_ID = 170258
+SLURM_JOB_NAME = fly-woa-all
+SLURM_JOB_NODELIST = cn010
+SLURM_JOB_USER = suhani
+SLURM_JOB_UID = 40500
+SLURM_JOB_PARTITION = small
+SLURM_TASK_PID = 36025
+SLURM_SUBMIT_DIR = /home/suhani/Multi_Agent_RL-FAI-
+SLURM_CPUS_ON_NODE = 48
+SLURM_NTASKS = 1
+SLURM_TASK_PID = 36025
+==========================================
+job 170258 on cn010, 48 workers (48 heavy), commit unknown
+........................................................................ [ 46%]
+..................................................s..................... [ 93%]
+..........                                                               [100%]
+153 passed, 1 skipped in 141.21s (0:02:21)
+=== 2026-11-20 01:21:25 commit unknown on cn010 (48 cpus), steps: run-block-long ===
++ scripts/run_experiment.py configs/block_gamec_sampled.yaml configs/block_gamec_pop_sampled.yaml configs/block_gamec_exact.yaml configs/block_game_b_sampled.yaml configs/long_gamec_sampled.yaml configs/long_gamec_pop_sampled.yaml --workers 48
+[block_gamec_sampled] trainable parameters per agent: {'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'rewired_block': 5626, 'rewired_block+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[block_gamec_sampled] 320 runs to do on 48 workers
+[block_gamec_sampled] 32/320 runs, 292s elapsed
+[block_gamec_sampled] 64/320 runs, 559s elapsed
+[block_gamec_sampled] 96/320 runs, 597s elapsed
+[block_gamec_sampled] 128/320 runs, 850s elapsed
+[block_gamec_sampled] 160/320 runs, 1105s elapsed
+[block_gamec_sampled] 192/320 runs, 1178s elapsed
+[block_gamec_sampled] 224/320 runs, 1412s elapsed
+[block_gamec_sampled] 256/320 runs, 1649s elapsed
+[block_gamec_sampled] 288/320 runs, 1752s elapsed
+[block_gamec_sampled] 320/320 runs, 1923s elapsed
+[block_gamec_pop_sampled] trainable parameters per agent: {'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'rewired_block': 5866, 'rewired_block+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[block_gamec_pop_sampled] 320 runs to do on 48 workers
+[block_gamec_pop_sampled] 32/320 runs, 295s elapsed
+[block_gamec_pop_sampled] 64/320 runs, 565s elapsed
+[block_gamec_pop_sampled] 96/320 runs, 597s elapsed
+[block_gamec_pop_sampled] 128/320 runs, 857s elapsed
+[block_gamec_pop_sampled] 160/320 runs, 1126s elapsed
+[block_gamec_pop_sampled] 192/320 runs, 1195s elapsed
+[block_gamec_pop_sampled] 224/320 runs, 1423s elapsed
+[block_gamec_pop_sampled] 256/320 runs, 1678s elapsed
+[block_gamec_pop_sampled] 288/320 runs, 1760s elapsed
+[block_gamec_pop_sampled] 320/320 runs, 1937s elapsed
+[block_gamec_exact] trainable parameters per agent: {'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'rewired_block': 5626, 'rewired_block+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[block_gamec_exact] 640 runs to do on 48 workers
+[block_gamec_exact] 64/640 runs, 71s elapsed
+[block_gamec_exact] 128/640 runs, 103s elapsed
+[block_gamec_exact] 192/640 runs, 148s elapsed
+[block_gamec_exact] 256/640 runs, 194s elapsed
+[block_gamec_exact] 320/640 runs, 228s elapsed
+[block_gamec_exact] 384/640 runs, 269s elapsed
+[block_gamec_exact] 448/640 runs, 318s elapsed
+[block_gamec_exact] 512/640 runs, 352s elapsed
+[block_gamec_exact] 576/640 runs, 397s elapsed
+[block_gamec_exact] 640/640 runs, 441s elapsed
+[block_game_b_sampled] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'rewired_block': 5610, 'rewired_block+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[block_game_b_sampled] 320 runs to do on 48 workers
+[block_game_b_sampled] 32/320 runs, 120s elapsed
+[block_game_b_sampled] 64/320 runs, 220s elapsed
+[block_game_b_sampled] 96/320 runs, 246s elapsed
+[block_game_b_sampled] 128/320 runs, 344s elapsed
+[block_game_b_sampled] 160/320 runs, 433s elapsed
+[block_game_b_sampled] 192/320 runs, 475s elapsed
+[block_game_b_sampled] 224/320 runs, 560s elapsed
+[block_game_b_sampled] 256/320 runs, 646s elapsed
+[block_game_b_sampled] 288/320 runs, 692s elapsed
+[block_game_b_sampled] 320/320 runs, 750s elapsed
+[long_gamec_sampled] trainable parameters per agent: {'dense': 5632, 'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'rewired_block': 5626, 'rewired_block+sign': 5626, 'random_sparse': 5626, 'random_sparse+sign': 5626, 'connectome(budget)': 5626}
+[long_gamec_sampled] 220 runs to do on 48 workers
+[long_gamec_sampled] 22/220 runs, 54s elapsed
+[long_gamec_sampled] 44/220 runs, 68s elapsed
+[long_gamec_sampled] 66/220 runs, 745s elapsed
+[long_gamec_sampled] 88/220 runs, 883s elapsed
+[long_gamec_sampled] 110/220 runs, 1295s elapsed
+[long_gamec_sampled] 132/220 runs, 1716s elapsed
+[long_gamec_sampled] 154/220 runs, 1792s elapsed
+[long_gamec_sampled] 176/220 runs, 2514s elapsed
+[long_gamec_sampled] 198/220 runs, 2569s elapsed
+[long_gamec_sampled] 220/220 runs, 3058s elapsed
+[long_gamec_pop_sampled] trainable parameters per agent: {'dense': 5824, 'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'rewired_block': 5866, 'rewired_block+sign': 5866, 'random_sparse': 5866, 'random_sparse+sign': 5866, 'connectome(budget)': 5866}
+[long_gamec_pop_sampled] 220 runs to do on 48 workers
+[long_gamec_pop_sampled] 22/220 runs, 54s elapsed
+[long_gamec_pop_sampled] 44/220 runs, 71s elapsed
+[long_gamec_pop_sampled] 66/220 runs, 749s elapsed
+[long_gamec_pop_sampled] 88/220 runs, 892s elapsed
+[long_gamec_pop_sampled] 110/220 runs, 1331s elapsed
+[long_gamec_pop_sampled] 132/220 runs, 1714s elapsed
+[long_gamec_pop_sampled] 154/220 runs, 1771s elapsed
+[long_gamec_pop_sampled] 176/220 runs, 2527s elapsed
+[long_gamec_pop_sampled] 198/220 runs, 2585s elapsed
+[long_gamec_pop_sampled] 220/220 runs, 3112s elapsed
+run-block-long: 11244 s wall (48 workers)
+=== total 187.4 min wall ===
+compare_to_committed: git not found (cluster compute node?); run it where git is

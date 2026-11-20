@@ -1,0 +1,22 @@
+# Shortcut test (Nov 2026). The real give-up circuit has no direct PPL1 -> AVLP727m
+# edge (outputs two steps from the inputs); the plain rewire and random graphs have ~7
+# (most outputs one step away), and the block-preserving rewire, like the real circuit,
+# has none - and learns as badly. Tested from both sides:
+#   connectome_shortcut: real wiring + 7 direct edges (7 degree-preserving swaps)
+#   rewired_noshortcut:  plain rewire with input -> output edges forbidden
+# plus connectome_signshuffle (+sign): real wiring, excitatory/inhibitory labels shuffled.
+base: gamec_sampled.yaml
+experiment: shortcut_gamec_sampled
+arms:
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: connectome_shortcut}
+  - {name: connectome_shortcut, sign_constrained: true}
+  - {name: rewired_noshortcut}
+  - {name: rewired_noshortcut, sign_constrained: true}
+  - {name: connectome_signshuffle, sign_constrained: true}
+lr_from: {file: tuned_lr.yaml, experiment: gamec_sampled, share_circuit_lr: true}
+sweep:
+  network.readout_norm: [none, ema_rms]

@@ -1,0 +1,21 @@
+# Sampled Game C trained 3x as long (15,000 rounds instead of 5,000): does the
+# real circuit's deficit persist as the learners approach convergence, or close? Every
+# circuit arm at the shared rate, dense and tabular at their tuned rates, 20 seeds.
+base: gamec_sampled.yaml
+experiment: long_gamec_sampled
+arms:
+  - {name: oracle}
+  - {name: tabular}
+  - {name: dense}
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: rewired_block}
+  - {name: rewired_block, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+training:
+  steps: 15000
+  eval_every: 100
+lr_from: {file: tuned_lr.yaml, experiment: gamec_sampled, share_circuit_lr: true}

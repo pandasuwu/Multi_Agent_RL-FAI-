@@ -97,7 +97,7 @@ def main() -> None:
     cfg = load_config(REPO_ROOT / "configs" / "base.yaml")
     depth = int(cfg["network"]["unroll_steps"]) - 1
     rows = []
-    for graph, seeds in (("connectome", [0]), ("rewired", SEEDS), ("random_sparse", SEEDS)):
+    for graph, seeds in (("connectome", [0]), ("rewired", SEEDS), ("rewired_block", SEEDS), ("connectome_shortcut", SEEDS), ("rewired_noshortcut", SEEDS), ("random_sparse", SEEDS)):
         for seed in seeds:
             spec = circuit_spec_for_arm(cfg["connectome"], graph, seed)
             rows.append({"graph": graph, "seed": seed, "graph_id": spec.graph_id, "max_path_length_used": depth, **diagnostics(spec, depth)})

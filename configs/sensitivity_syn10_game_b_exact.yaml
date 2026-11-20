@@ -1,0 +1,29 @@
+# Circuit-sensitivity check (review, Nov 2026): the give-up circuit cut out of MaleCNS
+# with a connection threshold of 10 synapses instead of 5 and, so that
+# the circuit keeps at least 100 neurons, one-hop partners that exchange at least 200
+# (not 400) synapses with it. Everything
+# else about the extraction is as in base.yaml. The real circuit and its two controls,
+# Game B exact, 20 seeds, all at the shared rate 0.01, where the main circuit and its
+# controls are stable (RESULTS.md sec. 15.4).
+#
+# The extracted circuit is committed. To rebuild it from the raw MaleCNS files:
+#   python scripts/build_connectome.py --config configs/sensitivity_syn10_game_b_exact.yaml
+base: game_b_exact.yaml
+experiment: sensitivity_syn10_game_b_exact
+connectome:
+  min_synapses: 10
+  cache: data/connectome/give_up_circuit_syn10.npz
+  provenance: data/connectome/give_up_circuit_syn10.provenance.json
+  expansion: {min_exchanged_synapses: 200}   # at 400 only 82 neurons remain, below the extraction's minimum of 100
+seeds: {start: 0, count: 20}
+arms:
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+lr_from: null
+lr: {default: 0.01}
+sweep:
+  training.shared_lr: [0.01]

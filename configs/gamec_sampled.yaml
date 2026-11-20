@@ -1,0 +1,19 @@
+# Game C (see gamec_exact.yaml) learned from sampled fights: 8 independent agents,
+# randomly re-matched, REINFORCE. 20 seeds (not 10) so wiring contrasts have the power
+# the 10-seed sampled experiments lacked.
+base: gamec_exact.yaml
+experiment: gamec_sampled
+seeds: {start: 0, count: 20}
+training:
+  mode: sampled
+  steps: 5000
+  eval_every: 50
+metrics:
+  threshold: 0.05
+tuning:
+  seeds: {start: 1000, count: 3}
+  lr_grid:
+    sampled:
+      tabular: [0.003, 0.01, 0.03, 0.1]
+      network: [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03]
+lr_from: {file: tuned_lr.yaml, experiment: gamec_sampled}
