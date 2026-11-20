@@ -49,7 +49,7 @@ stats:
   confidence: 0.95
 lr:
   connectome: 0.01
-  connectome+sign: 0.003
+  connectome+sign: 0.01
   dense: 0.003
   random_sparse: 0.01
   random_sparse+sign: 0.01

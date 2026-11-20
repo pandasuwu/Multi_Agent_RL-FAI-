@@ -44,7 +44,7 @@ lr:
   dense: 0.0003
   random_sparse: 0.003
   random_sparse+sign: 0.003
-  rewired: 0.03
+  rewired: 0.003
   rewired+sign: 0.003
   tabular: 0.03
 tuning:

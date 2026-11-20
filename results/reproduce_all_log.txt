@@ -1,0 +1,54 @@
+=== 2026-11-17 20:27:29 commit unknown on cn006 (48 cpus), steps: tune-main, run-main, run-robust, tune-flygm-fast, run-flygm-fast, run-eval1, tune-ppo-a, run-ppo-a, tune-flygm-b-sampled, run-flygm-b-sampled, tune-ppo-b, run-ppo-b, run-robust-ppo, run-robust-flygm, tune-readout-a, run-readout-a, tune-readout-b, run-readout-b, run-popsize, run-review, validate-asymmetric, path-diagnostics, welfare-from-records, analyze, welfare, figures ===
+tune-main: 814 s wall (48 workers)
+run-main: 484 s wall (48 workers)
+run-robust: SKIPPED robust_game_a_sampled_shared_lr, every arm tuned to the same rate
+run-robust: 241 s wall (48 workers)
+tune-flygm-fast: 2447 s wall (48 workers)
+run-flygm-fast: 821 s wall (48 workers)
+run-eval1: 55 s wall (48 workers)
+tune-ppo-a: 1116 s wall (48 workers)
+run-ppo-a: 348 s wall (48 workers)
+tune-flygm-b-sampled: 2961 s wall (48 workers)
+run-flygm-b-sampled: 2497 s wall (48 workers)
+tune-ppo-b: 592 s wall (48 workers)
+run-ppo-b: 738 s wall (48 workers)
+run-robust-ppo: 1064 s wall (48 workers)
+run-robust-flygm: SKIPPED robust_flygm_game_a_sampled_shared_lr, every arm tuned to the same rate
+run-robust-flygm: 3239 s wall (48 workers)
+tune-readout-a: 232 s wall (48 workers)
+run-readout-a: 98 s wall (48 workers)
+tune-readout-b: 4218 s wall (48 workers)
+run-readout-b: 1765 s wall (48 workers)
+run-popsize: SKIPPED popsize_game_a_sampled, every arm tuned to the same rate
+run-popsize: 0 s wall (48 workers)
+run-review: SKIPPED popnash_game_a_sampled, every arm tuned to the same rate
+run-review: 183 s wall (48 workers)
+validate-asymmetric: 366 s wall (48 workers)
+path-diagnostics: 10 s wall (48 workers)
+=== 2026-11-18 23:20:11 commit unknown on cn006 (48 cpus), steps: run-robust, run-popsize, run-review, welfare-from-records, analyze, welfare, figures ===
+run-robust: 78 s wall (48 workers)
+run-popsize: 119 s wall (48 workers)
+run-review: 85 s wall (48 workers)
+welfare-from-records: 16 s wall (48 workers)
+analyze: 36 s wall (48 workers)
+welfare: 18 s wall (48 workers)
+figures: 32 s wall (48 workers)
+=== total 6.4 min wall ===
+=== 2026-11-19 13:40:01 commit unknown on cn006 (48 cpus), steps: run-scale-sensitivity ===
+run-scale-sensitivity: 670 s wall (48 workers)
+=== total 11.2 min wall ===
+=== 2026-11-19 14:44:19 commit unknown on cn006 (48 cpus), steps: run-unroll-seeds20, tune-gamec, run-gamec, run-gamec-checks ===
+run-unroll-seeds20: 677 s wall (48 workers)
+tune-gamec: 3289 s wall (48 workers)
+run-gamec: 1840 s wall (48 workers)
+run-gamec-checks: 5334 s wall (48 workers)
+=== total 185.7 min wall ===
+=== 2026-11-20 01:21:25 commit unknown on cn010 (48 cpus), steps: run-block-long ===
+run-block-long: 11244 s wall (48 workers)
+=== total 187.4 min wall ===
+=== 2026-11-20 10:14:53 commit unknown on cn014 (48 cpus), steps: run-shortcut ===
+run-shortcut: 7244 s wall (48 workers)
+=== total 120.7 min wall ===
+=== 2026-11-20 14:20:30 commit unknown on cn020 (48 cpus), steps: run-signs ===
+run-signs: 2514 s wall (48 workers)
+=== total 41.9 min wall ===
