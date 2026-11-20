@@ -1,0 +1,17 @@
+# Game B, sampled, with 20 seeds instead of 10: the setting where the rerun found the
+# signed real circuit worse than its controls with 10 seeds, and where 10 seeds cannot
+# reach project-wide significance under the exact paired test. Circuit arms at their
+# shared rate, readout input as is and RMS-normalised.
+base: game_b_sampled.yaml
+experiment: seeds20_game_b_sampled
+seeds: {start: 0, count: 20}
+arms:
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+lr_from: {file: tuned_lr.yaml, experiment: game_b_sampled, share_circuit_lr: true}
+sweep:
+  network.readout_norm: [none, ema_rms]

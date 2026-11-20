@@ -1,0 +1,19 @@
+# Game C (population code), exact: the dense net and every circuit arm at three shared
+# rates, readout input as is and RMS-normalised. The wiring contrast is read at each
+# rate (no tuning confound) and must hold under both readout scalings (no step-size
+# artefact, see scalenorm_game_a_exact.yaml) before it counts.
+base: gamec_pop_exact.yaml
+experiment: gamec_pop_shared_exact
+arms:
+  - {name: dense}
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+lr_from: null
+lr: {default: 0.01}   # unused: training.shared_lr overrides it
+sweep:
+  training.shared_lr: [0.003, 0.01, 0.03]
+  network.readout_norm: [none, ema_rms]

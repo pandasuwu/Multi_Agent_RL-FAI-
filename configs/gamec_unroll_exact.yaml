@@ -1,0 +1,15 @@
+# Game C, exact: how many steps the signal runs through the circuit (4 = exactly the
+# PPL1 -> MBON -> X -> Y -> AVLP727m path, 6 the default, 8). Circuit arms at the modal
+# tuned rate of gamec_exact.
+base: gamec_exact.yaml
+experiment: gamec_unroll_exact
+arms:
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+lr_from: {file: tuned_lr.yaml, experiment: gamec_exact, share_circuit_lr: true}
+sweep:
+  network.unroll_steps: [4, 6, 8]

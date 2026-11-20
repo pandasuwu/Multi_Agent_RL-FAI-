@@ -25,6 +25,10 @@ NOT_KEYS = {"run_id", "seed", "graph_id", "config_hash", "params_per_agent"}
 
 
 def committed(ref: str, rel: str) -> pd.DataFrame | None:
+    try:
+        subprocess.run(["git", "--version"], capture_output=True, check=True)
+    except (OSError, subprocess.CalledProcessError):
+        raise SystemExit("compare_to_committed: git not found (cluster compute node?); run it where git is")
     out = subprocess.run(["git", "show", f"{ref}:{rel}"], cwd=ROOT, capture_output=True)
     return pd.read_csv(io.BytesIO(out.stdout)) if out.returncode == 0 else None
 

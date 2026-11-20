@@ -1,0 +1,89 @@
+==========================================
+SLURM_CLUSTER_NAME = paramananta
+SLURM_ARRAY_JOB_ID = 
+SLURM_ARRAY_TASK_ID = 
+SLURM_ARRAY_TASK_COUNT = 
+SLURM_ARRAY_TASK_MAX = 
+SLURM_ARRAY_TASK_MIN = 
+SLURM_JOB_ACCOUNT = iitgn
+SLURM_JOB_ID = 170144
+SLURM_JOB_NAME = fly-woa-all
+SLURM_JOB_NODELIST = cn006
+SLURM_JOB_USER = suhani
+SLURM_JOB_UID = 40500
+SLURM_JOB_PARTITION = small
+SLURM_TASK_PID = 3295
+SLURM_SUBMIT_DIR = /home/suhani/Multi_Agent_RL-FAI-
+SLURM_CPUS_ON_NODE = 48
+SLURM_NTASKS = 1
+SLURM_TASK_PID = 3295
+==========================================
+job 170144 on cn006, 48 workers (48 heavy), commit unknown
+........................................................................ [ 56%]
+.......................s...............................                  [100%]
+126 passed, 1 skipped in 98.72s (0:01:38)
+=== 2026-11-19 13:40:01 commit unknown on cn006 (48 cpus), steps: run-scale-sensitivity ===
++ scripts/run_experiment.py configs/scalenorm_game_a_exact.yaml configs/scalenorm_game_b_exact.yaml configs/scalenorm_game_b_sampled.yaml configs/sensitivity_syn3_game_b_exact.yaml configs/sensitivity_syn10_game_b_exact.yaml --workers 48
+[scalenorm_game_a_exact] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[scalenorm_game_a_exact] 480 runs to do on 48 workers
+[scalenorm_game_a_exact] 48/480 runs, 19s elapsed
+[scalenorm_game_a_exact] 96/480 runs, 28s elapsed
+[scalenorm_game_a_exact] 144/480 runs, 37s elapsed
+[scalenorm_game_a_exact] 192/480 runs, 47s elapsed
+[scalenorm_game_a_exact] 240/480 runs, 55s elapsed
+[scalenorm_game_a_exact] 288/480 runs, 62s elapsed
+[scalenorm_game_a_exact] 336/480 runs, 70s elapsed
+[scalenorm_game_a_exact] 384/480 runs, 78s elapsed
+[scalenorm_game_a_exact] 432/480 runs, 87s elapsed
+[scalenorm_game_a_exact] 480/480 runs, 95s elapsed
+[scalenorm_game_b_exact] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[scalenorm_game_b_exact] 480 runs to do on 48 workers
+[scalenorm_game_b_exact] 48/480 runs, 26s elapsed
+[scalenorm_game_b_exact] 96/480 runs, 44s elapsed
+[scalenorm_game_b_exact] 144/480 runs, 62s elapsed
+[scalenorm_game_b_exact] 192/480 runs, 81s elapsed
+[scalenorm_game_b_exact] 240/480 runs, 98s elapsed
+[scalenorm_game_b_exact] 288/480 runs, 113s elapsed
+[scalenorm_game_b_exact] 336/480 runs, 128s elapsed
+[scalenorm_game_b_exact] 384/480 runs, 144s elapsed
+[scalenorm_game_b_exact] 432/480 runs, 160s elapsed
+[scalenorm_game_b_exact] 480/480 runs, 174s elapsed
+[scalenorm_game_b_sampled] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'random_sparse': 5610, 'random_sparse+sign': 5610, 'connectome(budget)': 5610}
+[scalenorm_game_b_sampled] 120 runs to do on 48 workers
+[scalenorm_game_b_sampled] 12/120 runs, 111s elapsed
+[scalenorm_game_b_sampled] 24/120 runs, 118s elapsed
+[scalenorm_game_b_sampled] 36/120 runs, 122s elapsed
+[scalenorm_game_b_sampled] 48/120 runs, 129s elapsed
+[scalenorm_game_b_sampled] 60/120 runs, 214s elapsed
+[scalenorm_game_b_sampled] 72/120 runs, 224s elapsed
+[scalenorm_game_b_sampled] 84/120 runs, 232s elapsed
+[scalenorm_game_b_sampled] 96/120 runs, 247s elapsed
+[scalenorm_game_b_sampled] 108/120 runs, 294s elapsed
+[scalenorm_game_b_sampled] 120/120 runs, 304s elapsed
+[sensitivity_syn3_game_b_exact] trainable parameters per agent: {'connectome': 3350, 'connectome+sign': 3350, 'rewired': 3350, 'rewired+sign': 3350, 'random_sparse': 3350, 'random_sparse+sign': 3350, 'connectome(budget)': 3350}
+[sensitivity_syn3_game_b_exact] 120 runs to do on 48 workers
+[sensitivity_syn3_game_b_exact] 12/120 runs, 19s elapsed
+[sensitivity_syn3_game_b_exact] 24/120 runs, 21s elapsed
+[sensitivity_syn3_game_b_exact] 36/120 runs, 21s elapsed
+[sensitivity_syn3_game_b_exact] 48/120 runs, 21s elapsed
+[sensitivity_syn3_game_b_exact] 60/120 runs, 30s elapsed
+[sensitivity_syn3_game_b_exact] 72/120 runs, 32s elapsed
+[sensitivity_syn3_game_b_exact] 84/120 runs, 32s elapsed
+[sensitivity_syn3_game_b_exact] 96/120 runs, 33s elapsed
+[sensitivity_syn3_game_b_exact] 108/120 runs, 40s elapsed
+[sensitivity_syn3_game_b_exact] 120/120 runs, 41s elapsed
+[sensitivity_syn10_game_b_exact] trainable parameters per agent: {'connectome': 2509, 'connectome+sign': 2509, 'rewired': 2509, 'rewired+sign': 2509, 'random_sparse': 2509, 'random_sparse+sign': 2509, 'connectome(budget)': 2509}
+[sensitivity_syn10_game_b_exact] 120 runs to do on 48 workers
+[sensitivity_syn10_game_b_exact] 12/120 runs, 19s elapsed
+[sensitivity_syn10_game_b_exact] 24/120 runs, 20s elapsed
+[sensitivity_syn10_game_b_exact] 36/120 runs, 20s elapsed
+[sensitivity_syn10_game_b_exact] 48/120 runs, 21s elapsed
+[sensitivity_syn10_game_b_exact] 60/120 runs, 29s elapsed
+[sensitivity_syn10_game_b_exact] 72/120 runs, 30s elapsed
+[sensitivity_syn10_game_b_exact] 84/120 runs, 31s elapsed
+[sensitivity_syn10_game_b_exact] 96/120 runs, 32s elapsed
+[sensitivity_syn10_game_b_exact] 108/120 runs, 39s elapsed
+[sensitivity_syn10_game_b_exact] 120/120 runs, 40s elapsed
+run-scale-sensitivity: 670 s wall (48 workers)
+=== total 11.2 min wall ===
+compare_to_committed: git not found (cluster compute node?); run it where git is

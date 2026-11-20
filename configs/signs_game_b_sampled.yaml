@@ -1,0 +1,18 @@
+# E/I-label check (Nov 2026). connectome_signshuffle also moved the sign-0 neurons, so
+# it sign-constrained most of the dopaminergic PPL1 inputs. These shuffles leave every
+# unsigned neuron unconstrained where it is:
+#   connectome_signshuffle_signed: labels shuffled across all signed neurons
+#   connectome_signshuffle_stage:  labels shuffled within each cell group (keeps each
+#                                  group's E/I counts)
+# Signed arms only (unsigned, the labels are unused).
+base: game_b_sampled.yaml
+experiment: signs_game_b_sampled
+seeds: {start: 0, count: 20}
+arms:
+  - {name: connectome, sign_constrained: true}
+  - {name: connectome_signshuffle, sign_constrained: true}
+  - {name: connectome_signshuffle_signed, sign_constrained: true}
+  - {name: connectome_signshuffle_stage, sign_constrained: true}
+lr_from: {file: tuned_lr.yaml, experiment: game_b_sampled, share_circuit_lr: true}
+sweep:
+  network.readout_norm: [none, ema_rms]

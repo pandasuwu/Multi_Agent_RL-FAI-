@@ -169,8 +169,40 @@ def spread_onto_grid(grid: TimeGrid, targets: np.ndarray) -> np.ndarray:
 
 
 def game_b_analytic_policy(game: GameB) -> np.ndarray:
-    """The oracle for Game B: ``b(v_k)`` placed on the grid for every type."""
-    return spread_onto_grid(game.grid, game_b_bid(game.values, game.value_rate, game.cost_rate))
+    """The oracle for Games B and C: the BNE bid of every type placed on the grid."""
+    return spread_onto_grid(game.grid, game.bne_bids())
+
+
+# --------------------------------------------------------------------------- Game C
+def mixture_hazard(x: np.ndarray | float, food_levels: tuple[float, ...], hunger_rate: float) -> np.ndarray:
+    """Hazard ``g(x) / (1 - G(x))`` of ``v = h f``, ``h ~ Exp(rate)``, ``f`` uniform on the levels.
+
+    Given ``f``, ``v ~ Exp(rate / f)``, so ``1 - G(x) = mean_j exp(-rate x / f_j)`` and
+    ``g(x) = mean_j (rate / f_j) exp(-rate x / f_j)``.
+    """
+    x = np.asarray(x, dtype=np.float64)
+    lam = hunger_rate / np.asarray(food_levels, dtype=np.float64)
+    # shift the exponents by the slowest decay so large x does not underflow to 0/0
+    e = np.exp(-np.multiply.outer(x, lam) + np.min(lam) * x[..., None])
+    return (e * lam).sum(-1) / e.sum(-1)
+
+
+def game_c_bid(
+    v: np.ndarray | float, food_levels: tuple[float, ...], hunger_rate: float, cost_rate: float
+) -> np.ndarray:
+    """Symmetric BNE of Game C: ``b(v) = (1/c) int_0^v x g(x) / (1 - G(x)) dx``.
+
+    Same formula as Game B, whose constant hazard ``rate`` gives ``rate v^2 / (2c)``.
+    Here the hazard falls from ``mean_j rate / f_j`` at 0 towards ``rate / max f``.
+    Computed by adaptive quadrature for each value.
+    """
+    v = np.asarray(v, dtype=np.float64)
+    flat = np.array([
+        integrate.quad(lambda x: x * float(mixture_hazard(x, food_levels, hunger_rate)), 0.0, float(z),
+                       epsabs=1e-12, epsrel=1e-10, limit=200)[0]
+        for z in v.ravel()
+    ])
+    return flat.reshape(v.shape) / cost_rate
 
 
 def game_b_interim_payoff_continuous(

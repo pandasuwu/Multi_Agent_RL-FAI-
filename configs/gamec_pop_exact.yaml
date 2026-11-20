@@ -1,0 +1,9 @@
+# Game C with hunger delivered as a population code: 16 Gaussian tuning curves over
+# the hunger range (one per PPL1 neuron's worth of input), plus standardised food.
+# The circuit must decode a distributed signal and combine it with food.
+base: gamec_exact.yaml
+experiment: gamec_pop_exact
+game:
+  input_code: population
+  n_population: 16
+lr_from: {file: tuned_lr.yaml, experiment: gamec_pop_exact}

@@ -69,6 +69,21 @@ STEPS: list[tuple[str, str, list[str], bool]] = [
     # --- population size (RESULTS 14) and review checks (RESULTS 15) ---
     ("run-popsize", "run", ["popsize_game_a_sampled"], False),
     ("run-review", "run", ["popnash_game_a_sampled", "lrsweep_game_a_exact", "lrsweep_game_b_exact"], False),
+    # --- second review: activation scale and how the circuit is cut (RESULTS 15.5-15.6) ---
+    ("run-scale-sensitivity", "run", ["scalenorm_game_a_exact", "scalenorm_game_b_exact", "scalenorm_game_b_sampled",
+                                      "sensitivity_syn3_game_b_exact", "sensitivity_syn10_game_b_exact"], False),
+    # --- task that needs computation (Game C) and the remaining review checks (RESULTS 16) ---
+    ("run-unroll-seeds20", "run", ["unroll_game_b_exact", "seeds20_game_b_sampled"], False),
+    ("tune-gamec", "tune", ["gamec_exact", "gamec_pop_exact", "gamec_sampled", "gamec_pop_sampled"], False),
+    ("run-gamec", "run", ["gamec_exact", "gamec_pop_exact", "gamec_sampled", "gamec_pop_sampled"], False),
+    ("run-gamec-checks", "run", ["gamec_shared_exact", "gamec_pop_shared_exact", "gamec_readout_all_exact",
+                                 "gamec_unroll_exact", "gamec_robust_sampled", "gamec_pop_robust_sampled"], False),
+    ("run-block-long", "run", ["block_gamec_sampled", "block_gamec_pop_sampled", "block_gamec_exact",
+                               "block_game_b_sampled", "long_gamec_sampled", "long_gamec_pop_sampled"], False),
+    # --- what in the coarse layout: input -> output shortcuts, E/I labels, dose-response ---
+    ("run-shortcut", "run", ["shortcut_gamec_sampled", "shortcut_gamec_pop_sampled", "shortcut_game_b_sampled",
+                             "dose_gamec_sampled", "dose_game_b_sampled"], False),
+    ("run-signs", "run", ["signs_gamec_sampled", "signs_gamec_pop_sampled", "signs_game_b_sampled"], False),
     ("validate-asymmetric", "script", ["validate_asymmetric.py"], False),
     ("path-diagnostics", "script", ["path_diagnostics.py"], False),
     # --- tables and figures ---
@@ -78,6 +93,11 @@ STEPS: list[tuple[str, str, list[str], bool]] = [
     ("figures", "script", ["make_figures.py"], False),
 ]
 TUNED_FILE = ROOT / "configs" / "tuned_lr.yaml"
+# Steps where a shared-rate config is dropped when every arm was tuned to one rate (it
+# would duplicate its main experiment), as reproduce_flygm_ppo.py did. Not the others:
+# robust_game_a_sampled, popsize and popnash also use share_circuit_lr, but always run
+# (popsize and popnash vary something else, and reproduce.py ran the robust set as is).
+SKIP_IF_SAME_RATE = {"run-robust-ppo", "run-robust-flygm"}
 
 
 def sharing_changes_nothing(path: Path) -> bool:
@@ -102,27 +122,7 @@ def git(*args: str) -> str:
     try:
         return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
     except (OSError, subprocess.CalledProcessError):
-        if args == ("rev-parse", "HEAD"):
-            return head_from_dotgit()
         return "unknown"
-
-
-def head_from_dotgit() -> str:
-    """HEAD read from .git directly, for nodes without the git binary (cluster compute nodes)."""
-    try:
-        head = (ROOT / ".git" / "HEAD").read_text(encoding="utf-8").strip()
-        if not head.startswith("ref: "):
-            return head
-        ref = head[5:]
-        loose = ROOT / ".git" / ref
-        if loose.exists():
-            return loose.read_text(encoding="utf-8").strip()
-        for line in (ROOT / ".git" / "packed-refs").read_text(encoding="utf-8").splitlines():
-            if line.endswith(" " + ref):
-                return line.split()[0]
-    except OSError:
-        pass
-    return "unknown"
 
 
 def clean(steps: list[tuple[str, str, list[str], bool]], tuning: bool) -> None:
@@ -171,8 +171,8 @@ def main() -> None:
     heavy_workers = args.heavy_workers or args.workers
 
     manifest = {
-        "commit": git("rev-parse", "HEAD"),
-        "dirty": bool(git("status", "--porcelain", "--untracked-files=no")),
+        # compute nodes may have no git: pass GIT_COMMIT from the login node
+        "commit": os.environ.get("GIT_COMMIT") or git("rev-parse", "HEAD"),
         "host": platform.node(),
         "platform": platform.platform(),
         "cpu_count": os.cpu_count(),
@@ -216,7 +216,7 @@ def main() -> None:
             extra = ["--workers", str(w)] if configs[0] == "welfare_rerun.py" else []
             run([f"scripts/{configs[0]}", *configs[1:], *extra])
         else:
-            if kind == "run":
+            if kind == "run" and name in SKIP_IF_SAME_RATE:
                 # a shared-rate config whose arms were all tuned to one rate would only
                 # duplicate its main experiment (same rule as reproduce_flygm_ppo.py)
                 skipped = [c for c in configs if sharing_changes_nothing(ROOT / "configs" / f"{c}.yaml")]

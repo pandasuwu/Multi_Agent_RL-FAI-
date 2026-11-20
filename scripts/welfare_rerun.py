@@ -156,10 +156,13 @@ def main() -> None:
     for exp in args.only or ORDER:
         runs = sorted((RES / exp / "runs").glob("*.json"))
         if args.from_records:
+            if not runs:
+                print(f"[{exp}] no runs, skipped", flush=True)
+                continue
             for p in runs:
                 if "oracle" not in p.stem:
                     from_record(p)
-            n = len(collect().query("experiment == @exp"))
+            n = int((collect()["experiment"] == exp).sum())
             print(f"[{exp}] {n} runs read from records", flush=True)
             continue
         done = {p.stem for p in (SCRATCH / exp).glob("*.json")} if (SCRATCH / exp).exists() else set()

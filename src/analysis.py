@@ -16,6 +16,7 @@ Conventions
 from __future__ import annotations
 
 import json
+import zlib
 from pathlib import Path
 from typing import Any
 
@@ -25,7 +26,7 @@ import pandas as pd
 from .config import REPO_ROOT, load_config
 from .games import GameA, TimeGrid, asymmetric_fixed_point, game_a_analytic_policy
 from .metrics.exploitability import exploitability_a, total_variation
-from .metrics.stats import benjamini_hochberg, bootstrap_mean_ci, compare, holm
+from .metrics.stats import benjamini_hochberg, bootstrap_mean_ci, compare, compare_paired, holm
 
 RESULTS = REPO_ROOT / "results"
 
@@ -50,6 +51,26 @@ CONTRASTS: list[tuple[str, str, str]] = [
     # only resolvable where both architectures run in one experiment (the PPO grids)
     ("flygm", "connectome", "frozen vs trained synapses"),
     ("flygm", "dense", "FlyGM vs conventional"),
+    # block-preserving rewire (second review): fine wiring with the block structure fixed
+    ("connectome", "rewired_block", "fine wiring (unsigned)"),
+    ("connectome+sign", "rewired_block+sign", "fine wiring (signed)"),
+    ("rewired_block", "rewired", "block structure (unsigned)"),
+    ("rewired_block+sign", "rewired+sign", "block structure (signed)"),
+    # direct input -> output shortcuts (the real circuit has none, rewires have ~7)
+    ("connectome_shortcut", "connectome", "shortcuts added (unsigned)"),
+    ("connectome_shortcut+sign", "connectome+sign", "shortcuts added (signed)"),
+    ("connectome_shortcut", "rewired", "real+shortcuts vs rewire (unsigned)"),
+    ("connectome_shortcut+sign", "rewired+sign", "real+shortcuts vs rewire (signed)"),
+    ("rewired_noshortcut", "rewired", "shortcuts removed (unsigned)"),
+    ("rewired_noshortcut+sign", "rewired+sign", "shortcuts removed (signed)"),
+    ("connectome", "rewired_noshortcut", "wiring beyond shortcuts (unsigned)"),
+    ("connectome+sign", "rewired_noshortcut+sign", "wiring beyond shortcuts (signed)"),
+    # which neurons are excitatory or inhibitory
+    ("connectome+sign", "connectome_signshuffle+sign", "E/I assignment (signed)"),
+    # the same without moving the unsigned (dopaminergic input) neurons
+    ("connectome+sign", "connectome_signshuffle_signed+sign", "E/I among signed neurons (signed)"),
+    ("connectome+sign", "connectome_signshuffle_stage+sign", "E/I within cell groups (signed)"),
+    ("connectome_signshuffle_stage+sign", "connectome_signshuffle_signed+sign", "E/I group composition (signed)"),
 ]
 
 EXPERIMENTS = (
@@ -119,6 +140,33 @@ def per_arm_table(df: pd.DataFrame, metrics: list[str], group: list[str], rng: n
     return pd.DataFrame(rows)
 
 
+def paired_by_seed(df: pd.DataFrame, a: str, b: str, metric: str, experiment: str) -> dict[str, Any]:
+    """Paired columns for one contrast: arms ``a`` and ``b`` matched on ``seed``.
+
+    Every arm of an experiment runs on the same evaluation seeds. The seed fixes the
+    initialisation draw, the sampled matches and, for the controls, which graph is
+    drawn, so per-seed differences are the natural unit. NaN when the seeds of the two
+    arms are not one-to-one (then only the unpaired columns apply). The test draws from
+    its own generator, seeded by the contrast, so adding it leaves every bootstrap
+    interval drawn from the shared generator exactly as it was."""
+    nan = float("nan")
+    empty = {"diff_lo_paired": nan, "diff_hi_paired": nan, "dz_paired": nan, "p_paired": nan,
+             "n_pairs": 0, "seed_corr": nan, "ci_excludes_0_paired": False}
+    if "seed" not in df:
+        return empty
+    xa = df.loc[df["arm"] == a, ["seed", metric]]
+    xb = df.loc[df["arm"] == b, ["seed", metric]]
+    if xa["seed"].duplicated().any() or xb["seed"].duplicated().any():
+        return empty
+    m = xa.merge(xb, on="seed", suffixes=("_a", "_b"))
+    if len(m) < 2 or len(m) != len(xa) or len(m) != len(xb):
+        return empty
+    rng = np.random.default_rng(zlib.crc32(f"{experiment}|{a}|{b}|{metric}".encode()))
+    r = compare_paired(m[f"{metric}_a"].to_numpy(float), m[f"{metric}_b"].to_numpy(float), 0.95, rng)
+    return {"diff_lo_paired": r.lo, "diff_hi_paired": r.hi, "dz_paired": r.dz, "p_paired": r.p,
+            "n_pairs": r.n, "seed_corr": r.corr, "ci_excludes_0_paired": r.distinguishable}
+
+
 def pairwise_table(
     df: pd.DataFrame, metrics: list[str], rng: np.random.Generator, n_boot: int, experiment: str
 ) -> pd.DataFrame:
@@ -132,6 +180,7 @@ def pairwise_table(
             x = df.loc[df["arm"] == a, metric].to_numpy(float)
             y = df.loc[df["arm"] == b, metric].to_numpy(float)
             d = compare(x, y, n_boot, 0.95, rng)
+            paired = paired_by_seed(df, a, b, metric, experiment)
             family.append(
                 {
                     "experiment": experiment,
@@ -148,6 +197,7 @@ def pairwise_table(
                     "n_a": d.n_x,
                     "n_b": d.n_y,
                     "ci_excludes_0": d.distinguishable,
+                    **paired,
                 }
             )
         if family:
@@ -155,6 +205,11 @@ def pairwise_table(
             for r, p in zip(family, adj):
                 r["p_holm"] = p
                 r["distinguishable"] = bool(r["ci_excludes_0"] and p < 0.05)
+            ps = [r["p_paired"] for r in family]
+            if all(np.isfinite(ps)):
+                for r, p in zip(family, holm(ps)):
+                    r["p_holm_paired"] = p
+                    r["distinguishable_paired"] = bool(r["ci_excludes_0_paired"] and p < 0.05)
             rows.extend(family)
     return pd.DataFrame(rows)
 
@@ -452,9 +507,24 @@ def game_b_deciles(rng: np.random.Generator, n_boot: int) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+WIRING_QUESTION_STEMS = (
+    "specific wiring",
+    "wiring + degrees",
+    "degree structure",
+    "fine wiring",
+    "block structure",
+    "shortcuts added",
+    "real+shortcuts vs rewire",
+    "shortcuts removed",
+    "wiring beyond shortcuts",
+    "E/I assignment",
+    "E/I among signed neurons",
+    "E/I within cell groups",
+    "E/I group composition",
+)
 WIRING_QUESTIONS = tuple(
     f"{q} ({kind})"
-    for q in ("specific wiring", "wiring + degrees", "degree structure")
+    for q in WIRING_QUESTION_STEMS
     for kind in ("unsigned", "signed", "FlyGM")
 )
 
@@ -481,8 +551,20 @@ def wiring_familywide(pairwise: pd.DataFrame, asym_pairwise: pd.DataFrame | None
     t["p_holm_familywide"] = holm(t["p_perm"].tolist())
     t["p_bh_familywide"] = benjamini_hochberg(t["p_perm"].tolist())
     t["distinguishable_familywide"] = t["ci_excludes_0"] & (t["p_holm_familywide"] < 0.05)
+    # the same family on the paired test (contrasts with one-to-one seeds only)
+    t["p_holm_familywide_paired"] = np.nan
+    if "p_paired" in t:
+        has = t["p_paired"].notna()
+        if has.any():
+            t.loc[has, "p_holm_familywide_paired"] = holm(t.loc[has, "p_paired"].tolist())
+        t["distinguishable_familywide_paired"] = (
+            t["ci_excludes_0_paired"].fillna(False).astype(bool) & (t["p_holm_familywide_paired"] < 0.05)
+        )
     cols = ["experiment", "contrast", "question", "diff", "diff_lo", "diff_hi", "hedges_g", "p_perm", "p_holm",
-            "p_holm_familywide", "p_bh_familywide", "distinguishable", "distinguishable_familywide", "duplicate"]
+            "p_holm_familywide", "p_bh_familywide", "distinguishable", "distinguishable_familywide",
+            "diff_lo_paired", "diff_hi_paired", "dz_paired", "p_paired", "p_holm_paired", "seed_corr",
+            "p_holm_familywide_paired", "distinguishable_familywide_paired", "duplicate"]
+    cols = [c for c in cols if c in t]
     return t[cols].sort_values("p_perm", kind="stable").reset_index(drop=True)
 
 
@@ -503,7 +585,7 @@ def value_dependence(experiments: tuple[str, ...]) -> pd.DataFrame:
         game = build_game(load_config(RESULTS / exp / "config.yaml")["game"])
         if not isinstance(game, GameB):
             continue
-        t, bne = game.grid.times, game.values ** 2 / 2
+        t, bne = game.grid.times, game.bne_bids()
         for arm, sub in final_policies(exp).groupby("arm"):
             spreads, cors = [], []
             for policy in sub["policy"]:
@@ -530,7 +612,7 @@ def readout_analysis(rng: np.random.Generator, n_boot: int) -> dict[str, pd.Data
         if not (RESULTS / exp / "summary.csv").exists():
             continue
         df, cfg = load_summary(exp)
-        metrics = METRICS_B if cfg["game"]["name"] == "B" else METRICS_A
+        metrics = METRICS_B if cfg["game"]["name"] in ("B", "C") else METRICS_A
         t = per_arm_table(df, metrics, ["arm"], rng, n_boot)
         t.insert(0, "experiment", exp)
         per_arm.append(t)
@@ -552,7 +634,10 @@ POPULATION_EXPERIMENTS = (
     "popsize_game_a_sampled",
     "popnash_game_a_sampled",
 )
-WIRING_CONTRASTS = [c for c in CONTRASTS if c[2].startswith(("specific wiring", "wiring + degrees", "degree structure"))]
+WIRING_CONTRASTS = [
+    c for c in CONTRASTS
+    if c[2].startswith(WIRING_QUESTION_STEMS)
+]
 
 
 def population_nash(rng: np.random.Generator, n_boot: int) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -640,7 +725,7 @@ def lr_sweep_analysis(rng: np.random.Generator, n_boot: int) -> tuple[pd.DataFra
             continue
         df, cfg = load_summary(exp)
         metrics = ["final_exploitability", "steps_to_threshold_c"]
-        if cfg["game"]["name"] == "B":
+        if cfg["game"]["name"] in ("B", "C"):
             metrics.append("final_l2")
         t = per_arm_table(df, metrics, ["shared_lr", "arm"], rng, n_boot)
         t.insert(0, "experiment", exp)
@@ -682,6 +767,184 @@ def lr_sweep_analysis(rng: np.random.Generator, n_boot: int) -> tuple[pd.DataFra
     return pd.concat(per_rate, ignore_index=True), pd.DataFrame(pairs)
 
 
+# ------------------------------------- second review: activation scale, circuit cut
+SCALE_EXPERIMENTS = ("scalenorm_game_a_exact", "scalenorm_game_b_exact", "scalenorm_game_b_sampled")
+SENSITIVITY_EXPERIMENTS = (
+    "sensitivity_syn3_game_b_exact",
+    "sensitivity_syn10_game_b_exact",
+    # added last so the experiments above keep their random draws
+    "unroll_game_b_exact",
+    "seeds20_game_b_sampled",
+    "gamec_shared_exact",
+    "gamec_pop_shared_exact",
+    "gamec_readout_all_exact",
+    "gamec_unroll_exact",
+    "gamec_robust_sampled",
+    "gamec_pop_robust_sampled",
+    "block_gamec_sampled",
+    "block_gamec_pop_sampled",
+    "block_gamec_exact",
+    "block_game_b_sampled",
+    "shortcut_gamec_sampled",
+    "shortcut_gamec_pop_sampled",
+    "shortcut_game_b_sampled",
+    "signs_gamec_sampled",
+    "signs_gamec_pop_sampled",
+    "signs_game_b_sampled",
+)
+SWEEP_POINT_COLUMNS = ("shared_lr", "readout_norm", "unroll_steps")
+READOUT_RMS = ["diag_readout_rms_first", "diag_readout_rms_final"]
+
+
+def scale_sensitivity_analysis(rng: np.random.Generator, n_boot: int) -> dict[str, pd.DataFrame]:
+    """Activation-scale check (``scalenorm_*``) and circuit-cut check (``sensitivity_*``).
+
+    Every experiment is split by its sweep point (shared rate, and readout
+    normalisation where swept). Per point: per-arm means with the readout-input size the
+    runs logged, and the wiring contrasts with the same unpaired and paired columns as
+    the main table, Holm-adjusted within that point and metric. ``scale_norm_effect``
+    pairs each arm with itself, normalised minus not, seed by seed.
+    """
+    per_arm, pairs, norm_rows = [], [], []
+    for exp in (*SCALE_EXPERIMENTS, *SENSITIVITY_EXPERIMENTS):
+        if not (RESULTS / exp / "summary.csv").exists():
+            continue
+        df, cfg = load_summary(exp)
+        metrics = ["final_exploitability", "steps_to_threshold_c"]
+        if cfg["game"]["name"] in ("B", "C"):
+            metrics.append("final_l2")
+        point_cols = [c for c in SWEEP_POINT_COLUMNS if c in df.columns]
+        if "readout_norm" in df.columns:
+            df["readout_norm"] = df["readout_norm"].fillna("none")
+        rms = [c for c in READOUT_RMS if c in df.columns]
+        t = per_arm_table(df, metrics + rms, [*point_cols, "arm"], rng, n_boot)
+        t.insert(0, "experiment", exp)
+        per_arm.append(t)
+        for point, sub in df.groupby(point_cols, sort=True):
+            point = point if isinstance(point, tuple) else (point,)
+            p = pairwise_table(sub, metrics, rng, n_boot, exp)
+            for col, val in zip(point_cols, point):
+                p.insert(1, col, val)
+            pairs.append(p)
+        if "readout_norm" in df.columns:
+            other = [c for c in point_cols if c != "readout_norm"]
+            for key, sub in df.groupby([*other, "arm"], sort=True):
+                key = key if isinstance(key, tuple) else (key,)
+                lr, arm = (key[0] if other else np.nan), key[-1]
+                a = sub[sub["readout_norm"] == "ema_rms"]
+                b = sub[sub["readout_norm"] == "none"]
+                for metric in metrics:
+                    m = a[["seed", metric]].merge(b[["seed", metric]], on="seed", suffixes=("_n", "_0"))
+                    r = compare_paired(m[f"{metric}_n"].to_numpy(float), m[f"{metric}_0"].to_numpy(float), 0.95,
+                                       np.random.default_rng(zlib.crc32(f"{exp}|{lr}|{arm}|{metric}".encode())))
+                    norm_rows.append({"experiment": exp, "shared_lr": lr, "arm": arm, "metric": metric,
+                                      "mean_none": float(m[f"{metric}_0"].mean()),
+                                      "mean_ema_rms": float(m[f"{metric}_n"].mean()), "diff": r.diff,
+                                      "diff_lo": r.lo, "diff_hi": r.hi, "p_paired": r.p, "n_pairs": r.n})
+    norm = pd.DataFrame(norm_rows)
+    if len(norm):
+        norm["p_holm"] = np.nan
+        for _, idx in norm.groupby(["experiment", "metric"]).groups.items():
+            norm.loc[idx, "p_holm"] = holm(norm.loc[idx, "p_paired"].tolist())
+    return {
+        "scale_sensitivity_per_arm": pd.concat(per_arm, ignore_index=True) if per_arm else pd.DataFrame(),
+        "scale_sensitivity_pairwise": pd.concat(pairs, ignore_index=True) if pairs else pd.DataFrame(),
+        "scale_norm_effect": norm,
+    }
+
+
+# ------------------------------------------------------- Game C: value from two cues
+GAMEC_EXPERIMENTS = (
+    "gamec_exact",
+    "gamec_pop_exact",
+    "gamec_sampled",
+    "gamec_pop_sampled",
+    "long_gamec_sampled",  # 3x the training length
+    "long_gamec_pop_sampled",
+)
+
+
+def cue_use(game, policy: np.ndarray) -> dict[str, float]:
+    """How a Game C policy combines hunger and food, from its mean quitting time per type.
+
+    * ``corr_with_bne``: correlation of the mean quitting time with the BNE bid.
+    * ``interaction_share``: share of the variance of the mean quitting time that an
+      additive model ``alpha(h) + beta(f)`` (one level per hunger and per food value)
+      cannot explain. The BNE ``f h^2 / 2``-like surface has its own share (reported as
+      ``bne_interaction_share``); a policy that only adds the cues has 0.
+    * ``food_effect_ratio``: mean over hunger levels of (bid at the highest food level
+      minus bid at the lowest), over the same quantity for the BNE. 1 = the BNE's
+      dependence on food, 0 = ignores food.
+    """
+    mq = np.asarray(policy) @ game.grid.times
+    hi = np.unique(game.type_hunger, return_inverse=True)[1]
+    fi = np.unique(game.type_food, return_inverse=True)[1]
+    x = np.concatenate([np.eye(hi.max() + 1)[hi], np.eye(fi.max() + 1)[fi][:, 1:]], axis=1)
+
+    def share(y: np.ndarray) -> float:
+        var = float(np.var(y))
+        if var < 1e-12:
+            return float("nan")
+        resid = y - x @ np.linalg.lstsq(x, y, rcond=None)[0]
+        return float(np.var(resid) / var)
+
+    def food_effect(y: np.ndarray) -> float:
+        grid = y.reshape(len(game.food_levels), game.n_hunger)  # food-major
+        return float(np.mean(grid[-1] - grid[0]))
+
+    bne = np.clip(game.bne_bids(), 0, game.grid.t_max)
+    sd = float(np.std(mq))
+    return {
+        "corr_with_bne": float(np.corrcoef(mq, bne)[0, 1]) if sd > 1e-9 else float("nan"),
+        "interaction_share": share(mq),
+        "bne_interaction_share": share(bne),
+        "food_effect_ratio": food_effect(mq) / food_effect(bne),
+    }
+
+
+def gamec_analysis(rng: np.random.Generator, n_boot: int) -> dict[str, pd.DataFrame]:
+    """Game C main experiments: per-arm table, wiring contrasts (same columns as the main
+    pairwise table), and how each arm uses the two cues (``cue_use``), with contrasts.
+    Own random stream, so it moves no earlier table."""
+    from .games import GameC, build_game
+
+    per_arm, pairs, cue_rows = [], [], []
+    for exp in GAMEC_EXPERIMENTS:
+        if not (RESULTS / exp / "summary.csv").exists():
+            continue
+        df, cfg = load_summary(exp)
+        t = per_arm_table(df, METRICS_B, ["arm"], rng, n_boot)
+        t.insert(0, "experiment", exp)
+        per_arm.append(t)
+        pairs.append(pairwise_table(df[df["arm"] != "oracle"], METRICS_B, rng, n_boot, exp))
+        game = build_game(cfg["game"])
+        assert isinstance(game, GameC)
+        for _, r in final_policies(exp).iterrows():
+            cue_rows.append({"experiment": exp, "arm": r["arm"], "seed": r["seed"], **cue_use(game, r["policy"])})
+    out: dict[str, pd.DataFrame] = {
+        "gamec_per_arm": pd.concat(per_arm, ignore_index=True) if per_arm else pd.DataFrame(),
+        "gamec_pairwise": pd.concat(pairs, ignore_index=True) if pairs else pd.DataFrame(),
+    }
+    cues = pd.DataFrame(cue_rows)
+    if len(cues):
+        metrics = ["corr_with_bne", "interaction_share", "food_effect_ratio"]
+        summary, cue_pairs = [], []
+        for exp, sub in cues.groupby("experiment", sort=False):
+            rows = []
+            for arm, s in sub.groupby("arm", sort=False):
+                row = {"experiment": exp, "arm": arm, "n_seeds": len(s),
+                       "bne_interaction_share": float(s["bne_interaction_share"].iloc[0])}
+                for m in metrics:
+                    ci = bootstrap_mean_ci(s[m].to_numpy(float), n_boot, 0.95, rng)
+                    row.update({m: ci.mean, f"{m}_lo": ci.lo, f"{m}_hi": ci.hi})
+                rows.append(row)
+            summary.append(pd.DataFrame(rows))
+            cue_pairs.append(pairwise_table(sub[sub["arm"] != "oracle"], metrics, rng, n_boot, exp))
+        out["gamec_cue_use"] = pd.concat(summary, ignore_index=True)
+        out["gamec_cue_use_pairwise"] = pd.concat(cue_pairs, ignore_index=True)
+    return out
+
+
 def run_all(n_boot: int, seed: int = 20260918) -> dict[str, pd.DataFrame]:
     rng = np.random.default_rng(seed)
     out: dict[str, pd.DataFrame] = {}
@@ -692,7 +955,7 @@ def run_all(n_boot: int, seed: int = 20260918) -> dict[str, pd.DataFrame]:
         df, cfg = load_summary(exp)
         if "loss_win_ratio" in df.columns:
             df = df[(df["loss_win_ratio"] == 1.0) | (df["arm"] == "oracle")]
-        metrics = METRICS_B if cfg["game"]["name"] == "B" else METRICS_A
+        metrics = METRICS_B if cfg["game"]["name"] in ("B", "C") else METRICS_A
         t = per_arm_table(df, metrics, ["arm"], rng, n_boot)
         t.insert(0, "experiment", exp)
         per_arm.append(t)
@@ -717,7 +980,68 @@ def run_all(n_boot: int, seed: int = 20260918) -> dict[str, pd.DataFrame]:
     # own RNG streams, so adding these never moves an earlier table's bootstrap
     out["population_nash"], out["population_nash_pairwise"] = population_nash(np.random.default_rng(seed + 13), n_boot)
     out["lr_sweep"], out["lr_sweep_pairwise"] = lr_sweep_analysis(np.random.default_rng(seed + 14), n_boot)
+    out.update(scale_sensitivity_analysis(np.random.default_rng(seed + 15), n_boot))
+    out.update(gamec_analysis(np.random.default_rng(seed + 16), n_boot))
+    out.update(shortcut_dose_analysis())
+    # project-wide family: every wiring contrast on final exploitability, including Game C
+    # and every sweep point of the review checks (each point labelled in "experiment")
+    extra = [out[k] for k in ("gamec_pairwise",) if len(out.get(k, []))]
+    sweep = out.get("scale_sensitivity_pairwise")
+    if sweep is not None and len(sweep):
+        sweep = sweep.copy()
+        point = [c for c in SWEEP_POINT_COLUMNS if c in sweep]
+        label = sweep[point].apply(
+            lambda r: ",".join(f"{c}={v:g}" if isinstance(v, float) else f"{c}={v}" for c, v in r.items() if not pd.isna(v)),
+            axis=1,
+        )
+        sweep["experiment"] = sweep["experiment"] + "@" + label
+        extra.append(sweep.drop(columns=point))
+    if extra:
+        out["wiring_familywide"] = wiring_familywide(
+            pd.concat([out["pairwise"], *extra], ignore_index=True), out.get("asym_pairwise")
+        )
     return out
+
+
+# ----------------------------------- shortcut dose-response (number of PPL1 -> AVLP727m edges)
+DOSE_EXPERIMENTS = ("dose_gamec_sampled", "dose_game_b_sampled")
+
+
+def shortcut_dose_analysis() -> dict[str, pd.DataFrame]:
+    """The real circuit with k = 0, 1, 2, 4, 8, 16 direct input->output edges.
+
+    Per k and arm: mean final exploitability. Paired per seed (k and seed fix the graph
+    and the initialisation): each k > 0 against k = 0, Holm-adjusted within experiment
+    and arm; and a trend test, the per-seed least-squares slope of exploitability on
+    log2(1 + k), its mean tested against 0 by sign flips. A negative slope means more
+    shortcuts, better learning."""
+    rows, trend = [], []
+    for exp in DOSE_EXPERIMENTS:
+        if not (RESULTS / exp / "summary.csv").exists():
+            continue
+        df, _ = load_summary(exp)
+        for arm, sub in df.groupby("arm"):
+            wide = sub.pivot_table(index="seed", columns="shortcut_edges", values="final_exploitability").dropna()
+            ks = sorted(wide.columns)
+            fam = []
+            for k in ks:
+                r = compare_paired(wide[k].to_numpy(float), wide[0].to_numpy(float), 0.95,
+                                   np.random.default_rng(zlib.crc32(f"{exp}|{arm}|{k}".encode())))
+                fam.append({"experiment": exp, "arm": arm, "shortcut_edges": k, "mean": float(wide[k].mean()),
+                            "diff_vs_0": r.diff, "diff_lo": r.lo, "diff_hi": r.hi, "p_paired": r.p, "n_pairs": r.n})
+            ps = list(holm([f["p_paired"] for f in fam if f["shortcut_edges"] != 0]))
+            for f in fam:
+                f["p_holm"] = np.nan if f["shortcut_edges"] == 0 else ps.pop(0)
+            rows.extend(fam)
+            x = np.log2(1.0 + np.asarray(ks, float))
+            xc = x - x.mean()
+            y = wide[ks].to_numpy(float)
+            slopes = (y - y.mean(1, keepdims=True)) @ xc / (xc @ xc)
+            r = compare_paired(slopes, np.zeros_like(slopes), 0.95,
+                               np.random.default_rng(zlib.crc32(f"{exp}|{arm}|slope".encode())))
+            trend.append({"experiment": exp, "arm": arm, "slope_per_log2_1pk": r.diff, "slope_lo": r.lo,
+                          "slope_hi": r.hi, "p_paired": r.p, "n_seeds": r.n})
+    return {"shortcut_dose": pd.DataFrame(rows), "shortcut_dose_trend": pd.DataFrame(trend)}
 
 
 def write_tables(tables: dict[str, pd.DataFrame], directory: Path | None = None) -> None:

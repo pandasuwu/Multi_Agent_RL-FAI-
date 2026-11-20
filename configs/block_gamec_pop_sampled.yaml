@@ -1,0 +1,21 @@
+# Block-preserving control (second review, Nov 2026): rewired_block keeps every
+# in/out-degree AND the number of edges between every pair of cell groups (PPL1, MBON,
+# path neurons, one-hop partners, AVLP727m); only which neuron within a group connects
+# to which is shuffled. Like the real circuit it has no direct PPL1 or MBON -> AVLP727m
+# edge. Real vs rewired_block isolates fine wiring; rewired_block vs rewired isolates the
+# block structure.
+# Here: sampled Game C (population code), where the real circuit learned worst.
+base: gamec_pop_sampled.yaml
+experiment: block_gamec_pop_sampled
+arms:
+  - {name: connectome}
+  - {name: connectome, sign_constrained: true}
+  - {name: rewired}
+  - {name: rewired, sign_constrained: true}
+  - {name: rewired_block}
+  - {name: rewired_block, sign_constrained: true}
+  - {name: random_sparse}
+  - {name: random_sparse, sign_constrained: true}
+lr_from: {file: tuned_lr.yaml, experiment: gamec_pop_sampled, share_circuit_lr: true}
+sweep:
+  network.readout_norm: [none, ema_rms]

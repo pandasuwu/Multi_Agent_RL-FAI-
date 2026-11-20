@@ -12,8 +12,11 @@ results/_scratch/
 results/game_a_exact_eval1/runs/
 results/game_a_exact_eval1/curves.csv
 
-# the user's own working files, untracked at the start of this work
+# LaTeX sources of the report; the built PDF is committed as final_report.pdf
 report/
 
 # built demo (scripts/build_demo.py); published by .github/workflows/pages.yml
 site/
+
+# archives used to move code and results between the laptop and the cluster
+*.tgz

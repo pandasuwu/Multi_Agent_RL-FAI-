@@ -121,4 +121,9 @@ def resolve_lr_table(cfg: dict[str, Any]) -> dict[str, Any]:
             for k in lrs:
                 if k.split("+")[0] in family:
                     lrs[k] = shared
+            # family members that were never tuned (e.g. a control added later) get the
+            # same shared rate, signed and unsigned
+            for name in family:
+                for label in (name, name + "+sign"):
+                    lrs.setdefault(label, shared)
     return lrs

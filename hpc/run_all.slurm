@@ -4,6 +4,8 @@
 #   sbatch hpc/run_all.slurm                    # from scratch, tuning included
 #   SKIP_TUNING=1 sbatch hpc/run_all.slurm      # keep configs/tuned_lr.yaml
 #   RESUME=1 sbatch hpc/run_all.slurm           # continue after a time limit
+#   RESUME=1 ONLY="analyze figures" sbatch ...  # only some steps (see --list)
+#   GIT_COMMIT=$(git rev-parse HEAD) sbatch ... # compute nodes have no git
 #
 # Edit the partition / time / cpus lines for your cluster, or override them on the
 # command line: sbatch -A <account> -p small -c 48 hpc/run_all.slurm. CPU only.
@@ -33,8 +35,9 @@ HEAVY=${HEAVY_WORKERS:-$WORKERS}
 ARGS=(--workers "$WORKERS" --heavy-workers "$HEAVY")
 [[ -n "${SKIP_TUNING:-}" ]] && ARGS+=(--skip-tuning)
 [[ -n "${RESUME:-}" ]] && ARGS+=(--resume)
+[[ -n "${ONLY:-}" ]] && ARGS+=(--only $ONLY)
 
-echo "job $SLURM_JOB_ID on $(hostname), $WORKERS workers ($HEAVY heavy), commit $(git rev-parse --short HEAD)"
+echo "job $SLURM_JOB_ID on $(hostname), $WORKERS workers ($HEAVY heavy), commit ${GIT_COMMIT:-$(git rev-parse --short HEAD 2>/dev/null || echo unknown)}"
 python -m pytest -q
 python scripts/reproduce_all.py "${ARGS[@]}"
-python scripts/compare_to_committed.py --out results/tables/rerun_vs_committed.csv
+python scripts/compare_to_committed.py --out results/tables/rerun_vs_committed.csv || true

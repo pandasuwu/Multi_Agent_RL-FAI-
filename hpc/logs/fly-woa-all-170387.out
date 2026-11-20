@@ -1,0 +1,90 @@
+==========================================
+SLURM_CLUSTER_NAME = paramananta
+SLURM_ARRAY_JOB_ID = 
+SLURM_ARRAY_TASK_ID = 
+SLURM_ARRAY_TASK_COUNT = 
+SLURM_ARRAY_TASK_MAX = 
+SLURM_ARRAY_TASK_MIN = 
+SLURM_JOB_ACCOUNT = iitgn
+SLURM_JOB_ID = 170387
+SLURM_JOB_NAME = fly-woa-all
+SLURM_JOB_NODELIST = cn014
+SLURM_JOB_USER = suhani
+SLURM_JOB_UID = 40500
+SLURM_JOB_PARTITION = small
+SLURM_TASK_PID = 443
+SLURM_SUBMIT_DIR = /home/suhani/Multi_Agent_RL-FAI-
+SLURM_CPUS_ON_NODE = 48
+SLURM_NTASKS = 1
+SLURM_TASK_PID = 443
+==========================================
+job 170387 on cn014, 48 workers (48 heavy), commit unknown
+........................................................................ [ 41%]
+.....................................................s.................. [ 83%]
+............................                                             [100%]
+171 passed, 1 skipped in 146.82s (0:02:26)
+=== 2026-11-20 10:14:53 commit unknown on cn014 (48 cpus), steps: run-shortcut ===
++ scripts/run_experiment.py configs/shortcut_gamec_sampled.yaml configs/shortcut_gamec_pop_sampled.yaml configs/shortcut_game_b_sampled.yaml configs/dose_gamec_sampled.yaml configs/dose_game_b_sampled.yaml --workers 48
+[shortcut_gamec_sampled] trainable parameters per agent: {'connectome': 5626, 'connectome+sign': 5626, 'rewired': 5626, 'rewired+sign': 5626, 'connectome_shortcut': 5626, 'connectome_shortcut+sign': 5626, 'rewired_noshortcut': 5626, 'rewired_noshortcut+sign': 5626, 'connectome_signshuffle+sign': 5626, 'connectome(budget)': 5626}
+[shortcut_gamec_sampled] 360 runs to do on 48 workers
+[shortcut_gamec_sampled] 36/360 runs, 294s elapsed
+[shortcut_gamec_sampled] 72/360 runs, 567s elapsed
+[shortcut_gamec_sampled] 108/360 runs, 833s elapsed
+[shortcut_gamec_sampled] 144/360 runs, 873s elapsed
+[shortcut_gamec_sampled] 180/360 runs, 1135s elapsed
+[shortcut_gamec_sampled] 216/360 runs, 1402s elapsed
+[shortcut_gamec_sampled] 252/360 runs, 1663s elapsed
+[shortcut_gamec_sampled] 288/360 runs, 1729s elapsed
+[shortcut_gamec_sampled] 324/360 runs, 1974s elapsed
+[shortcut_gamec_sampled] 360/360 runs, 2167s elapsed
+[shortcut_gamec_pop_sampled] trainable parameters per agent: {'connectome': 5866, 'connectome+sign': 5866, 'rewired': 5866, 'rewired+sign': 5866, 'connectome_shortcut': 5866, 'connectome_shortcut+sign': 5866, 'rewired_noshortcut': 5866, 'rewired_noshortcut+sign': 5866, 'connectome_signshuffle+sign': 5866, 'connectome(budget)': 5866}
+[shortcut_gamec_pop_sampled] 360 runs to do on 48 workers
+[shortcut_gamec_pop_sampled] 36/360 runs, 297s elapsed
+[shortcut_gamec_pop_sampled] 72/360 runs, 574s elapsed
+[shortcut_gamec_pop_sampled] 108/360 runs, 841s elapsed
+[shortcut_gamec_pop_sampled] 144/360 runs, 890s elapsed
+[shortcut_gamec_pop_sampled] 180/360 runs, 1146s elapsed
+[shortcut_gamec_pop_sampled] 216/360 runs, 1420s elapsed
+[shortcut_gamec_pop_sampled] 252/360 runs, 1682s elapsed
+[shortcut_gamec_pop_sampled] 288/360 runs, 1761s elapsed
+[shortcut_gamec_pop_sampled] 324/360 runs, 1994s elapsed
+[shortcut_gamec_pop_sampled] 360/360 runs, 2195s elapsed
+[shortcut_game_b_sampled] trainable parameters per agent: {'connectome': 5610, 'connectome+sign': 5610, 'rewired': 5610, 'rewired+sign': 5610, 'connectome_shortcut': 5610, 'connectome_shortcut+sign': 5610, 'rewired_noshortcut': 5610, 'rewired_noshortcut+sign': 5610, 'connectome_signshuffle+sign': 5610, 'connectome(budget)': 5610}
+[shortcut_game_b_sampled] 360 runs to do on 48 workers
+[shortcut_game_b_sampled] 36/360 runs, 123s elapsed
+[shortcut_game_b_sampled] 72/360 runs, 225s elapsed
+[shortcut_game_b_sampled] 108/360 runs, 322s elapsed
+[shortcut_game_b_sampled] 144/360 runs, 368s elapsed
+[shortcut_game_b_sampled] 180/360 runs, 455s elapsed
+[shortcut_game_b_sampled] 216/360 runs, 550s elapsed
+[shortcut_game_b_sampled] 252/360 runs, 639s elapsed
+[shortcut_game_b_sampled] 288/360 runs, 715s elapsed
+[shortcut_game_b_sampled] 324/360 runs, 777s elapsed
+[shortcut_game_b_sampled] 360/360 runs, 847s elapsed
+[dose_gamec_sampled] trainable parameters per agent: {'connectome_shortcut': 5626, 'connectome_shortcut+sign': 5626, 'connectome(budget)': 5626}
+[dose_gamec_sampled] 240 runs to do on 48 workers
+[dose_gamec_sampled] 24/240 runs, 287s elapsed
+[dose_gamec_sampled] 48/240 runs, 308s elapsed
+[dose_gamec_sampled] 72/240 runs, 570s elapsed
+[dose_gamec_sampled] 96/240 runs, 593s elapsed
+[dose_gamec_sampled] 120/240 runs, 847s elapsed
+[dose_gamec_sampled] 144/240 runs, 890s elapsed
+[dose_gamec_sampled] 168/240 runs, 1124s elapsed
+[dose_gamec_sampled] 192/240 runs, 1186s elapsed
+[dose_gamec_sampled] 216/240 runs, 1393s elapsed
+[dose_gamec_sampled] 240/240 runs, 1446s elapsed
+[dose_game_b_sampled] trainable parameters per agent: {'connectome_shortcut': 5610, 'connectome_shortcut+sign': 5610, 'connectome(budget)': 5610}
+[dose_game_b_sampled] 240 runs to do on 48 workers
+[dose_game_b_sampled] 24/240 runs, 119s elapsed
+[dose_game_b_sampled] 48/240 runs, 129s elapsed
+[dose_game_b_sampled] 72/240 runs, 224s elapsed
+[dose_game_b_sampled] 96/240 runs, 244s elapsed
+[dose_game_b_sampled] 120/240 runs, 334s elapsed
+[dose_game_b_sampled] 144/240 runs, 360s elapsed
+[dose_game_b_sampled] 168/240 runs, 440s elapsed
+[dose_game_b_sampled] 192/240 runs, 482s elapsed
+[dose_game_b_sampled] 216/240 runs, 541s elapsed
+[dose_game_b_sampled] 240/240 runs, 574s elapsed
+run-shortcut: 7244 s wall (48 workers)
+=== total 120.7 min wall ===
+compare_to_committed: git not found (cluster compute node?); run it where git is

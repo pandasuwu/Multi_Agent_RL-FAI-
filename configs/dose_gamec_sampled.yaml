@@ -1,0 +1,12 @@
+# Shortcut dose-response (Nov 2026): the real circuit with k = 0..16 direct
+# PPL1 -> AVLP727m edges (k = 0 is the real circuit itself; the rewires have ~7).
+# Natural readout scale, shared circuit rate. If the missing shortcut is what slows the
+# real circuit, exploitability should fall as k grows.
+base: gamec_sampled.yaml
+experiment: dose_gamec_sampled
+arms:
+  - {name: connectome_shortcut}
+  - {name: connectome_shortcut, sign_constrained: true}
+lr_from: {file: tuned_lr.yaml, experiment: gamec_sampled, share_circuit_lr: true}
+sweep:
+  connectome.shortcut_edges: [0, 1, 2, 4, 8, 16]

@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import itertools
 from dataclasses import dataclass
 
 import numpy as np
+from scipy import stats as sps
 
 
 @dataclass
@@ -88,6 +90,61 @@ def compare(
     px = pooled[perm[:, : len(x)]].mean(axis=1) - pooled[perm[:, len(x) :]].mean(axis=1)
     p = (np.sum(np.abs(px) >= abs(d) - 1e-15) + 1) / (n_boot + 1)
     return Difference(float(d), float(lo), float(hi), hedges_g(x, y), float(p), len(x), len(y))
+
+
+@dataclass
+class PairedDifference:
+    diff: float
+    lo: float
+    hi: float
+    dz: float
+    p: float
+    n: int
+    corr: float
+
+    @property
+    def distinguishable(self) -> bool:
+        return bool(np.isfinite(self.lo) and (self.lo > 0 or self.hi < 0))
+
+
+def compare_paired(
+    x: np.ndarray, y: np.ndarray, confidence: float, rng: np.random.Generator, n_perm: int = 20000
+) -> PairedDifference:
+    """Paired comparison of two arms run on the same seeds (``x[i]`` and ``y[i]`` share seed i).
+
+    Interval: Student t on the per-seed differences (``t_{n-1}``). At 10-20 seeds this
+    is wider than a percentile bootstrap, which tends to understate the uncertainty
+    there. p: two-sided sign-flip permutation test on the differences, exact (all
+    ``2^n`` sign patterns) up to n = 16, Monte Carlo with ``n_perm`` draws above.
+    ``dz`` is the mean of the differences over their standard deviation, ``corr`` the
+    across-seed correlation of the two arms (how much the pairing helps)."""
+    x, y = np.asarray(x, float), np.asarray(y, float)
+    ok = np.isfinite(x) & np.isfinite(y)
+    d = x[ok] - y[ok]
+    n = len(d)
+    nan = float("nan")
+    if n < 2:
+        return PairedDifference(float(d.mean()) if n else nan, nan, nan, nan, nan, n, nan)
+    mean, sd = float(d.mean()), float(d.std(ddof=1))
+    if sd == 0:
+        # every seed gives the same difference: no spread to test against
+        lo = hi = mean
+        p = 1.0 if mean == 0 else 2.0 ** (1 - n)
+        dz = 0.0 if mean == 0 else float("inf") * np.sign(mean)
+    else:
+        half = float(sps.t.ppf(0.5 + confidence / 2, n - 1)) * sd / np.sqrt(n)
+        lo, hi = mean - half, mean + half
+        if n <= 16:
+            signs = np.array(list(itertools.product((1.0, -1.0), repeat=n)))
+        else:
+            signs = rng.choice((1.0, -1.0), size=(n_perm, n))
+            signs[0] = 1.0  # include the observed pattern
+        null = np.abs((signs * d).mean(axis=1))
+        p = float(np.mean(null >= abs(mean) - 1e-12))
+        dz = mean / sd
+    sx, sy = x[ok].std(), y[ok].std()
+    corr = float(np.corrcoef(x[ok], y[ok])[0, 1]) if sx > 0 and sy > 0 else nan
+    return PairedDifference(mean, float(lo), float(hi), float(dz), p, n, corr)
 
 
 def holm(p_values: list[float]) -> list[float]:

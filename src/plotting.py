@@ -36,6 +36,14 @@ FAMILY_COLOR = {
     "flygm": "#eb6834",  # same graph as "connectome", frozen synapses
     "flygm_rewired": "#1baf7a",
     "flygm_random_sparse": "#4a3aa7",
+    # later controls take the hue of the graph they are derived from; marker shape and
+    # the axis label carry their identity (see DERIVED_MARKER)
+    "connectome_shortcut": "#eb6834",
+    "connectome_signshuffle": "#eb6834",
+    "connectome_signshuffle_signed": "#eb6834",
+    "connectome_signshuffle_stage": "#eb6834",
+    "rewired_block": "#1baf7a",
+    "rewired_noshortcut": "#1baf7a",
     "tabular": NEUTRAL,
     "oracle": INK,
 }
@@ -53,6 +61,24 @@ PRETTY = {
     "flygm": "FlyGM, real circuit",
     "flygm_rewired": "FlyGM, rewired",
     "flygm_random_sparse": "FlyGM, random sparse",
+    "rewired_block": "Block-preserving rewire",
+    "rewired_block+sign": "Block-preserving rewire, signed",
+    "rewired_noshortcut": "Rewire, shortcuts forbidden",
+    "rewired_noshortcut+sign": "Rewire, shortcuts forbidden, signed",
+    "connectome_shortcut": "Connectome + 7 shortcuts",
+    "connectome_shortcut+sign": "Connectome + 7 shortcuts, signed",
+    "connectome_signshuffle+sign": "E/I shuffled, all neurons",
+    "connectome_signshuffle_signed+sign": "E/I shuffled, signed neurons only",
+    "connectome_signshuffle_stage+sign": "E/I shuffled within cell groups",
+}
+# marker per graph for the derived controls (circle for the original graphs)
+DERIVED_MARKER = {
+    "rewired_block": "D",
+    "rewired_noshortcut": "v",
+    "connectome_shortcut": "^",
+    "connectome_signshuffle": "X",
+    "connectome_signshuffle_signed": "P",
+    "connectome_signshuffle_stage": "s",
 }
 ARM_ORDER = list(PRETTY)
 

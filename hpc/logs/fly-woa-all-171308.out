@@ -1,0 +1,66 @@
+==========================================
+SLURM_CLUSTER_NAME = paramananta
+SLURM_ARRAY_JOB_ID = 
+SLURM_ARRAY_TASK_ID = 
+SLURM_ARRAY_TASK_COUNT = 
+SLURM_ARRAY_TASK_MAX = 
+SLURM_ARRAY_TASK_MIN = 
+SLURM_JOB_ACCOUNT = iitgn
+SLURM_JOB_ID = 171308
+SLURM_JOB_NAME = fly-woa-all
+SLURM_JOB_NODELIST = cn020
+SLURM_JOB_USER = suhani
+SLURM_JOB_UID = 40500
+SLURM_JOB_PARTITION = small
+SLURM_TASK_PID = 6129
+SLURM_SUBMIT_DIR = /home/suhani/Multi_Agent_RL-FAI-
+SLURM_CPUS_ON_NODE = 48
+SLURM_NTASKS = 1
+SLURM_TASK_PID = 6129
+==========================================
+job 171308 on cn020, 48 workers (48 heavy), commit unknown
+........................................................................ [ 40%]
+.......................................................s................ [ 80%]
+...................................                                      [100%]
+178 passed, 1 skipped in 146.02s (0:02:26)
+=== 2026-11-20 14:20:30 commit unknown on cn020 (48 cpus), steps: run-signs ===
++ scripts/run_experiment.py configs/signs_gamec_sampled.yaml configs/signs_gamec_pop_sampled.yaml configs/signs_game_b_sampled.yaml --workers 48
+[signs_gamec_sampled] trainable parameters per agent: {'connectome+sign': 5626, 'connectome_signshuffle+sign': 5626, 'connectome_signshuffle_signed+sign': 5626, 'connectome_signshuffle_stage+sign': 5626, 'connectome(budget)': 5626}
+[signs_gamec_sampled] 160 runs to do on 48 workers
+[signs_gamec_sampled] 16/160 runs, 281s elapsed
+[signs_gamec_sampled] 32/160 runs, 294s elapsed
+[signs_gamec_sampled] 48/160 runs, 307s elapsed
+[signs_gamec_sampled] 64/160 runs, 558s elapsed
+[signs_gamec_sampled] 80/160 runs, 580s elapsed
+[signs_gamec_sampled] 96/160 runs, 600s elapsed
+[signs_gamec_sampled] 112/160 runs, 833s elapsed
+[signs_gamec_sampled] 128/160 runs, 855s elapsed
+[signs_gamec_sampled] 144/160 runs, 882s elapsed
+[signs_gamec_sampled] 160/160 runs, 1040s elapsed
+[signs_gamec_pop_sampled] trainable parameters per agent: {'connectome+sign': 5866, 'connectome_signshuffle+sign': 5866, 'connectome_signshuffle_signed+sign': 5866, 'connectome_signshuffle_stage+sign': 5866, 'connectome(budget)': 5866}
+[signs_gamec_pop_sampled] 160 runs to do on 48 workers
+[signs_gamec_pop_sampled] 16/160 runs, 290s elapsed
+[signs_gamec_pop_sampled] 32/160 runs, 300s elapsed
+[signs_gamec_pop_sampled] 48/160 runs, 309s elapsed
+[signs_gamec_pop_sampled] 64/160 runs, 576s elapsed
+[signs_gamec_pop_sampled] 80/160 runs, 588s elapsed
+[signs_gamec_pop_sampled] 96/160 runs, 599s elapsed
+[signs_gamec_pop_sampled] 112/160 runs, 853s elapsed
+[signs_gamec_pop_sampled] 128/160 runs, 874s elapsed
+[signs_gamec_pop_sampled] 144/160 runs, 891s elapsed
+[signs_gamec_pop_sampled] 160/160 runs, 1060s elapsed
+[signs_game_b_sampled] trainable parameters per agent: {'connectome+sign': 5610, 'connectome_signshuffle+sign': 5610, 'connectome_signshuffle_signed+sign': 5610, 'connectome_signshuffle_stage+sign': 5610, 'connectome(budget)': 5610}
+[signs_game_b_sampled] 160 runs to do on 48 workers
+[signs_game_b_sampled] 16/160 runs, 118s elapsed
+[signs_game_b_sampled] 32/160 runs, 121s elapsed
+[signs_game_b_sampled] 48/160 runs, 128s elapsed
+[signs_game_b_sampled] 64/160 runs, 227s elapsed
+[signs_game_b_sampled] 80/160 runs, 232s elapsed
+[signs_game_b_sampled] 96/160 runs, 250s elapsed
+[signs_game_b_sampled] 112/160 runs, 332s elapsed
+[signs_game_b_sampled] 128/160 runs, 341s elapsed
+[signs_game_b_sampled] 144/160 runs, 360s elapsed
+[signs_game_b_sampled] 160/160 runs, 406s elapsed
+run-signs: 2514 s wall (48 workers)
+=== total 41.9 min wall ===
+compare_to_committed: git not found (cluster compute node?); run it where git is
