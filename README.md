@@ -1,7 +1,7 @@
 # Fly give-up circuit and the war of attrition
 
-CS329 Foundations of AI: Multi-Agent Systems, IIT Gandhinagar, 2026. Project by Suhani,
-Mayank Choudhary, Krina Paghadar and Nakshatra Lad.
+CS329 Foundations of AI: Multi-Agent Systems, IIT Gandhinagar, 2026.
+Project by Suhani, Mayank Choudhary, Krina Paghadar and Nakshatra Lad.
 
 Question: when independent agents learn the war of attrition from their own fights, what
 decides how close they get to equilibrium: the learning rule, the number of agents, what
