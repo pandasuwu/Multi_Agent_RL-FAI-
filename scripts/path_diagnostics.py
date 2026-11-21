@@ -17,7 +17,9 @@ Per graph:
 * ``shortest_min`` / ``shortest_median``: shortest PPL1 -> AVLP727m path over pairs;
 * ``walks_in_time``: number of directed walks of length 1..unroll_steps-1 from
   PPL1 to AVLP727m (sum of the binary adjacency powers), a count of routes;
-* ``reach_one_hop_hidden``: neurons a PPL1 neuron synapses onto directly.
+* ``reach_one_hop_hidden``: neurons a PPL1 neuron synapses onto directly (fan-out);
+* ``direct_edges``: PPL1 -> AVLP727m edges;
+* ``two_hop_routes``: PPL1 -> hidden -> AVLP727m walks of exactly two synapses.
 
 Then, for the control arms, the Spearman correlation across seeds between each graph's
 connectivity and that run's final exploitability, to see whether runs on better-
@@ -52,8 +54,12 @@ PERF_EXPERIMENTS = (
     "readout_game_b_exact",
     "flygm_game_b_exact",
     "flygm_game_b_sampled",
+    "gamec_sampled",
+    "gamec_robust_sampled",
+    "block_gamec_sampled",
+    "shortcut_gamec_sampled",
 )
-CONNECTIVITY = ["pairs_reachable_in_time", "walks_in_time", "shortest_median"]
+CONNECTIVITY = ["pairs_reachable_in_time", "walks_in_time", "shortest_median", "direct_edges", "two_hop_routes", "reach_one_hop_hidden"]
 
 
 def diagnostics(spec, depth: int) -> dict[str, float]:
@@ -90,6 +96,8 @@ def diagnostics(spec, depth: int) -> dict[str, float]:
         "walks_in_time": walks,
         "log10_walks_in_time": float(np.log10(walks)) if walks > 0 else -np.inf,
         "reach_one_hop_hidden": int(adj[src].any(axis=0).sum()),
+        "direct_edges": int(adj[np.ix_(src, dst)].sum()),
+        "two_hop_routes": int((adj @ adj)[np.ix_(src, dst)].sum()),
     }
 
 
@@ -106,7 +114,7 @@ def main() -> None:
     summary = []
     for graph, sub in per_graph.groupby("graph", sort=False):
         row = {"graph": graph, "n_graphs": len(sub)}
-        for col in ("outputs_reachable_in_time", "pairs_reachable_in_time", "shortest_min", "shortest_median", "log10_walks_in_time", "reach_one_hop_hidden"):
+        for col in ("outputs_reachable_in_time", "pairs_reachable_in_time", "shortest_min", "shortest_median", "log10_walks_in_time", "reach_one_hop_hidden", "direct_edges", "two_hop_routes"):
             row[f"{col}_min"] = sub[col].min()
             row[f"{col}_median"] = sub[col].median()
             row[f"{col}_max"] = sub[col].max()
@@ -123,7 +131,10 @@ def main() -> None:
             continue
         df = pd.read_csv(path)
         df = df[df["graph_id"].isin(by_id.index)]
-        for arm, sub in df.groupby("arm"):
+        # runs at different readout scalings are different conditions: never pool them
+        keys = ["arm", "readout_norm"] if "readout_norm" in df.columns else ["arm"]
+        for key, sub in df.groupby(keys):
+            arm = "/".join(map(str, key)) if isinstance(key, tuple) else key
             if sub["graph_id"].nunique() < 5:
                 continue  # the real circuit is one graph: nothing to correlate
             merged = sub.join(by_id[CONNECTIVITY], on="graph_id")

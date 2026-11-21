@@ -15,18 +15,22 @@ fly give-up circuit against size-matched networks wired differently.
 project-wide Holm correction. 26 say the real circuit learns *worse* than a control. Of
 the other 6, five are smaller than 0.001 in exploitability, and the sixth comes from a
 flawed control that we then replaced (§7).
+
 **Where it is worse, the cause is a lack of short input→output connectivity.** The real
 circuit has no direct edge from its input neurons (PPL1) to its output neurons (AVLP727m),
-and only about 9 two-hop routes, where a size-matched rewire has about 7 direct edges and
-90–157 two-hop routes.
+and only 9 two-hop routes. A size-matched rewire has about 7 direct edges and 157 two-hop
+routes.
 - In sampled Game C, the task that needs computation, the real circuit is worse than the
   rewire by +0.041 (paired 95% CI [0.028, 0.054], Holm p = 0.001).
 - Adding 7 direct edges to the real circuit (14 of its 4,952 edges changed) removes the
   gap. The real circuit with the shortcuts minus the rewire is −0.002 [−0.024, 0.019].
-  Each swap also adds a reverse edge, so the treated graph has ~5× as many two-hop
-  routes as the original (see §6).
+  Each swap also adds a second edge (c→b), so the treated graph has 45 two-hop routes
+  instead of 9 (§6.2).
 - Exploitability falls steadily as shortcuts are added: 0.190, 0.182, 0.166, 0.146,
-  0.139, 0.121 for 0, 1, 2, 4, 8, 16 shortcuts (trend p < 0.0001, §6).
+  0.139, 0.121 for 0, 1, 2, 4, 8, 16 shortcuts (trend p < 0.0001, §6). Two-hop routes
+  rise with them (9 → 85), but at 16 shortcuts the circuit has fewer two-hop routes than
+  the block rewire (85 vs 90) and scores far better (0.121 vs 0.176), so the direct edges
+  matter on their own.
 - A block-preserving rewire, which keeps the circuit's cell-group layout and so also has
   no shortcut, learns about as badly as the real circuit.
 
@@ -42,7 +46,7 @@ What moved the outcome more than wiring:
 
 † At 2 agents the pair settles into asymmetric roles (one quits at once, one holds on),
 so low per-agent exploitability does not mean the pair is near the symmetric equilibrium
-(population-mixture exploitability is 0.19–0.25).
+(population-mixture exploitability is 0.18–0.22 across arms; connectome 0.180).
 
 Scope: one circuit (258 neurons), small policy networks, and a task family where the
 exact-gradient learners all converge. In exact mode wiring differences are at most a few
@@ -217,18 +221,24 @@ which the block rewire shares with the real circuit.
 ### 6.2 The coarse feature: lack of short input → output paths
 
 Like the real circuit, the block rewire has no PPL1 → AVLP727m edge, so every output is two
-or more steps from the inputs. The plain rewire has 7 such edges on average (range 4–9),
-and random sparse about 6. In all of them every output stays reachable within the network's
+or more steps from the inputs. The plain rewire has 7 such edges on average (range 4–10),
+and random sparse about 5. In all of them every output stays reachable within the network's
 unroll.
 
-| graph | direct PPL1 → AVLP727m edges | shortest input-output path |
-|---|---|---|
-| real circuit | 0 | 2 |
-| block-preserving rewire | 0 | 2 |
-| rewire, shortcuts forbidden | 0 | 2 |
-| real circuit + 7 shortcuts | 7 | 1 |
-| degree-preserving rewire | ~7 | 1 |
-| random sparse | ~6 | 1 |
+Means over the 20 graphs of each family (`results/tables/path_summary.csv`), with final
+exploitability in sampled Game C (cues, natural scale, shared rate):
+
+| graph | direct PPL1 → AVLP727m edges | two-hop routes | PPL1 fan-out | shortest path | final exploitability |
+|---|---|---|---|---|---|
+| real circuit | 0 | 9 | 97 | 2 | 0.189 |
+| block-preserving rewire | 0 | 90 | 154 | 2 | 0.176 |
+| rewire, shortcuts forbidden | 0 | 151 | 161 | 2 | 0.161 |
+| real circuit + 7 shortcuts | 7 | 45 | 101 | 1 | 0.146 |
+| degree-preserving rewire | ~7 | 157 | 162 | 1 | 0.149 |
+| random sparse | ~5 | 111 | 184 | 1 | 0.136 |
+
+Fan-out (neurons PPL1 synapses onto directly) is not the driver: the shortcut graph keeps
+the real circuit's fan-out (101 vs 97) and still closes the gap.
 
 We tested this from both sides:
 - `connectome_shortcut`: the real circuit plus 7 direct edges, made by 7
@@ -249,9 +259,14 @@ Sampled Game C, cues, natural scale, shared rate, 20 seeds:
 - **Adding shortcuts is enough to close the gap.** Forbidding them in a rewire costs
   only about a third of it (+0.012, p = 1.0), and the real circuit is still worse than
   that no-shortcut rewire (+0.029, p = 0.084). So direct edges are sufficient to close
-  the gap, but other short-path features contribute: among graphs with no direct edge,
-  exploitability falls as two-hop routes increase (real circuit 9, block rewire ~90,
-  no-shortcut rewire ~151).
+  the gap, but they are not the whole story: among graphs with no direct edge,
+  exploitability falls as two-hop routes increase (9 → 90 → 151 routes: 0.189 → 0.176 →
+  0.161). That trend rests on three graph families, and the data cannot separate two-hop
+  routes from fan-out, which rise together.
+- Within any one family, a graph's connectivity does not predict its run: no per-graph
+  Spearman correlation with any connectivity measure survives Holm, in Game B or Game C
+  (`results/tables/path_vs_performance.csv`). Graph and initialisation share a seed in
+  the controls, so the evidence is the contrast between families, not within them.
 - Population code: same direction, weaker. Real + shortcuts − real is −0.030 (p = 0.12),
   and forbidding shortcuts costs the rewire +0.033 (p = 0.12).
 - With rescaling, shortcuts still help (−0.068, Holm p = 0.001) but leave a gap to the
@@ -272,6 +287,12 @@ seeds, natural scale.
 - In Game C every added step improves learning, and from k = 2 the improvement over the
   real circuit is significant (Holm p ≤ 0.036).
 - At k = 4 the real circuit matches the rewire (0.149). At k = 16 it beats it.
+- Each added shortcut also adds a second edge (c→b), so two-hop routes rise with k:
+  9, 14, 20, 30, 50, 85 for k = 0, 1, 2, 4, 8, 16. The dose-response alone cannot tell
+  direct edges from two-hop routes. Comparing across families does: k = 16 has fewer
+  two-hop routes than the block rewire (85 vs 90) but 16 direct edges, and scores 0.121
+  against 0.176. At k = 4 (30 two-hop routes) the circuit already beats both no-direct-edge
+  controls (0.146 vs 0.176 and 0.161), although they have 3–5× as many two-hop routes.
 
 ## 7. Excitatory/inhibitory labels
 
@@ -312,7 +333,7 @@ survive correction.
   distinguishable at any ρ (`figures/fig4_asymmetric_sweep.png`).
 - **Number of agents (Game A sampled).**
   - A fixed pair usually splits into one agent that quits at once and one that holds on.
-  - Four agents learn worst for every arm (0.062–0.099).
+  - Four agents learn worst for every arm (0.062–0.099). We did not find out why.
   - At 16 every arm reaches 0.034–0.036 (`figures/fig10_population_size.png`).
   - The population as a whole is further from Nash than each agent against the others:
     the mixture's exploitability is 0.056 against 0.041 for the connectome at 8 agents.
