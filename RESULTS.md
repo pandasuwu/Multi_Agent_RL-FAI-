@@ -15,14 +15,16 @@ fly give-up circuit against size-matched networks wired differently.
 project-wide Holm correction. 26 say the real circuit learns *worse* than a control. Of
 the other 6, five are smaller than 0.001 in exploitability, and the sixth comes from a
 flawed control that we then replaced (§7).
-
-**Where it is worse, the cause is one structural feature.** The real circuit has no direct
-edge from its input neurons (PPL1) to its output neurons (AVLP727m). Every input reaches the
-output in two or more steps. A size-matched rewire has about 7 such edges.
+**Where it is worse, the cause is a lack of short input→output connectivity.** The real
+circuit has no direct edge from its input neurons (PPL1) to its output neurons (AVLP727m),
+and only about 9 two-hop routes, where a size-matched rewire has about 7 direct edges and
+90–157 two-hop routes.
 - In sampled Game C, the task that needs computation, the real circuit is worse than the
   rewire by +0.041 (paired 95% CI [0.028, 0.054], Holm p = 0.001).
 - Adding 7 direct edges to the real circuit (14 of its 4,952 edges changed) removes the
   gap. The real circuit with the shortcuts minus the rewire is −0.002 [−0.024, 0.019].
+  Each swap also adds a reverse edge, so the treated graph has ~5× as many two-hop
+  routes as the original (see §6).
 - Exploitability falls steadily as shortcuts are added: 0.190, 0.182, 0.166, 0.146,
   0.139, 0.121 for 0, 1, 2, 4, 8, 16 shortcuts (trend p < 0.0001, §6).
 - A block-preserving rewire, which keeps the circuit's cell-group layout and so also has
@@ -33,10 +35,14 @@ What moved the outcome more than wiring:
 | factor | what we varied | final exploitability | § |
 |---|---|---|---|
 | Learning rule | losses weighted 1, 2, 4, 8 × wins (Game A sampled, mean of 8 arms) | 0.044, 0.107, 0.128, 0.142; predicted rest point 0, 0.066, 0.108, 0.130 | §8 |
-| Number of agents | 2, 4, 8, 16 (Game A sampled, connectome) | 0.031, 0.091, 0.041, 0.035 | §8 |
+| Number of agents | 2, 4, 8, 16 (Game A sampled, connectome) | 0.031†, 0.091, 0.041, 0.035 | §8 |
 | Learning signal | exact payoff gradient vs own sampled fights (connectome, Game B) | 0.0083 vs 0.160 | §3 |
 | Readout | 5 output neurons vs all 258 (Game B exact) | connectome 0.0083 → 0.0028; FlyGM 0.331 → 0.013 | §8 |
 | Wiring | real vs rewire, sampled Game C, shared rate | 0.190 vs 0.149; real + 7 shortcuts 0.146 | §5, §6 |
+
+† At 2 agents the pair settles into asymmetric roles (one quits at once, one holds on),
+so low per-agent exploitability does not mean the pair is near the symmetric equilibrium
+(population-mixture exploitability is 0.19–0.25).
 
 Scope: one circuit (258 neurons), small policy networks, and a task family where the
 exact-gradient learners all converge. In exact mode wiring differences are at most a few
@@ -208,7 +214,7 @@ which the block rewire shares with the real circuit.
 - With rescaling, exact Game C's small gap is also fine wiring: real − block +0.0016,
   block − rewire 0.0000.
 
-### 6.2 The coarse feature: no direct input → output edge
+### 6.2 The coarse feature: lack of short input → output paths
 
 Like the real circuit, the block rewire has no PPL1 → AVLP727m edge, so every output is two
 or more steps from the inputs. The plain rewire has 7 such edges on average (range 4–9),
@@ -241,9 +247,11 @@ Sampled Game C, cues, natural scale, shared rate, 20 seeds:
 | real − rewire, shortcuts forbidden | +0.029 [0.008, 0.050] | 0.084 |
 
 - **Adding shortcuts is enough to close the gap.** Forbidding them in a rewire costs
-  only about a third of it. So the missing shortcut explains most of the deficit, but
-  the rest of the layout (the block rewire has fewer two-step routes than the plain
-  rewire) contributes too.
+  only about a third of it (+0.012, p = 1.0), and the real circuit is still worse than
+  that no-shortcut rewire (+0.029, p = 0.084). So direct edges are sufficient to close
+  the gap, but other short-path features contribute: among graphs with no direct edge,
+  exploitability falls as two-hop routes increase (real circuit 9, block rewire ~90,
+  no-shortcut rewire ~151).
 - Population code: same direction, weaker. Real + shortcuts − real is −0.030 (p = 0.12),
   and forbidding shortcuts costs the rewire +0.033 (p = 0.12).
 - With rescaling, shortcuts still help (−0.068, Holm p = 0.001) but leave a gap to the
@@ -328,8 +336,8 @@ survive correction.
 
 `results/tables/wiring_familywide.csv` holds every wiring contrast on final exploitability
 in every experiment and sweep point: 576 rows, 436 after removing exact duplicates (several
-check experiments reuse identical runs). One paired Holm correction across all of them
-(the smallest attainable p is 0.029):
+check experiments reuse identical runs). One paired Holm correction across all 576 rows,
+duplicates included (the smallest attainable p is 576 × 5×10⁻⁵ = 0.029):
 
 - 32 distinct contrasts survive.
 - 26 say the real circuit is worse.

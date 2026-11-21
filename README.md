@@ -37,23 +37,27 @@ against size-matched networks with the same neurons but different wiring.
 ## Findings
 
 Full numbers are in [RESULTS.md](RESULTS.md); § points there. The report is
-[final_report.pdf](final_report.pdf).
+[Project_Report.pdf](Project_Report.pdf).
 
-1. **The real wiring never helped.** Of 436 distinct wiring contrasts, 32 survive a
-   project-wide Holm correction. 26 say the real circuit learns worse. The rest favour it
-   by less than 0.001, except one that came from a flawed control (§9).
+1. **The real wiring never helped.** Of 436 distinct wiring contrasts (576 including
+   duplicates from overlapping experiments), 32 survive a project-wide Holm correction.
+   26 say the real circuit learns worse. The rest favour it by less than 0.001, except
+   one that came from a flawed control (§7).
 2. **It is worse where agents learn from sampled fights and the task needs computation.**
    In sampled Game C the real circuit ends worse than the rewire: +0.041 [0.028, 0.054]
    at a shared learning rate (§5).
-3. **The cause is a missing shortcut.**
-   - The real circuit has no direct PPL1 → AVLP727m edge; size-matched rewires have about
-     7.
-   - Adding 7 such edges to the real circuit (14 of 4,952 edges changed) closes the gap
-     (−0.043, Holm p = 0.029).
+3. **The real circuit has very little short input→output connectivity.**
+   The real circuit has no direct PPL1 → AVLP727m edge and only ~9 two-hop routes,
+   where size-matched rewires have ~7 direct edges and 90–157 two-hop routes.
+   - Adding 7 direct edges to the real circuit (14 of 4,952 edges changed) closes the
+     gap (−0.043, Holm p = 0.029), but each swap also adds a two-hop route, so the
+     treated graph has ~5× more two-hop connectivity than the original.
    - Exploitability falls steadily with the number added: 0.190 → 0.121 from 0 to 16
      (trend p < 0.0001).
-   - A rewire that keeps the circuit's cell-group layout also lacks the shortcut, and is
-     about as bad (§6).
+   - Forbidding direct edges in a rewire recovers only about a third of the gap
+     (+0.012, p = 1.0), and the real circuit is still worse than that no-shortcut
+     rewire (+0.029, p = 0.084). So direct edges are sufficient but other short-path
+     features contribute (§6).
 4. **The real excitatory/inhibitory labels don't help either**, once the unlabelled
    dopaminergic inputs are left unconstrained (§7).
 5. **Other factors matter more than wiring** (§8):
@@ -61,10 +65,14 @@ Full numbers are in [RESULTS.md](RESULTS.md); § points there. The report is
 | factor | what we varied | final exploitability |
 |---|---|---|
 | Learning rule | losses weighted 1, 2, 4, 8 × wins (Game A sampled) | 0.044, 0.107, 0.128, 0.142 (predicted rest point 0, 0.066, 0.108, 0.130) |
-| Number of agents | 2, 4, 8, 16 (Game A sampled, connectome) | 0.031, 0.091, 0.041, 0.035 |
+| Number of agents | 2, 4, 8, 16 (Game A sampled, connectome) | 0.031*, 0.091, 0.041, 0.035 |
 | Learning signal | exact gradient vs sampled fights (connectome, Game B) | 0.0083 vs 0.160 |
 | Readout | 5 output neurons vs all 258 (Game B exact) | 0.0083 → 0.0028 |
 | Wiring | real vs rewire (Game C sampled, shared rate) | 0.190 vs 0.149; real + 7 shortcuts 0.146 |
+
+\* At 2 agents the pair settles into asymmetric roles (one quits at once, one holds on),
+so low per-agent exploitability does not mean the pair is near the symmetric equilibrium;
+its population-mixture exploitability is 0.19–0.25.
 
 ## Results at a glance
 
