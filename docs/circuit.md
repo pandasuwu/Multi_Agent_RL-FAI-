@@ -149,7 +149,8 @@ No control loses a functional path. If anything the controls are better connecte
 the real circuit: shorter routes and more of them. Each PPL1 neuron keeps its out-degree,
 but in the real circuit the 16 PPL1 neurons converge on shared targets, and rewiring
 scatters them over more neurons. Tables: `results/tables/path_diagnostics.csv` (per graph),
-`path_summary.csv`, and `path_vs_performance.csv`, which checks whether runs on
+`path_summary.csv` (which also counts direct PPL1 → AVLP727m edges and two-hop routes),
+and `path_vs_performance.csv`, which checks, in Game B and Game C, whether runs on
 better-connected control graphs did better (no Spearman correlation survives Holm).
 
 So the rewired control destroys the circuit's specific wiring, including its strong

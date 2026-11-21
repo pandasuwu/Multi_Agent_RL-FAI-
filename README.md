@@ -47,17 +47,21 @@ Full numbers are in [RESULTS.md](RESULTS.md); § points there. The report is
    In sampled Game C the real circuit ends worse than the rewire: +0.041 [0.028, 0.054]
    at a shared learning rate (§5).
 3. **The real circuit has very little short input→output connectivity.**
-   The real circuit has no direct PPL1 → AVLP727m edge and only ~9 two-hop routes,
-   where size-matched rewires have ~7 direct edges and 90–157 two-hop routes.
+   It has no direct PPL1 → AVLP727m edge and only 9 two-hop routes. A size-matched
+   rewire has about 7 direct edges and 157 two-hop routes; the block rewire, which keeps
+   the cell-group layout, has no direct edge and 90 two-hop routes.
    - Adding 7 direct edges to the real circuit (14 of 4,952 edges changed) closes the
-     gap (−0.043, Holm p = 0.029), but each swap also adds a two-hop route, so the
-     treated graph has ~5× more two-hop connectivity than the original.
+     gap (−0.043, Holm p = 0.029). Each swap also adds a second edge, so the treated
+     graph has 45 two-hop routes instead of 9.
    - Exploitability falls steadily with the number added: 0.190 → 0.121 from 0 to 16
-     (trend p < 0.0001).
-   - Forbidding direct edges in a rewire recovers only about a third of the gap
+     (trend p < 0.0001). Two-hop routes rise with it (9 → 85), but the direct edges
+     matter on their own: with 16 direct edges and 85 two-hop routes the circuit scores
+     0.121, against 0.176 for the block rewire with no direct edge and 90 two-hop routes.
+   - Forbidding direct edges in a rewire costs only about a third of the gap
      (+0.012, p = 1.0), and the real circuit is still worse than that no-shortcut
-     rewire (+0.029, p = 0.084). So direct edges are sufficient but other short-path
-     features contribute (§6).
+     rewire (+0.029, p = 0.084). So direct edges are sufficient, but they are not the
+     whole story: among graphs with no direct edge, more two-hop routes go with lower
+     exploitability (§6).
 4. **The real excitatory/inhibitory labels don't help either**, once the unlabelled
    dopaminergic inputs are left unconstrained (§7).
 5. **Other factors matter more than wiring** (§8):
@@ -72,7 +76,7 @@ Full numbers are in [RESULTS.md](RESULTS.md); § points there. The report is
 
 \* At 2 agents the pair settles into asymmetric roles (one quits at once, one holds on),
 so low per-agent exploitability does not mean the pair is near the symmetric equilibrium;
-its population-mixture exploitability is 0.19–0.25.
+its population-mixture exploitability is 0.18–0.22 across arms (connectome 0.180).
 
 ## Results at a glance
 
